@@ -1,15 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Spec proposal</title>
-    <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove"></script>
+    <title>
+      Spec proposal
+    </title>
+    <script src="https://www.w3.org/Tools/respec/respec-w3c" class=
+    "remove"></script>
     <script class='remove'>
       // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
       var respecConfig = {
         specStatus: "CG-DRAFT",
         editors: [{
-          name: "Marcos Cáceres"
+          name: "Daniel Murphy"
         }],
         github: "WICG/manifest-incubations",
         shortName: "manifest-incubations",
@@ -23,7 +26,10 @@
   <body>
     <section id="abstract">
       <p>
-        Feature specifications for manifest extensions & incubations.
+        Feature specifications for manifest extensions & incubations which
+        Chromium has shipped but do not have committments / implementations
+        from other user agents. Instead of keeping these features as
+        explainers, they are documented more officially here.
       </p>
     </section>
     <section id="sotd">
@@ -31,24 +37,25 @@
         This is an unofficial proposal.
       </p>
     </section>
-
     <section id="introduction">
-      <h2>Introduction</h2>
+      <h2>
+        Introduction
+      </h2>
       <p>
-        See <a href="https://github.com/w3c/respec/wiki/User's-Guide">ReSpec's user guide</a>
-        for how toget started!
+        See <a href="https://github.com/w3c/respec/wiki/User's-Guide">ReSpec's
+        user guide</a> for how toget started!
       </p>
     </section>
-
     <section class="informative">
       <h2>
         Incubation Usage Examples
       </h2>
       <p>
-        The following shows a [=manifest=] that prefers the <code>minimal-ui
-        </code> <a data-cite="appmanifest#dfn-display-mode">display modes</a>
-        to <code>standalone</code>, but if minimal-ui isn't supported, fall
-        back to standalone as opposed to browser.
+        The following shows a [=manifest=] that prefers the
+        <code>minimal-ui</code> <a data-cite=
+        "appmanifest#dfn-display-mode">display modes</a> to
+        <code>standalone</code>, but if minimal-ui isn't supported, fall back
+        to standalone as opposed to browser.
       </p>
       <pre class="example json" title="Advanced display usage manifest">
         {
@@ -66,39 +73,35 @@
         }
       </pre>
     </section>
-
     <section>
-      <h2 data-dft-for="">Display_override extension</h2>
+      <h2 data-dft-for="">
+        Display_override extension
+      </h2>
       <p>
         For advanced usages, the display_override member can be used to specify
         a custom fallback order of {DisplayModeType}}s for developers to choose
-        their prefered <a data-cite="appmanifest#dfn-display-mode">display mode
-        </a>.
+        their prefered <a data-cite="appmanifest#dfn-display-mode">display
+        mode</a> .
       </p>
       <p>
-        The <dfn>extension point for evaluating display_override</dfn> is given
-        by the following algorithm addition to the
-        <a data-cite="appmanifest#dfn-steps-for-determing-the-web-app-s-chosen-display-mode">
-        steps for determining the web app's chosen display mode</a>. The
-        following algorithm is executed at the
-        <a data-cite="appmanifest#dfn-extension-point">extension point</a>:
+        The following steps are added to the <a data-cite=
+        "appmanifest#dfn-extension-point">extension point</a> in <a data-cite=
+        "appmanifest#dfn-steps-for-determing-the-web-app-s-chosen-display-mode">
+        determining the web app's chosen display mode</a>:
       </p>
       <ol>
-        <li>
-          [=list/For each=] |candidate_display_mode:DisplayModeType| of
-          |manifest|.{{WebAppManifest/display_override}}:
+        <li>[=list/For each=] |candidate_display_mode:DisplayModeType| of
+        |manifest|.{{WebAppManifest/display_override}}:
           <ol>
-            <li>
-              If the user agent supports the |candidate_display_mode|, then
-              return |candidate_display_mode|.
+            <li>If the user agent supports the |candidate_display_mode|, then
+            return |candidate_display_mode|.
             </li>
           </ol>
         </li>
       </ol>
     </section>
-
-    <section data-dfn-for="WebAppManifestIncubations"
-        data-link-for="WebAppManifestIncubations">
+    <section data-dfn-for="WebAppManifestIncubations" data-link-for=
+    "WebAppManifestIncubations">
       <h2>
         <dfn data-dfn-for="">WebAppManifestIncubations</dfn> dictionary
       </h2>
@@ -108,7 +111,7 @@
           };
       </pre>
       <p>
-        This is an expansion of {{WebAppManifest}}.
+        This is an extension of {{WebAppManifest}}.
       </p>
       <section>
         <h3>
@@ -117,20 +120,21 @@
         <p>
           The <dfn>display_override</dfn> member is a <a>sequence</a> of {{
           DisplayModeType}}. This item represents the developer's preferred
-          fallback chain for <a data-cite="appmanifest#dfn-display-mode">
-          display modes</a>. This field overrides the
-          {{WebAppManifest/display}} property. If the user agent does not
-          support any of the display modes specified here, then it falls back
-          to considering the {{WebAppManifest/display}} field. See
+          fallback chain for <a data-cite=
+          "appmanifest#dfn-display-mode">display modes</a>. This field
+          overrides the {{WebAppManifest/display}} property. If the user agent
+          does not support any of the display modes specified here, then it
+          falls back to considering the {{WebAppManifest/display}} field. See
           <a data-cite="appmanifest#dfn-display-mode">display modes</a> for the
           algorithm steps.
         </p>
         <p class="note">
-          This member is intended to be only used for advanced cases, where
-          the developer wants explicit control over the fallback order of their
-          display modes. Otherwise, the {{WebAppManifest/display}} should be sufficient for
-          most use cases.
+          This member is intended to be only used for advanced cases, where the
+          developer wants explicit control over the fallback order of their
+          display modes. Otherwise, the {{WebAppManifest/display}} should be
+          sufficient for most use cases.
         </p>
       </section>
+    </section>
   </body>
 </html>
