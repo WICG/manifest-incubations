@@ -1,7 +1,9 @@
 
 # Specification 'manifest-incubations'
 
-There's nothing here yet, but here's a brief description of what this repo is for.
+Specification link: https://wicg.github.io/manifest-incubations/index.html
+
+# Background
 
 There are a number of [Web App Manifest](https://www.w3.org/TR/appmanifest/) features that are either not mature enough to go into the main W3C spec, or that do not belong there because they do not have multiple independent implementations.
 
