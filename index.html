@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>
-      Spec proposal
+      Manifest Incubations
     </title>
     <script src="https://www.w3.org/Tools/respec/respec-w3c" class=
     "remove"></script>
@@ -37,61 +37,39 @@
         This is an unofficial proposal.
       </p>
     </section>
-    <section id="introduction">
-      <h2>
-        Introduction
-      </h2>
-      <p>
-        See <a href="https://github.com/w3c/respec/wiki/User's-Guide">ReSpec's
-        user guide</a> for how toget started!
-      </p>
-    </section>
-    <section class="informative">
-      <h2>
-        Incubation Usage Examples
-      </h2>
-      <p>
-        The following shows a [=manifest=] that prefers the
-        <code>minimal-ui</code> <a data-cite=
-        "appmanifest#dfn-display-mode">display mode</a> over
-        <code>standalone</code>, but if <code>minimal-ui</code> isn't supported, falls back
-        to <code>standalone</code> as opposed to <code>browser</code>.
-      </p>
-      <pre class="example json" title="Advanced display usage manifest">
-        {
-          "name": "Recipe Zone",
-          "description": "All of the recipes!",
-          "icons": [{
-            "src": "icon/hd_hi",
-            "sizes": "128x128"
-          }],
-          "start_url": "/index.html",
-          "display_override": ["minimal-ui"],
-          "display": "standalone",
-          "theme_color": "yellow",
-          "background_color": "red"
-        }
-      </pre>
-    </section>
     <section>
       <h2 data-dft-for="">
-        Display_override extension
+        <code>display_override</code> member
       </h2>
       <p>
         For advanced usages, the display_override member can be used to specify
         a custom fallback order of {DisplayModeType}}s for developers to choose
         their prefered <a data-cite="appmanifest#dfn-display-mode">display
-        mode</a> .
+        mode</a>.
+      </p>
+      <p>
+        The <dfn>display_override</dfn> member of the <a data-cite=
+        "appmanifest#web-application-manifest">Web Application Manifest</a> as
+        a <a>sequence</a> of <a data-cite=
+        "appmanifest#dfn-display-modes-values">display mode values</a>. This
+        item represents the developer's preferred fallback chain for
+        <a data-cite="appmanifest#dfn-display-mode">display modes</a>. This
+        field overrides the <a data-cite="appmanifest#display">display</a>
+        property. If the user agent does not support any of the display modes
+        specified here, then it falls back to considering the <a data-cite=
+        "appmanifest#display">display</a> field. See <a data-cite=
+        "appmanifest#dfn-display-mode">display modes</a> for the algorithm
+        steps.
       </p>
       <p>
         The following steps are added to the <a data-cite=
         "appmanifest#dfn-extension-point">extension point</a> in <a data-cite=
-        "appmanifest#dfn-steps-for-determing-the-web-app-s-chosen-display-mode">
+        "appmanifest#dfn-steps-for-determining-the-web-app-s-chosen-display-mode">
         determining the web app's chosen display mode</a>:
       </p>
       <ol>
         <li>[=list/For each=] |candidate_display_mode:DisplayModeType| of
-        |manifest|.{{WebAppManifest/display_override}}:
+        |manifest|.{{display_override}}:
           <ol>
             <li>If the user agent supports the |candidate_display_mode|, then
             return |candidate_display_mode|.
@@ -99,41 +77,40 @@
           </ol>
         </li>
       </ol>
-    </section>
-    <section data-dfn-for="WebAppManifestIncubations" data-link-for=
-    "WebAppManifestIncubations">
-      <h2>
-        <dfn data-dfn-for="">WebAppManifestIncubations</dfn> dictionary
-      </h2>
-      <pre class="idl">
-          partial dictionary WebAppManifest {
-            sequence&lt;DisplayModeType&gt; display_override;
-          };
-      </pre>
-      <p>
-        This is an extension of {{WebAppManifest}}.
+      <p class="note">
+        This member is intended to be only used for advanced cases, where the
+        developer wants explicit control over the fallback order of their
+        display modes. Otherwise, the <a data-cite=
+        "appmanifest#display">display</a> should be sufficient for most use
+        cases.
       </p>
-      <section>
+      <section class="informative">
         <h3>
-          <code>display_override</code> member
+          Usage Example
         </h3>
         <p>
-          The <dfn>display_override</dfn> member is a <a>sequence</a> of {{
-          DisplayModeType}}. This item represents the developer's preferred
-          fallback chain for <a data-cite=
-          "appmanifest#dfn-display-mode">display modes</a>. This field
-          overrides the {{WebAppManifest/display}} property. If the user agent
-          does not support any of the display modes specified here, then it
-          falls back to considering the {{WebAppManifest/display}} field. See
-          <a data-cite="appmanifest#dfn-display-mode">display modes</a> for the
-          algorithm steps.
+          The following shows a [=manifest=] that prefers the
+          <code>minimal-ui</code> <a data-cite=
+          "appmanifest#dfn-display-mode">display mode</a> over
+          <code>standalone</code>, but if <code>minimal-ui</code> isn't
+          supported, falls back to <code>standalone</code> as opposed to
+          <code>browser</code>.
         </p>
-        <p class="note">
-          This member is intended to be only used for advanced cases, where the
-          developer wants explicit control over the fallback order of their
-          display modes. Otherwise, the {{WebAppManifest/display}} should be
-          sufficient for most use cases.
-        </p>
+        <pre class="example json" title="Advanced display usage manifest">
+          {
+            "name": "Recipe Zone",
+            "description": "All of the recipes!",
+            "icons": [{
+              "src": "icon/hd_hi",
+              "sizes": "128x128"
+            }],
+            "start_url": "/index.html",
+            "display_override": ["minimal-ui"],
+            "display": "standalone",
+            "theme_color": "yellow",
+            "background_color": "red"
+          }
+        </pre>
       </section>
     </section>
   </body>
