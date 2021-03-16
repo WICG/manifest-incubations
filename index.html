@@ -38,13 +38,13 @@
       </p>
     </section>
     <section>
-      <h2 data-dft-for="">
+      <h2 data-dfn-for="">
         <code>display_override</code> member
       </h2>
       <p>
         For advanced usages, the display_override member can be used to specify
         a custom fallback order of {DisplayModeType}}s for developers to choose
-        their prefered <a data-cite="appmanifest#dfn-display-mode">display
+        their preferred <a data-cite="appmanifest#dfn-display-mode">display
         mode</a>.
       </p>
       <p>
@@ -109,6 +109,56 @@
             "display": "standalone",
             "theme_color": "yellow",
             "background_color": "red"
+          }
+        </pre>
+      </section>
+    </section>
+    <section>
+      <h2>
+        <code><dfn>note_taking</dfn></code> member
+      </h2>
+      <p>
+        The <code>note_taking</code> member of the <a data-cite=
+        "appmanifest#web-application-manifest">Web Application Manifest</a> is
+        an <a data-cite="appmanifest#dfn-object">object</a> that contains
+        information related to note-taking. It has the following members:
+      </p>
+      <ul>
+        <li>[=note_taking/new_note_url=]
+        </li>
+      </ul>
+      <section>
+        <h3>
+          <code><dfn data-dfn-for="note_taking">new_note_url</dfn></code> member
+        </h3>
+        <p>
+          The [=note_taking=] <code>new_note_url</code> member is a <a>URL</a>
+          [=manifest/within scope=] to open when the user wants to take a new
+          note using the web application (e.g., from an operating system
+          shortcut icon or keyboard shortcut). Defining this member indicates
+          that the web application is a note-taking application.
+        </p>
+      </section>
+      <section class="informative">
+        <h3>
+          Usage Example
+        </h3>
+        <p>
+          The following shows a [=manifest=] for a note-taking application.
+        </p>
+        <pre class="example json" title="Note-taking application">
+          {
+            "name": "My Note Taking App",
+            "description": "You can take notes!",
+            "icons": [{
+              "src": "icon/hd_hi",
+              "sizes": "128x128"
+            }],
+            "start_url": "/index.html",
+            "display": "standalone",
+            "note_taking": {
+              "new_note_url": "/new_note.html"
+            }
           }
         </pre>
       </section>
