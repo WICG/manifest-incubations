@@ -26,10 +26,12 @@
   <body>
     <section id="abstract">
       <p>
-        Feature specifications for manifest extensions & incubations which
-        Chromium has shipped but do not have committments / implementations
-        from other user agents. Instead of keeping these features as
-        explainers, they are documented more officially here.
+        Feature specifications for <a href=
+        "https://www.w3.org/TR/appmanifest/">Web Application Manifest</a>
+        extensions & incubations which Chromium has shipped but do not have
+        committments / implementations from other user agents. Instead of
+        keeping these features as explainers, they are documented more
+        officially here.
       </p>
     </section>
     <section id="sotd">
@@ -43,13 +45,14 @@
       </h2>
       <p>
         For advanced usages, the display_override member can be used to specify
-        a custom fallback order of {DisplayModeType}}s for developers to choose
-        their prefered <a data-cite="appmanifest#dfn-display-mode">display
-        mode</a>.
+        a custom fallback order of <a data-cite=
+        "appmanifest#dfn-display-modes-values">display mode values</a> for
+        developers to choose their prefered <a data-cite=
+        "appmanifest#dfn-display-mode">display mode</a>.
       </p>
       <p>
         The <dfn>display_override</dfn> member of the <a data-cite=
-        "appmanifest#web-application-manifest">Web Application Manifest</a> as
+        "appmanifest#web-application-manifest">Web Application Manifest</a> is
         a <a>sequence</a> of <a data-cite=
         "appmanifest#dfn-display-modes-values">display mode values</a>. This
         item represents the developer's preferred fallback chain for
@@ -112,6 +115,19 @@
           }
         </pre>
       </section>
+    </section>
+    <section>
+      <h2 data-dft-for="">
+        <code>share_target</code> member
+      </h2>
+      <p>
+        The `share_target` member registers a web application as "target" for
+        share actions (e.g., for sharing a text, a URL, or a file). The
+        `share_target` member is part of the <a href=
+        "https://wicg.github.io/web-share-target/">Web Share Target</a>
+        specification, being incubated at the <a href=
+        "https://wicg.io">WICG</a>.
+      </p>
     </section>
   </body>
 </html>
