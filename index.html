@@ -149,20 +149,25 @@
           </li>
           <li>The installation process can occur through an <dfn>automated
           install prompt</dfn>: that is, a UI that the user agent presents to
-          the user when, for instance, there are sufficient <a>installability
-          signals</a> to warrant <a>installation</a> of the web application.
+          the user when, for instance, there are sufficient <a data-cite=
+          "appmanifest#installability-signals">installability signals</a> to
+          warrant <a data-cite="appmanifest#dfn-installed">installation</a> of
+          the web application.
           </li>
           <li>The installation process can occur through a <dfn>site-triggered
           install prompt</dfn>: the site can programmatically request that the
           user agent present an install prompt to the user. The user agent MAY
           restrict the availability of this feature to cases where, for
-          instance, there are sufficient <a>installability signals</a> to
-          warrant <a>installation</a> of the web application.
+          instance, there are sufficient <a data-cite=
+          "appmanifest#installability-signals">installability signals</a> to
+          warrant <a data-cite="appmanifest#dfn-installed">installation</a> of
+          the web application.
           </li>
         </ul>
         <p>
           In any case, the user agent MUST NOT <a>present an install prompt</a>
-          if the document is not <a>installable</a>.
+          if the document is not <a data-cite=
+          "appmanifest#dfn-is-installable">installable</a>.
         </p>
         <p>
           Prior to presenting an <a>automated install prompt</a>, a user agent
@@ -170,10 +175,10 @@
           available</a>, to give the site the opportunity to prevent the
           default action (which is to install the application). Alternatively,
           the user agent MAY, at any time (only if the document is
-          <a>installable</a>), run the <a>steps to notify that an install
-          prompt is available</a> at any time, giving the site the opportunity
-          to show a <a>site-triggered install prompt</a> without automatically
-          showing the prompt.
+          <a data-cite="appmanifest#dfn-is-installable">installable</a>), run
+          the <a>steps to notify that an install prompt is available</a> at any
+          time, giving the site the opportunity to show a <a>site-triggered
+          install prompt</a> without automatically showing the prompt.
         </p>
         <p>
           To <dfn data-lt=
@@ -445,6 +450,61 @@
           these steps.
           </li>
         </ol>
+      </section>
+      <section>
+        <h3>
+          Extensions to the <code>Window</code> object
+        </h3>
+        <p>
+          The following extensions to the <code><dfn data-cite=
+          "HTML/window-object.html#window">Window</dfn></code> object specify
+          the <a>event handler idl attribute</a> on which events relating to
+          the <a>installation</a> of a web application are <a>fired</a>.
+        </p>
+        <pre class="idl" data-cite="HTML">
+          partial interface Window {
+            attribute EventHandler onappinstalled;
+            attribute EventHandler onbeforeinstallprompt;
+          };
+        </pre>
+        <pre class="example js" title=
+        "Two ways of handling the 'appinstalled' event">
+          function handleInstalled(ev) {
+            const date = new Date(ev.timeStamp / 1000);
+            console.log(`Yay! Our app got installed at ${date.toTimeString()}.`);
+          }
+
+          // Using the event handler IDL attribute
+          window.onappinstalled = handleInstalled;
+
+          // Using .addEventListener()
+          window.addEventListener("appinstalled", handleInstalled);
+        </pre>
+        <section data-dfn-for="Window">
+          <h4>
+            <code>onappinstalled</code> attribute
+          </h4>
+          <p>
+            The <dfn>onappinstalled</dfn> is an <a>event handler IDL
+            attribute</a> for the "<dfn>appinstalled</dfn>" event type. The
+            interface used for these events is the <a><code>Event</code>
+            interface</a> [[DOM]]. This event is dispatched as a result of a
+            successful installation (see the <a>steps to install the web
+            application</a>).
+          </p>
+        </section>
+        <section data-dfn-for="Window">
+          <h4>
+            <code>onbeforeinstallprompt</code> attribute
+          </h4>
+          <p>
+            The <dfn>onbeforeinstallprompt</dfn> is an <a>event handler IDL
+            attribute</a> for the "<dfn>beforeinstallprompt</dfn>" event type.
+            The interface used for these events is the
+            <a>BeforeInstallPromptEvent</a> interface (see the <a>steps to
+            notify that an install prompt is available</a>).
+          </p>
+        </section>
       </section>
     </section>
   </body>
