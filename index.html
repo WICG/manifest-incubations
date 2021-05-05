@@ -149,11 +149,15 @@
         </h3>
         <p>
           The [=note_taking=] <code>new_note_url</code> member is a <a>URL</a>
-          [=manifest/within scope=] of the manifest, to open when the user
-          wants to take a new note using the web application (e.g., from an
-          operating system shortcut icon or keyboard shortcut). Defining this
-          member indicates that the web application is a note-taking
-          application.
+          to open when the user wants to take a new note using the web
+          application (e.g., from an operating system shortcut icon or keyboard
+          shortcut). Defining this member indicates that the web application is
+          a note-taking application.
+        </p>
+        <p>
+          The <code>new_note_url</code> member is parsed with
+          <a data-cite="appmanifest#dfn-manifest-url">manifest URL</a> as the
+          base URL and must be [=manifest/within scope=] of the manifest.
         </p>
       </section>
       <section class="informative">
