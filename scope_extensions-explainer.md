@@ -34,7 +34,7 @@ associated origins.
    origin patterns to associate with.
 
    Example manifest located at `https://example.com/manifest.webmanifest`:
-   ```
+   ```json
    {
      "id": "",
      "name": "Example",
