@@ -82,7 +82,7 @@ associated origins.
     - Does not match as `exclude_paths` entry in the association entry.
 
 1. Replace the constraint on manifest URLs that are bound by scope to instead be
-   bound by the extended scope with one exception; `start_url` remains bound by
+   bound by the extended scope—with one exception: `start_url` remains bound by
    the `scope` member.
 
 ## Security Considerations
