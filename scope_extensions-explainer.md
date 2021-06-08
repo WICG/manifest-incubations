@@ -47,7 +47,7 @@ associated origins.
      ]
    }
    ```
-   In this example the Example app is extending its app scope to all its
+   In this example the "Example" app is extending its app scope to all its
    subdomains along with its `.co.uk` site and its subdomains.
 
 1. Specify a `web-app-origin-association.json` file format that must be located
