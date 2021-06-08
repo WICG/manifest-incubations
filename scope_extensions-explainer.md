@@ -19,7 +19,7 @@ origins.
 ## Background
 
 Web app scope (defined by the `scope` field) is currently used for:
-1. Constraining urls like start_url, file handlers, share target.
+1. Constraining URLs appearing in manifest members like `start_url`, `file_handlers`, or `share_target`.
 1. Defining the set of link navigations that can be captured by the app.
 1. Determining whether an app window's root document has left the app's scope
    (possibly invoking window UI informing the user of this).
