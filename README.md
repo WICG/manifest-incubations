@@ -3,6 +3,10 @@
 
 Specification link: https://wicg.github.io/manifest-incubations/index.html
 
+# Explainers
+
+ - [Extended scopes for Web Apps](scope_extensions-explainer.md)
+
 # Background
 
 There are a number of [Web App Manifest](https://www.w3.org/TR/appmanifest/) features that are either not mature enough to go into the main W3C spec, or that do not belong there because they do not have multiple independent implementations.
