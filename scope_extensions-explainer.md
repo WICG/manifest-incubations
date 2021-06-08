@@ -57,7 +57,7 @@ associated origins.
 
    Example association file located at
    `https://example.co.uk/.well-known/web-app-origin-association.json`:
-   ```
+   ```json
    {
      "web_apps": {
         "https://example.com/": {
