@@ -1,4 +1,4 @@
-# Extended scopes for Web Apps
+# Scope Extensions for Web Apps
 
 ## Overview
 
@@ -62,7 +62,7 @@ associated origins.
      "web_apps": {
         "https://example.com/": {
           "include_paths": ["/*"],
-          "permissions": ["intercept-links"]
+          "authorize": ["intercept-links"]
         },
         "https://associated.site.com/": {
           "include_paths": ["/*"],
@@ -99,6 +99,35 @@ origin and the web app.
 
 ## Related Proposals
 
-- [URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
-- [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-- [PWA Unique ID](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md)
+### [URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
+
+The Scope Extensions proposal is intended to be a replacement for the
+[URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
+proposal with the following changes:
+ - Re-orient the goal to be focused just on expanding the set of origins/URLs in
+   the web app's scope. Remove the goal of registering web apps as URL handlers
+   in the user's operating system. That behaviour will be covered by the
+   [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
+   proposal instead.
+ - Rename the new manifest field from `url_handlers` to `scope_extensions` to
+   reflect the change in goals.
+ - Move the association file from "<origin>/web-app-origin-association.json" to
+   "<origin>/.well-known/web-app-origin-association.json". This better conforms
+   with [RFC 8615](https://datatracker.ietf.org/doc/html/rfc8615).
+ - Change the association file entries to be keyed on the web app identifier
+   rather than the web app's manifest URL. This aligns with the recent
+   [PWA Unique ID](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md)
+   proposal.
+ - Rename `"paths"` to `"include_paths"` in the association file entries.
+ - Add an "authorize" field to the association file entries for the associated
+   origin to provide explicit opt-in signals for security sensitive
+   capabilities.
+
+### [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
+
+Scope extensions can be considered the first stage in the link capturing
+pipeline. This proposal allows developers to control the set of user navigation
+URLs that the web app is intended to capture.
+[Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)'s
+allows developers to control the action that is taken once a user navigation is
+captured e.g. open a new app context or navigate an existing one.

@@ -5,7 +5,7 @@ Specification link: https://wicg.github.io/manifest-incubations/index.html
 
 # Explainers
 
- - [Extended scopes for Web Apps](scope_extensions-explainer.md)
+ - [Scope Extensions for Web Apps](scope_extensions-explainer.md)
 
 # Background
 
