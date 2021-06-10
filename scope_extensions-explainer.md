@@ -19,7 +19,7 @@ origins.
 ## Background
 
 Web app scope (defined by the `scope` field) is currently used for:
-1. Constraining urls like start_url, file handlers, share target.
+1. Constraining URLs appearing in manifest members like `start_url`, `file_handlers`, or `share_target`.
 1. Defining the set of link navigations that can be captured by the app.
 1. Determining whether an app window's root document has left the app's scope
    (possibly invoking window UI informing the user of this).
@@ -34,7 +34,7 @@ associated origins.
    origin patterns to associate with.
 
    Example manifest located at `https://example.com/manifest.webmanifest`:
-   ```
+   ```json
    {
      "id": "",
      "name": "Example",
@@ -47,8 +47,8 @@ associated origins.
      ]
    }
    ```
-   In this example the Example app is extending its app scope to all its
-   subdomains along with its .co.uk site and its subdomains.
+   In this example the "Example" app is extending its app scope to all its
+   subdomains along with its `.co.uk` site and its subdomains.
 
 1. Specify a `web-app-origin-association.json` file format that must be located
    at `https://<associated origin>/.well-known/web-app-origin-association.json`
@@ -57,7 +57,7 @@ associated origins.
 
    Example association file located at
    `https://example.co.uk/.well-known/web-app-origin-association.json`:
-   ```
+   ```json
    {
      "web_apps": {
         "https://example.com/": {
@@ -82,7 +82,7 @@ associated origins.
     - Does not match as `exclude_paths` entry in the association entry.
 
 1. Replace the constraint on manifest URLs that are bound by scope to instead be
-   bound by the extended scope with one exception; `start_url` remains bound by
+   bound by the extended scope—with one exception: `start_url` remains bound by
    the `scope` member.
 
 ## Security Considerations
@@ -127,7 +127,7 @@ proposal with the following changes:
 
 Scope extensions can be considered the first stage in the link capturing
 pipeline. This proposal allows developers to control the set of user navigation
-URLs that the web app is intended to capture.
-[Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)'s
-allows developers to control the action that is taken once a user navigation is
-captured e.g. open a new app context or navigate an existing one.
+URLs that the web app is intended to capture. The
+[Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
+proposal allows developers to control the action that is taken once a user
+navigation is captured e.g. open a new app context or navigate an existing one.
