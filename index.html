@@ -134,31 +134,44 @@
         <code><dfn>note_taking</dfn></code> member
       </h2>
       <p>
-        The <code>note_taking</code> member of the <a data-cite=
+        The `note_taking` member of the <a data-cite=
         "appmanifest#web-application-manifest">Web Application Manifest</a> is
-        an <a data-cite="appmanifest#dfn-object">object</a> that contains
-        information related to note-taking. It has the following members:
+        an [=ordered map=] that contains information related to note-taking. It
+        has the following members:
       </p>
       <ul>
         <li>[=note_taking/new_note_url=]
         </li>
       </ul>
+      <p>
+        A user agent MAY use these members to treat the web application
+        differently as an application with note-taking capabilities (e.g.,
+        integrate with operating system note-taking surfaces).
+      </p>
       <section>
         <h3>
           <code><dfn data-dfn-for="note_taking">new_note_url</dfn></code> member
         </h3>
         <p>
-          The [=note_taking=] <code>new_note_url</code> member is a <a>URL</a>
-          to open when the user wants to take a new note using the web
-          application (e.g., from an operating system shortcut icon or keyboard
-          shortcut). Defining this member indicates that the web application is
-          a note-taking application.
+          The [=note_taking=] `new_note_url` member is a [=string=] that
+          represents the <a data-cite="url#concept-url">URL</a> the developer
+          would prefer the user agent load when the user wants to take a new
+          note using the web application (e.g., from an operating system
+          shortcut icon or keyboard shortcut).
         </p>
         <p>
-          The <code>new_note_url</code> member is parsed with
-          <a data-cite="appmanifest#dfn-manifest-url">manifest URL</a> as the
-          base URL and must be [=manifest/within scope=] of the manifest.
+          The `new_note_url` member is purely advisory,
+          and a user agent MAY <a data-cite="appmanifest#dfn-ignore">ignore</a>
+          it or provide the end-user the choice to modify it or to not use it.
         </p>
+        <aside class="note">
+          <p>
+            The `new_note_url` member is parsed with
+            <a data-cite="appmanifest#dfn-manifest-url">manifest URL</a> as the
+            base URL and is ignored if not [=manifest/within scope=] of the
+            manifest.
+          </p>
+        </aside>
       </section>
       <section class="informative">
         <h3>
@@ -182,6 +195,67 @@
             }
           }
         </pre>
+      </section>
+      <section>
+        <h3>
+          Processing the `note_taking` member
+        </h3>
+        <p>
+          To <dfn>process the `note_taking` member</dfn>, given [=ordered map=]
+          |json:ordered map|, [=ordered map=] |manifest:ordered map|, [=URL=]
+          |manifest_URL:URL|, run the following during the
+          <a data-cite=
+          "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
+          point</a> in [=processing a manifest=]:
+        </p>
+        <ol class="algorithm">
+          <li>If |json|["note_taking"] does not [=map/exist=], return.</li>
+          <li>If the type of |json|["note_taking"] is not [=ordered map=],
+            return.
+          </li>
+          <li>Set |manifest|["note_taking"] to a new [=ordered map=].</li>
+          <li>If |json|["note_taking"]["new_note_url"] does not [=map/exist=],
+            return.
+          </li>
+          <li>If the type of |json|["note_taking"]["new_note_url"] is not
+            [=string=], return.
+          </li>
+          <li>Let |new_note_url:URL| be the result of [=URL Parser|parsing=]
+            |json|["note_taking"]["new_note_url"] with |manifest URL| as the
+            base URL.
+          </li>
+          <li>If |new_note_url| is failure, return.</li>
+          <li>If |new_note_url| is not [=manifest/within scope=] of |manifest
+            URL|, return.
+          </li>
+          <li>Set |manifest|["note_taking"]["new_note_url"] to |new_note_url|.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Launching the `new_note_url`
+        </h3>
+        <p>
+          To <dfn>launch the `new_note_url`</dfn>, given <a data-cite=
+          "appmanifest#dfn-processed-manifest">processed manifest</a>
+          |manifest:processed manifest|, run the following steps:
+        </p>
+        <ol>
+          <li>If |manifest|["note_taking"] does not [=map/exist=], return.</li>
+          <li>If |manifest|["note_taking"]["new_note_url"] does not
+            [=map/exist=], return.
+          </li>
+          <li>If the type of |manifest|["note_taking"]["new_note_url"] is not
+            [=URL=], return.
+          </li>
+          <li>Let |browsing context:Browsing Context| be the result of creating
+            a new [=top-level browsing context=].
+          </li>
+          <li>[=Navigate=] |browsing context| to resource
+            |manifest|["note_taking"]["new_note_url"].
+          </li>
+        </ol>
       </section>
     </section>
   </body>
