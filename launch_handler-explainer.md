@@ -11,20 +11,15 @@ web apps to customise their launch behaviour across mulitple launch triggers.
 - Web apps that are designed to be used in a single window e.g. a music app.
 
 - Web app that capture and handle share target events and user navigations
-  in existing windows without invoking a navigation and losing existing state.\
+  in existing windows without invoking a navigation and losing existing state.
   E.g. sharing an image to a chat web app could open a picker overlayed on top
-  of an existing conversation to select which contact to send it to .
-
-- Opening a productivity web app via a
-  [file handler](https://github.com/WICG/file-handling/blob/main/explainer.md)
-  causes an existing window that already had the file open to come into focus
-  instead of launching a duplicate window.
+  of an existing conversation to select which contact to send it to.
 
 
 ## Background
 
 There are several ways for a web app window to be opened:
-- Operating system app list
+- Platform specific app launch surface
 - [File handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
 - [Share target](https://w3c.github.io/web-share-target/)
 - [In scope link capturing](https://github.com/WICG/sw-launch/blob/master/declarative_link_capturing.md)
@@ -39,70 +34,70 @@ web app to configure this behaviour.
 
 ## Proposal
 
-1. Add a `launch_handler` member to the web app manifest specifying .
+- Add a `launch_handler` member to the web app manifest specifying the default
+  client selection and navigation behaviour for web app launches.
+  The shape of this member is as follows:
+  ```json
+  "launch_handler": {
+    "route_to_client": "new" | "existing",
+    "navigate_client": true | false
+  }
+  ```
 
-   Example manifest located at `https://example.com/manifest.webmanifest`:
-   ```json
-   {
-     "id": "",
-     "name": "Example",
-     "display": "standalone",
-     "start_url": "/index.html",
-     "scope_extensions": [
-       {"origin": "*.example.com"},
-       {"origin": "example.co.uk"},
-       {"origin": "*.example.co.uk"}
-     ]
-   }
-   ```
-   In this example the "Example" app is extending its app scope to all its
-   subdomains along with its `.co.uk` site and its subdomains.
+  Example manifest:
+  ```json
+  {
+    "name": "Example app",
+    "start_url": "/index.html",
+    "launch_handler": {
+      "route_to_client": "existing",
+      "navigate_client": false
+    }
+  }
+  ```
+
+  If unspecified then `launch_handler` defaults to
+  `{"route_to_client": "new", "navigate_client": true}`.
+
+  Both `route_to_client` and `navigate_client` also accept a list of values, the
+  first valid value will be used.
+
+- Enqueue a [`LaunchParams`](
+  https://github.com/WICG/file-handling/blob/main/explainer.md#launch)
+  object in the DOM Window's `launchQueue` of the chosen client for every web
+  app launch.
+
+- Add a `url` field to `LaunchParams` and set it to the URL being launched if
+  the chosen launch client is not navigated as part of the launch.
 
 
+## Future extensions to this proposal
 
-## Security Considerations
+- Add a service worker `launch` event that intercepts every web app launch.
+  The service worker can choose to override the value of `route_to_client`,
+  `navigate_client` and `LaunchParams`.
 
-### Declarative link capturing events
+  Use case:\
+  Opening a productivity web app via a
+  [file handler](https://github.com/WICG/file-handling/blob/main/explainer.md)
+  causes an existing window that already had the file open to come into focus
+  instead of launching a duplicate window.
 
-Capturing user navigations via `"capture_links": "existing-client-event"` has
-the potential for the web app to spoof its associated origins. Event link
-capturing must not be supported for associated origins unless they specify
-`"authorize": ["intercept-links"]` in their entry for the associated web app.
-This opt-in is used as a signal of trust between the associated origin and the
-web app.
+- Add a `new_client_url` member to the web app manifest. All new clients that
+  don't navigate to the launch URL will open `new_client_url` instead.
+
+  If `new_client_url` is the default value `null` then behave as if it is set to
+  the value of `start_url`.
+
+  Use case:\
+  Web apps that have heavy `start_url` pages and want to avoid loading
+  unnecessary resources.
 
 
-## Related Proposals
-
-### [URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
-
-The Scope Extensions proposal is intended to be a replacement for the
-[URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
-proposal with the following changes:
- - Re-orient the goal to be focused just on expanding the set of origins/URLs in
-   the web app's scope. Remove the goal of registering web apps as URL handlers
-   in the user's operating system. That behaviour will be covered by the
-   [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-   proposal instead.
- - Rename the new manifest field from `url_handlers` to `scope_extensions` to
-   reflect the change in goals.
- - Move the association file from "<origin>/web-app-origin-association.json" to
-   "<origin>/.well-known/web-app-origin-association.json". This better conforms
-   with [RFC 8615](https://datatracker.ietf.org/doc/html/rfc8615).
- - Change the association file entries to be keyed on the web app identifier
-   rather than the web app's manifest URL. This aligns with the recent
-   [PWA Unique ID](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md)
-   proposal.
- - Rename `"paths"` to `"include_paths"` in the association file entries.
- - Add an "authorize" field to the association file entries for the associated
-   origin to provide explicit opt-in signals for security sensitive
-   capabilities.
+## Related proposals
 
 ### [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
 
-Scope extensions can be considered the first stage in the link capturing
-pipeline. This proposal allows developers to control the set of user navigation
-URLs that the web app is intended to capture. The
-[Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-proposal allows developers to control the action that is taken once a user
-navigation is captured e.g. open a new app context or navigate an existing one.
+`launch_handler` generalises the concept of `capture_links` into two core
+primitive actions (launch client selection and navigation) and more explicitly
+decouples them from the specific "link capturing" launch trigger.
