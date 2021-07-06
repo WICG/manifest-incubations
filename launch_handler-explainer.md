@@ -67,8 +67,8 @@ web app to configure this behaviour.
 
 - Enqueue a [`LaunchParams`](
   https://github.com/WICG/file-handling/blob/main/explainer.md#launch)
-  object in the DOM Window's `launchQueue` of the chosen client for every web
-  app launch.
+  object in the DOM Window's `launchQueue` of the chosen client **for every web
+  app launch**.
 
 - Add a `url` field to `LaunchParams` and set it to the URL being launched if
   the chosen launch client is not navigated as part of the launch.
@@ -124,8 +124,17 @@ web app to configure this behaviour.
 
 ## Related proposals
 
+
 ### [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
 
 `launch_handler` generalises the concept of `capture_links` into two core
 primitive actions (launch client selection and navigation) and more explicitly
 decouples them from the specific "link capturing" launch trigger.
+
+
+### [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
+
+This proposal takes the `LaunchQueue` and `LaunchParams` ideas from the File
+Handling proposal and extends them slightly. Instead of enqueuing `LaunchParams`
+for specific types of launches they will be enqueued for every type of web app
+launch.
