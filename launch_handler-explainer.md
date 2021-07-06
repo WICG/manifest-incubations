@@ -119,6 +119,7 @@ web app to configure this behaviour.
         "navigate_client": false
       }
     }
+  }
   ```
 
 
