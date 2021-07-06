@@ -3,7 +3,8 @@
 ## Overview
 
 This document describes a new `launch_handler` manifest member that enables
-web apps to customise their launch behaviour across mulitple launch triggers.
+web apps to customise their launch behaviour across all types of app launch
+triggers.
 
 
 ## Use Cases
@@ -39,12 +40,20 @@ web app to configure this behaviour.
   The shape of this member is as follows:
   ```
   "launch_handler": {
-    "route_to_client": "new" | "existing",
-    "navigate_client": true | false
+    "route_to_client": null | "new" | "existing",
+    "navigate_client": null | true | false
   }
   ```
 
-  Example manifest:
+  If unspecified then `launch_handler` defaults to
+  `{"route_to_client": null, "navigate_client": null}` whereby the behaviour
+  is up to the user agent.
+
+  Both `route_to_client` and `navigate_client` also accept a list of values, the
+  first valid value will be used.
+
+  Example manifest that choses to receive all app launches as LaunchQueue events
+  in existing windows:
   ```json
   {
     "name": "Example app",
@@ -56,12 +65,6 @@ web app to configure this behaviour.
   }
   ```
 
-  If unspecified then `launch_handler` defaults to
-  `{"route_to_client": "new", "navigate_client": true}`.
-
-  Both `route_to_client` and `navigate_client` also accept a list of values, the
-  first valid value will be used.
-
 - Enqueue a [`LaunchParams`](
   https://github.com/WICG/file-handling/blob/main/explainer.md#launch)
   object in the DOM Window's `launchQueue` of the chosen client for every web
@@ -70,15 +73,18 @@ web app to configure this behaviour.
 - Add a `url` field to `LaunchParams` and set it to the URL being launched if
   the chosen launch client is not navigated as part of the launch.
 
+  Other web app APIs that involve launching may extend the `LaunchParams` with
+  more data specific to the method of launching e.g. a [share target](
+  https://w3c.github.io/web-share-target/) payload.
+
 
 ## Future extensions to this proposal
 
-- Add a service worker `launch` event that intercepts every web app launch.
+- Add a service worker `"launch"` event that intercepts every web app launch.
   The service worker can choose to override the value of `route_to_client`,
   `navigate_client` and `LaunchParams`.
 
-  Use case:\
-  Opening a productivity web app via a
+  **Use case:** Opening a productivity web app via a
   [file handler](https://github.com/WICG/file-handling/blob/main/explainer.md)
   causes an existing window that already had the file open to come into focus
   instead of launching a duplicate window.
@@ -89,9 +95,31 @@ web app to configure this behaviour.
   If `new_client_url` is the default value `null` then behave as if it is set to
   the value of `start_url`.
 
-  Use case:\
-  Web apps that have heavy `start_url` pages and want to avoid loading
-  unnecessary resources.
+  **Use case:** Web apps that have heavy `start_url` pages and want to avoid
+  loading unnecessary resources.
+
+- Add the `launch_handler` field to other launch methods to allow sites to
+  customise the launch behaviour for specfic launch methods. E.g.:
+  ```json
+  {
+    "name": "Example app",
+    "description": "This app will navigate existing clients unless it was launched via the share target API.",
+    "launch_handler": {
+      "route_to_client": "existing",
+      "navigate_client": true
+    },
+    "share_target": {
+      "action": "share.html",
+      "params": {
+        "title": "name",
+        "text": "description",
+        "url": "link"
+      },
+      "launch_handler": {
+        "navigate_client": false
+      }
+    }
+  ```
 
 
 ## Related proposals
