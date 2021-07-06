@@ -20,13 +20,13 @@ triggers.
 ## Background
 
 There are several ways for a web app window to be opened:
-- Platform specific app launch surface
 - [File handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
-- [Share target](https://w3c.github.io/web-share-target/)
 - [In scope link capturing](https://github.com/WICG/sw-launch/blob/master/declarative_link_capturing.md)
-- [Shortcuts](https://www.w3.org/TR/appmanifest/#dfn-shortcuts)
 - [Note taking](https://wicg.github.io/manifest-incubations/index.html#note_taking-member)
+- Platform specific app launch surface
 - [Protocol handling](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/URLProtocolHandler/explainer.md)
+- [Share target](https://w3c.github.io/web-share-target/)
+- [Shortcuts](https://www.w3.org/TR/appmanifest/#dfn-shortcuts)
 
 Web apps launched via these triggers will open in a new or existing app window
 depending on the user agent platform. There is currently no mechanism for the
@@ -52,8 +52,8 @@ web app to configure this behaviour.
   Both `route_to_client` and `navigate_client` also accept a list of values, the
   first valid value will be used.
 
-  Example manifest that choses to receive all app launches as LaunchQueue events
-  in existing windows:
+  Example manifest that choses to receive all app launches as events in existing
+  web app windows:
   ```json
   {
     "name": "Example app",
