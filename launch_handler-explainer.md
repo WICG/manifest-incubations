@@ -37,7 +37,7 @@ web app to configure this behaviour.
 - Add a `launch_handler` member to the web app manifest specifying the default
   client selection and navigation behaviour for web app launches.
   The shape of this member is as follows:
-  ```json
+  ```
   "launch_handler": {
     "route_to_client": "new" | "existing",
     "navigate_client": true | false
