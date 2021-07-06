@@ -13,8 +13,8 @@ triggers.
 
 - Web app that capture and handle share target events and user navigations
   in existing windows without invoking a navigation and losing existing state.
-  E.g. sharing an image to a chat web app could open a picker overlayed on top
-  of an existing conversation to select which contact to send it to.
+  E.g. sharing an image to a chat web app could open a contact picker overlayed
+  on top existing chat content.
 
 
 ## Background
