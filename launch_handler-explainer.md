@@ -40,16 +40,16 @@ web app to configure this behaviour.
   The shape of this member is as follows:
   ```
   "launch_handler": {
-    "route_to_client": null | "new" | "existing",
-    "navigate_client": null | true | false
+    "route_to": "auto" | "new" | "existing",
+    "navigate_client": "auto" | true | false
   }
   ```
 
   If unspecified then `launch_handler` defaults to
-  `{"route_to_client": null, "navigate_client": null}` whereby the behaviour
+  `{"route_to": "auto", "navigate_client": "auto"}` whereby the behaviour
   is up to the user agent.
 
-  Both `route_to_client` and `navigate_client` also accept a list of values, the
+  Both `route_to` and `navigate_client` also accept a list of values, the
   first valid value will be used.
 
   Example manifest that choses to receive all app launches as events in existing
@@ -59,7 +59,7 @@ web app to configure this behaviour.
     "name": "Example app",
     "start_url": "/index.html",
     "launch_handler": {
-      "route_to_client": "existing",
+      "route_to": "existing",
       "navigate_client": false
     }
   }
@@ -81,7 +81,7 @@ web app to configure this behaviour.
 ## Future extensions to this proposal
 
 - Add a service worker `"launch"` event that intercepts every web app launch.
-  The service worker can choose to override the value of `route_to_client`,
+  The service worker can choose to override the value of `route_to`,
   `navigate_client` and `LaunchParams`.
 
   **Use case:** Opening a productivity web app via a
@@ -92,7 +92,7 @@ web app to configure this behaviour.
 - Add a `new_client_url` member to the web app manifest. All new clients that
   don't navigate to the launch URL will open `new_client_url` instead.
 
-  If `new_client_url` is the default value `null` then behave as if it is set to
+  If `new_client_url` is the default value `"auto"` then behave as if it is set to
   the value of `start_url`.
 
   **Use case:** Web apps that have heavy `start_url` pages and want to avoid
@@ -105,7 +105,7 @@ web app to configure this behaviour.
     "name": "Example app",
     "description": "This app will navigate existing clients unless it was launched via the share target API.",
     "launch_handler": {
-      "route_to_client": "existing",
+      "route_to": "existing",
       "navigate_client": true
     },
     "share_target": {
