@@ -40,7 +40,7 @@ web app to configure this behaviour.
   The shape of this member is as follows:
   ```
   "launch_handler": {
-    "route_to": "auto" | "new" | "existing",
+    "route_to": "auto" | "new-client" | "existing-client",
     "navigate_client": "auto" | true | false
   }
   ```
