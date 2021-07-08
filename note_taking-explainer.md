@@ -33,12 +33,18 @@ new note.
 ```
 
 The presence of the `note_taking` member signals intent to act as a note-taking
-app, and `new_note_url` is a simple note-taking app capability. By using a
-dictionary we can easily add other note-taking app functionality if this is
-extended in the future, and it keeps the manifest organised with related
-functionality together. It also means note-taking can be specified largely
-orthogonally to other manifest specification changes, which helps to keep the
-manifest specification modular and manageable.
+app, and `new_note_url` is a simple note-taking app capability. The url is
+launched in the same way as the `start_url`, so is affected by the app's other
+properties, such as
+[display mode](https://www.w3.org/TR/appmanifest/#display-member) and
+[link capturing](
+https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md).
+
+By using a dictionary we can easily add other note-taking app functionality or
+extend the current functionality, and it keeps the manifest organised with
+related functionality together. It also means note-taking can be specified
+largely orthogonally to other manifest specification changes, which helps to
+keep the manifest specification modular and manageable.
 
 ## Alternatives Considered
 
@@ -50,28 +56,30 @@ contact".
 
 ### Extend the `Shortcuts` Member
 
-If we used the
-existing [Shortcuts manifest member](https://www.w3.org/TR/appmanifest/#shortcuts-member)
-, we would need to add a way for the user agent to identify shortcuts as
-intended to be used for specific purposes/tasks (eg. a new optional "purpose"
-field on each shortcut entry, with a defined set of values like "new-note", "
-new-contact", etc). Some of these future tasks might need additional
-parameters/context, which would further extend and complicate the `Shortcuts`
-member. Finally, Shortcuts are intended to be displayed to the user, while many
-tasks/capabilities should not be displayed in a shortcuts menu, eg. any
-parameterised or contextual tasks, non-task capabilities
-like [lock screen](https://github.com/WICG/lock-screen) support.
+If we used the existing [Shortcuts manifest member](
+https://www.w3.org/TR/appmanifest/#shortcuts-member), we would need to add a way
+for the user agent to identify shortcuts as intended to be used for specific
+purposes/tasks (eg. a new optional "purpose" field on each shortcut entry, with
+a defined set of values like "new-note", "new-contact", etc). Some of these
+future tasks might need additional parameters/context, which would further
+extend and complicate the `Shortcuts` member. Additionally, Shortcuts are
+intended to be displayed to the user, while many tasks/capabilities should not
+be displayed in a shortcuts menu, eg. any parameterised or contextual tasks,
+non-task capabilities like [lock screen](https://github.com/WICG/lock-screen)
+support. It seems like extending `Shortcuts` this far would be significantly
+changing the semantics of the member.
 
 ### A General Capability Member
 
-Some existing general capabilities approaches:
+There are existing general capabilities approaches for other functionality of
+web apps/pages:
 
 * [Web Share Target](https://w3c.github.io/web-share-target/)
 * [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
 * [Protocol Handlers](https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator-registerprotocolhandler)
 * [Declarative Web Actions](https://github.com/slightlyoff/declarative_web_actions)
 
-So perhaps we could have a more general-purpose field like:
+So perhaps we could do something similar with a more general-purpose field like:
 
 ```
 "integrations":  [
