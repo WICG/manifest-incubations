@@ -71,16 +71,19 @@ most use cases, and simplify the implementation in browsers and sites.
 
 ### `LaunchQueue` and `LaunchParams` interfaces
 
-Add two new interfaces; `LaunchParams` and `LaunchQueue`.
+Add two new interfaces; `LaunchParams` and `LaunchQueue`. Add a global instance
+of `LaunchQueue` to the `window` object named `launchQueue`.
 
-Whenever a web app is launched (via any user action) a `LaunchParams` object
-will be enqueued in a global `LaunchQueue` instance of the browsing context that
-handled the launch.
+Whenever a web app is launched (via any launch trigger) a `LaunchParams` object
+will be enqueued in a global `LaunchQueue` instance for the browsing context
+that handled the launch. Scripts can provide a single `LaunchConsumer` function
+to receive enqueued `LaunchParams`.
 
 This functions similarly to an event listener but avoids the problem where
 scripts may "miss" events if they're too slow to register their event listeners,
 this problem is particularly pronounced for launch events as they occur
-during the page's initialization.
+during the page's initialization. LaunchParams are buffered indefinitely until
+they are consumed.
 
 ```
 [Exposed=Window] interface LaunchParams {
