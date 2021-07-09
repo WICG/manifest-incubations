@@ -75,14 +75,14 @@ Add two new interfaces; `LaunchParams` and `LaunchQueue`. Add a global instance
 of `LaunchQueue` to the `window` object named `launchQueue`.
 
 Whenever a web app is launched (via any launch trigger) a `LaunchParams` object
-will be enqueued in a global `LaunchQueue` instance for the browsing context
-that handled the launch. Scripts can provide a single `LaunchConsumer` function
-to receive enqueued `LaunchParams`.
+will be enqueued in the `launchQueue` global `LaunchQueue` instance for the
+browsing context that handled the launch. Scripts can provide a single
+`LaunchConsumer` function to receive enqueued `LaunchParams`.
 
 This functions similarly to an event listener but avoids the problem where
 scripts may "miss" events if they're too slow to register their event listeners,
 this problem is particularly pronounced for launch events as they occur
-during the page's initialization. LaunchParams are buffered indefinitely until
+during the page's initialization. `LaunchParams` are buffered indefinitely until
 they are consumed.
 
 ```
@@ -136,10 +136,11 @@ If unspecified then `launch_handler` defaults to
 
 `route_to`:
 - `new-client`: A new browsing context is created in a web app window to load
-  the web app at the launch's target URL.
+  the launch's target URL.
 - `existing-client`: The most recently interacted with browsing context in a web
-  app window is chosen to handle the launch. How the launch is handled depends
-  on `navigate_existing_client`.
+  app window for the app being launched is chosen to handle the launch. How the
+  launch is handled within that browsing context depends on
+  `navigate_existing_client`.
 - `auto`: The behaviour is up to the user agent to decide what works best for
   the platform. E.g. mobile devices only support single clients and would use
   `existing-client` while desktop devices support multiple windows and would use
@@ -149,7 +150,8 @@ If unspecified then `launch_handler` defaults to
 - `always`: existing browsing contexts chosen for launch will navigate the
   browsing context to the launch's target URL.
 - `never`: existing browsing contexts chosen for launch will not be navigated
-  and instead have the targetURL set in the enqueued `LaunchParams`.
+  and instead have `targetURL` in the enqueued `LaunchParams` set to the
+  launch's target URL.
 
 Both `route_to` and `navigate_client` also accept a list of values, the
 first valid value will be used. This is to allow new values to be added to
