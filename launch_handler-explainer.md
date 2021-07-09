@@ -33,7 +33,7 @@ most use cases, and simplify the implementation in browsers and sites.
 ## Non-goals
 
 - Forcing a web app to only ever appear in a single client (e.g. blocking being
-  opening in a browser tab when open in an app window).
+  opened in a browser tab while already opened in an app window).
 - Configuring whether link navigations into the scope of a web app launch the
   web app (this is out of scope and may be handled by a future version of the
   [Declarative Link Capturing][dlc-explainer] spec).
