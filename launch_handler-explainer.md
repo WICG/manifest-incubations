@@ -18,7 +18,7 @@ sites to specify a set of fixed rules without having to implement custom
 most use cases, and simplify the implementation in browsers and sites.
 
 
-## Use Cases
+## Use cases
 
 - Single-window web apps: a web app that prefers to only have a single instance
   of itself open at any time, with new navigations focusing the existing
@@ -68,53 +68,107 @@ most use cases, and simplify the implementation in browsers and sites.
 
 ## Proposal
 
-- Add a `launch_handler` member to the web app manifest specifying the default
-  client selection and navigation behaviour for web app launches.
-  The shape of this member is as follows:
-  ```
+
+### `LaunchQueue` and `LaunchParams` interfaces
+
+Add two new interfaces; `LaunchParams` and `LaunchQueue`.
+
+Whenever a web app is launched (via any user action) a `LaunchParams` object
+will be enqueued in a global `LaunchQueue` instance of the browsing context that
+handled the launch.
+
+This functions similarly to an event listener but avoids the problem where
+scripts may "miss" events if they're too slow to register their event listeners,
+this problem is particularly pronounced for launch events as they occur
+during the page's initialization.
+
+```
+[Exposed=Window] interface LaunchParams {
+  readonly attribute DOMString? targetURL;
+};
+
+callback LaunchConsumer = any (LaunchParams params);
+
+[Exposed=Window] interface LaunchQueue {
+  void setConsumer(LaunchConsumer consumer);
+};
+
+partial interface Window {
+  readonly attribute LaunchQueue launchQueue;
+};
+```
+
+Example usage for a single-window music player app:
+```javascript
+launchQueue.setConsumer(launchParams => {
+  const songID = extractSongId(launchParams.targetURL);
+  if (songID) {
+    playSong(songID);
+  }
+});
+```
+
+The `targetURL` member in `LaunchParams` will only be set if the launch did not
+create a new browsing context or navigate an existing one.
+
+Other web app APIs that involve launching may extend `LaunchParams` with
+additional members containing data specific to the method of launching e.g. a
+[share target](https://w3c.github.io/web-share-target/) payload.
+
+
+### `launch_handler` manifest member
+
+Add a `launch_handler` member to the web app manifest specifying the default
+client selection and navigation behaviour for web app launches.
+The shape of this member is as follows:
+```
+"launch_handler": {
+  "route_to": "new-client" | "existing-client" | "auto",
+  "navigate_existing_client": "always" | "never",
+}
+```
+
+If unspecified then `launch_handler` defaults to
+`{"route_to": "auto", "navigate_existing_client": "always"}`.
+
+`route_to`:
+- `new-client`: A new browsing context is created in a web app window to load
+  the web app at the launch's target URL.
+- `existing-client`: The most recently interacted with browsing context in a web
+  app window is chosen to handle the launch. How the launch is handled depends
+  on `navigate_existing_client`.
+- `auto`: The behaviour is up to the user agent to decide what works best for
+  the platform. E.g. mobile devices only support single clients and would use
+  `existing-client` while desktop devices support multiple windows and would use
+  `new-client` to avoid data loss.
+
+`navigate_existing_client`:
+- `always`: existing browsing contexts chosen for launch will navigate the
+  browsing context to the launch's target URL.
+- `never`: existing browsing contexts chosen for launch will not be navigated
+  and instead have the targetURL set in the enqueued `LaunchParams`.
+
+Both `route_to` and `navigate_client` also accept a list of values, the
+first valid value will be used. This is to allow new values to be added to
+the spec without breaking backwards compatibility with old implementations by
+using them.\
+For example if `"matching-url-client"` were added sites would specify
+`"route_to": ["matching-url-client", "existing-client"]` to continue
+to control the behaviour of older browsers that didn't support
+`"matching-url-client"`.
+
+Example manifest that choses to receive all app launches as events in existing
+web app windows:
+```json
+{
+  "name": "Example app",
+  "start_url": "/index.html",
   "launch_handler": {
-    "route_to": "auto" | "new-client" | "existing-client",
-    "navigate_client": "auto" | true | false
+    "route_to": "existing",
+    "navigate_existing_client": "never"
   }
-  ```
-
-  If unspecified then `launch_handler` defaults to
-  `{"route_to": "auto", "navigate_client": "auto"}` whereby the behaviour
-  is up to the user agent.
-
-  Both `route_to` and `navigate_client` also accept a list of values, the
-  first valid value will be used. This is to allow new values to be added to
-  the spec without breaking backwards compatibility with old implementations by
-  using them.\
-  For example if `"matching-url-client"` were added sites would specify
-  `"route_to": ["matching-url-client", "existing-client"]` to continue
-  to control the behaviour of older browsers that didn't support
-  `"matching-url-client"`.
-
-  Example manifest that choses to receive all app launches as events in existing
-  web app windows:
-  ```json
-  {
-    "name": "Example app",
-    "start_url": "/index.html",
-    "launch_handler": {
-      "route_to": "existing",
-      "navigate_client": false
-    }
-  }
-  ```
-
-- Enqueue a [`LaunchParams`](
-  https://github.com/WICG/file-handling/blob/main/explainer.md#launch)
-  object in the DOM Window's `launchQueue` of the chosen client **for every web
-  app launch**.
-
-- Add a `url` field to `LaunchParams` and set it to the URL being launched if
-  the chosen launch client is not navigated as part of the launch.
-
-  Other web app APIs that involve launching may extend the `LaunchParams` with
-  more data specific to the method of launching e.g. a [share target](
-  https://w3c.github.io/web-share-target/) payload.
+}
+```
 
 
 ## Future extensions to this proposal
@@ -197,10 +251,13 @@ a web app has been chosen to handle an out-of-browser link navigation.
 
 ### [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
 
-This proposal takes the `LaunchQueue` and `LaunchParams` ideas from the File
-Handling proposal and extends them slightly. Instead of enqueuing `LaunchParams`
-for specific types of launches they will be enqueued for every type of web app
-launch.
+This proposal takes `LaunchQueue` and `LaunchParams` from the File Handling
+proposal with a few changes:
+- Instead of enqueuing `LaunchParams` for specific types of launches they will
+  be enqueued for every type of web app launch.
+- An optional targetURL field is added.
+- The interface is explicitly intended to be extended by other launch related
+  specs to contain launch specific data e.g. file handles or share data.
 
 
 ### [Tabbed Application Mode](https://github.com/w3c/manifest/issues/737)
