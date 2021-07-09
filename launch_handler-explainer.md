@@ -213,6 +213,20 @@ web app windows:
   }
   ```
 
+- Add `attribute readonly LaunchConsumer? consumer` to `LaunchQueue`. This will
+  allow sites to chain `LaunchConsumers` together more independently.
+  ```js
+  function addLaunchConsumer(launchConsumer) {
+    const existingLaunchConsumer = launchQueue.consumer;
+    launchQueue.setConsumer(launchParams => {
+      existingLaunchConsumer?.(launchParams);
+      launchConsumer(launchParams);
+    });
+  }
+  ```
+  Or maybe the `LaunchQueue` interface should be `addConsumer`/`removeConsumer`
+  like `addEventListener`/`removeEventListener` but with buffering.
+
 
 ## Related proposals
 
