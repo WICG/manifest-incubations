@@ -83,7 +83,13 @@ most use cases, and simplify the implementation in browsers and sites.
   is up to the user agent.
 
   Both `route_to` and `navigate_client` also accept a list of values, the
-  first valid value will be used.
+  first valid value will be used. This is to allow new values to be added to
+  the spec without breaking backwards compatibility with old implementations by
+  using them.\
+  For example if `"matching-url-client"` were added sites would specify
+  `"route_to": ["matching-url-client", "existing-client"]` to continue
+  to control the behaviour of older browsers that didn't support
+  `"matching-url-client"`.
 
   Example manifest that choses to receive all app launches as events in existing
   web app windows:
