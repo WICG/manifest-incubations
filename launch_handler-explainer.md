@@ -174,25 +174,18 @@ web app windows:
 ```
 
 
-## Future extensions to this proposal
+## Possible extensions to this proposal
 
-- Add a service worker `"launch"` event that intercepts every web app launch.
-  The service worker can choose to override the value of `route_to`,
-  `navigate_client` and `LaunchParams`.
-
-  **Use case:** Opening a productivity web app via a
-  [file handler](https://github.com/WICG/file-handling/blob/main/explainer.md)
-  causes an existing window that already had the file open to come into focus
-  instead of launching a duplicate window.
-
-- Add a `new_client_url` member to the web app manifest. All new clients that
-  don't navigate to the launch URL will open `new_client_url` instead.
-
-  If `new_client_url` is the default value `"auto"` then behave as if it is set to
-  the value of `start_url`.
-
-  **Use case:** Web apps that have heavy `start_url` pages and want to avoid
-  loading unnecessary resources.
+- Add two members:
+  ```
+  "launch_handler": {
+    "navigate_new_clients": "always" | "never",
+    "new_client_url": <URL>,
+  }
+  ```
+  This allows web apps to intercept new client navigations and provide a
+  constant alternative URL to handle the enqueued `LaunchParams` with
+  `targetURL` set.
 
 - Add the `launch_handler` field to other launch methods to allow sites to
   customise the launch behaviour for specfic launch methods. E.g.:
