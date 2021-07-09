@@ -1,36 +1,69 @@
 # Web App Launch Handling
 
+Authors: alancutter@, mgiuca@, dominickn@
+Last updated: 2021-07-09
+
+
 ## Overview
 
 This document describes a new `launch_handler` manifest member that enables
 web apps to customise their launch behaviour across all types of app launch
 triggers.
 
+We found that almost all "launch" use cases could be covered by a select few
+fixed rules (for example, "choose an existing window in the same app, focus it,
+and navigate it to the launched URL"). This `launch_handler` proposal enables
+sites to specify a set of fixed rules without having to implement custom
+[service worker `launch`][sw-launch-explainer] event logic, which should satisfy
+most use cases, and simplify the implementation in browsers and sites.
+
 
 ## Use Cases
 
-- Web apps that are designed to be used in a single window e.g. a music app.
+- Single-window web apps: a web app that prefers to only have a single instance
+  of itself open at any time, with new navigations focusing the existing
+  instance.\
+  Sub-use cases include:
+  - Apps that generally only make sense to have one instance running
+    (e.g., a music player, a game).
+  - Apps that include multi-document management within a single instance
+    (e.g., an HTML-implemented tab strip, floating sub-windows like Gmail).
 
-- Web app that capture and handle share target events and user navigations
-  in existing windows without invoking a navigation and losing existing state.
-  E.g. sharing an image to a chat web app could open a contact picker overlayed
-  on top of existing chat content.
+
+## Non-goals
+
+- Forcing a web app to only ever appear in a single client (e.g. blocking being
+  opening in a browser tab when open in an app window).
+- Configuring whether link navigations into the scope of a web app launch the
+  web app (this is out of scope and may be handled by a future version of the
+  [Declarative Link Capturing][dlc-explainer] spec).
+- Multi-document-instance web apps: a web app that opens documents in their own
+  instances but wishes to refocus an already open document instead of opening
+  duplicate instances for it. This would instead by handled by the [service
+  worker `launch` event][sw-launch-explainer].
+
 
 
 ## Background
 
-There are several ways for a web app window to be opened:
-- [File handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
-- [In scope link capturing](https://github.com/WICG/sw-launch/blob/master/declarative_link_capturing.md)
-- [Note taking](https://wicg.github.io/manifest-incubations/index.html#note_taking-member)
-- Platform specific app launch surface
-- [Protocol handling](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/URLProtocolHandler/explainer.md)
-- [Share target](https://w3c.github.io/web-share-target/)
-- [Shortcuts](https://www.w3.org/TR/appmanifest/#dfn-shortcuts)
+- There are several ways for a web app window to be opened:
+  - [File handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
+  - [In scope link capturing](https://github.com/WICG/sw-launch/blob/master/declarative_link_capturing.md)
+  - [Note taking](https://wicg.github.io/manifest-incubations/index.html#note_taking-member)
+  - Platform specific app launch surface
+  - [Protocol handling](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/URLProtocolHandler/explainer.md)
+  - [Share target](https://w3c.github.io/web-share-target/)
+  - [Shortcuts](https://www.w3.org/TR/appmanifest/#dfn-shortcuts)
 
-Web apps launched via these triggers will open in a new or existing app window
-depending on the user agent platform. There is currently no mechanism for the
-web app to configure this behaviour.
+  Web apps launched via these triggers will open in a new or existing app window
+  depending on the user agent platform. There is currently no mechanism for the
+  web app to configure this behaviour.
+
+- This is a refactor of the [Declarative Link Capturing][dlc-explainer]
+  explainer with a reduced behaviour scope. This does not prescribe link
+  capturing as a means of launching a web app, instead it describes how the
+  launch of a web app (via link capturing or any other means) may be configured
+  by the manifest and service worker.
 
 
 ## Proposal
@@ -126,11 +159,34 @@ web app to configure this behaviour.
 ## Related proposals
 
 
-### [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
+### [Service Worker launch event][sw-launch-explainer]
 
-`launch_handler` generalises the concept of `capture_links` into two core
-primitive actions (launch client selection and navigation) and more explicitly
-decouples them from the specific "link capturing" launch trigger.
+This proposal is declarative alternative to the [service worker `launch`](
+sw-launch-explainer) proposal in WICG. It covers many of the same
+use cases, but omits the more advanced use cases (specifically, the option to
+choose which client to focus).
+
+Use of `launch_handler` in the manifest would provide a "default" launch
+behaviour that the service worker `launch` event handler can choose to override.
+
+
+### [Declarative Link Capturing][dlc-explainer]
+
+This `launch_handler` proposal is intended to be a successor to the "launch"
+components of DLC and decouple launch configuration from "link capturing"
+behaviour.
+
+`launch_handler` generalises the concept of a launch into two core primitive
+actions; launch client selection and navigation, and explicitly decouples them
+from the "link capturing" launch trigger.
+
+
+### [WICG: URL Handlers](https://github.com/WICG/pwa-url-handler/blob/master/explainer.md)
+
+Similarly to Declarative Link Capturing this `launch_handler` proposal refactors
+out the "launch" component from the URL Handler proposal. `launch_handler`
+behaviour is intended for being "invoked" by URL Handlers at the point in which
+a web app has been chosen to handle an out-of-browser link navigation.
 
 
 ### [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
@@ -139,3 +195,14 @@ This proposal takes the `LaunchQueue` and `LaunchParams` ideas from the File
 Handling proposal and extends them slightly. Instead of enqueuing `LaunchParams`
 for specific types of launches they will be enqueued for every type of web app
 launch.
+
+
+### [Tabbed Application Mode](https://github.com/w3c/manifest/issues/737)
+
+This proposal is intended to work in tandem with tabbed mode web app windows.
+The behaviour of `"route_to": "new-client"` with an already open tabbed window
+is to open a new tab in that window.
+
+
+[sw-launch-explainer]: https://github.com/WICG/sw-launch/blob/main/explainer.md
+[dlc-explainer]: https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md
