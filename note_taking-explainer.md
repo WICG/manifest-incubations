@@ -17,6 +17,19 @@ new note. It wouldn't cover all the use-cases linked above (eg. voice assistant
 actually adding items to the note) but it covers the core flow of adding a new
 note.
 
+### Background
+
+Other web app APIs set a precedent of using a URL declared in the web app
+manifest to advertise capabilities and facilitate integrations with the OS:
+
+* [Web Share Target](https://w3c.github.io/web-share-target/)
+* [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
+* [Declarative Web Actions](https://github.com/slightlyoff/declarative_web_actions)
+
+[Protocol Handlers](
+https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator-registerprotocolhandler)
+uses JavaScript for a similar purpose.
+
 ## Proposal
 
 This explainer proposes a new dictionary manifest entry `note_taking` with an
@@ -46,6 +59,36 @@ related functionality together. It also means note-taking can be specified
 largely orthogonally to other manifest specification changes, which helps to
 keep the manifest specification modular and manageable.
 
+### Future Considerations
+
+If the need arises in the future to add more note-taking functionality, this can
+easily be added to the `note_taking` member. For example (**not
+currently proposed**), if we want to be able to populate a note with contents
+from another app or add items to a list from voice input, we could add:
+
+```
+{
+  ... other manifest fields ...
+  "note_taking": {
+    "new_note_with_contents": {
+      "url": "/POST_url/add_note.html",
+      "params": {
+        "title": "name",
+        "text":  "description",
+        "url":   "link"
+      }
+    },
+    "add_item_to_note": {
+      "action": "/POST_url/add_item_to_note.html",
+      "params": {
+        "existing_note_id": "id",
+        "item_text":  "description",
+      }
+    }
+  }
+}
+```
+
 ## Alternatives Considered
 
 A common theme of alternatives is to make a generalised interface for web apps
@@ -71,15 +114,8 @@ changing the semantics of the member.
 
 ### A General Capability Member
 
-There are existing general capabilities approaches for other functionality of
-web apps/pages:
-
-* [Web Share Target](https://w3c.github.io/web-share-target/)
-* [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
-* [Protocol Handlers](https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator-registerprotocolhandler)
-* [Declarative Web Actions](https://github.com/slightlyoff/declarative_web_actions)
-
-So perhaps we could do something similar with a more general-purpose field like:
+Perhaps we should use a more general-purpose field, where each separate
+integration has a particular schema of fields. For example:
 
 ```
 "integrations":  [
@@ -109,8 +145,6 @@ Or:
   }
 }
 ```
-
-Where each separate integration has a particular schema of fields.
 
 However, these individual integration likely need to be specified individually
 anyway, so we get little benefit from grouping like this. In fact there might be
