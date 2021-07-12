@@ -24,11 +24,7 @@ manifest to advertise capabilities and facilitate integrations with the OS:
 
 * [Web Share Target](https://w3c.github.io/web-share-target/)
 * [File Handling](https://github.com/WICG/file-handling/blob/main/explainer.md)
-* [Declarative Web Actions](https://github.com/slightlyoff/declarative_web_actions)
-
-[Protocol Handlers](
-https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator-registerprotocolhandler)
-uses JavaScript for a similar purpose.
+* [Protocol Handlers](https://web.dev/url-protocol-handler/)
 
 ## Proposal
 
@@ -114,8 +110,8 @@ changing the semantics of the member.
 
 ### A General Capability Member
 
-Perhaps we should use a more general-purpose field, where each separate
-integration has a particular schema of fields. For example:
+We also considered using a more general-purpose integrations field, where each
+individual integration has a particular schema of fields. For example:
 
 ```
 "integrations":  [
@@ -146,7 +142,7 @@ Or:
 }
 ```
 
-However, these individual integration likely need to be specified individually
+However, these individual integrations likely need to be specified individually
 anyway, so we get little benefit from grouping like this. In fact there might be
 a drawback to grouping disparate features and tying their specification together
 rather than having separate tiny specifications. This "integrations" member is
