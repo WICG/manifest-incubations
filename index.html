@@ -344,8 +344,7 @@
           If the <a>BeforeInstallPromptEvent</a> is <em>not</em> cancelled, the
           user agent is allowed to <a>present an install prompt</a>
           (specifically, an <a>automated install prompt</a>) to the end-user.
-          Canceling the default action (via <a data-cite=
-          "DOM#dom-event-preventdefault">preventDefault</a>) prevents the user
+          Canceling the default action (via {{Event/preventDefault()}}) prevents the user
           agent from <a>presenting an install prompt</a>. The user agent is
           free to run <a>steps to notify that an install prompt is
           available</a> again at a later time.
