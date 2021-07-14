@@ -173,14 +173,13 @@
         proceed with installing the app. See <a data-cite=
         "appmanifest#installation-sec">privacy and security considerations</a>
         for recommendations relating to this UI. The <var>result</var> of this
-        choice is either {{AppBannerPromptOutcome\accepted}} or
-        {{AppBannerPromptOutcome\dismissed}}.
+        choice is either {{AppBannerPromptOutcome/accepted}} or
+        {{AppBannerPromptOutcome/dismissed}}.
         </li>
         <li>Return <var>result</var>, and <a>in parallel</a>:
           <ol>
-            <li>If <var>result</var> is <a data-link-for=
-            "AppBannerPromptOutcome">accepted</a>, run the <a>steps to install
-            the web application</a>.
+            <li>If <var>result</var> is {{AppBannerPromptOutcome/accepted}},
+            run the <a>steps to install the web application</a>.
             </li>
           </ol>
         </li>
@@ -205,11 +204,11 @@
           <ol>
             <li>Let <var>event</var> be a newly constructed
             {{BeforeInstallPromptEvent}} named `"beforeinstallprompt"`, with
-            its {{Event\cancelable}} attribute initialized to true.
+            its {{Event/cancelable}} attribute initialized to true.
             </li>
-            <li>Let <var>mayShowPrompt</var> be the result of <a>firing</a>
-            <var>event</var> at the {{Window}} object of the <a>top-level
-            browsing context</a>.
+            <li>Let <var>mayShowPrompt</var> be the result of [=fire an
+            event|fire=] <var>event</var> at the {{Window}} object of the
+            <a>top-level browsing context</a>.
             </li>
             <li>If <var>mayShowPrompt</var> is true, then the user agent MAY,
             <a>in parallel</a>, <a>request to present an install prompt</a>
@@ -533,6 +532,75 @@
           </p>
         </section>
       </section>
+    </section>
+    <section id="linking">
+      <h3>
+        Linking to a manifest
+      </h3>
+      <p>
+        The <code>manifest</code> keyword can be used with a [[HTML]] [^link^]
+        element. This keyword creates an <a>external resource link</a>.
+      </p>
+      <table class="complex data">
+        <thead>
+          <tr>
+            <th rowspan="2">
+              Link type
+            </th>
+            <th colspan="2">
+              Effect on...
+            </th>
+            <th rowspan="2">
+              Brief description
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <code><a>link</a></code>
+            </th>
+            <th>
+              <code><a>a</a></code> and <code><a>area</a></code>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <code>manifest</code>
+            </td>
+            <td>
+              <a>External Resource Link</a>
+            </td>
+            <td>
+              not allowed
+            </td>
+            <td>
+              Imports or links to a <a>manifest</a>.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">
+        In cases where more than one [^link^] element with a
+        <code>manifest</code> link type appears in a {{Document}}, the user
+        agent uses the first [^link^] element in tree order and ignores all
+        subsequent [^link^] elements with a <code>manifest</code> link type
+        (even if the first element was erroneous). See the steps for
+        <a>obtaining a manifest</a>.
+      </p>
+      <p>
+        To obtain a manifest, the user agent MUST run the steps for <a data-lt=
+        "obtaining the manifest">obtaining a manifest</a>. The appropriate time
+        to obtain the manifest is left up to implementations. A user agent MAY
+        opt to delay fetching a manifest until after the document and its other
+        resources have been fully loaded (i.e., to not delay the availability
+        of content and scripts required by the <a>document</a>).
+      </p>
+      <p>
+        A <a>manifest</a> is obtained and applied regardless of the
+        {{HTMLLinkElement/media}} attribute of the [^link^] element matches the
+        environment or not.
+      </p>
     </section>
   </body>
 </html>
