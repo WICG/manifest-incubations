@@ -191,7 +191,8 @@
       </p>
       <ol>
         <li>Wait until the {{Document}} of the <a>top-level browsing
-        context</a> is <a data-cite="html#completely-loaded">completely loaded</a>.
+        context</a> is <a data-cite="html#completely-loaded">completely
+        loaded</a>.
         </li>
         <li>If there is already an <a data-lt=
         "present an install prompt">install prompt being presented</a> or if
@@ -203,9 +204,8 @@
           to do the following:
           <ol>
             <li>Let <var>event</var> be a newly constructed
-            {{BeforeInstallPromptEvent}} named
-            `"beforeinstallprompt"`, with its {{Event\cancelable}}
-            attribute initialized to true.
+            {{BeforeInstallPromptEvent}} named `"beforeinstallprompt"`, with
+            its {{Event\cancelable}} attribute initialized to true.
             </li>
             <li>Let <var>mayShowPrompt</var> be the result of <a>firing</a>
             <var>event</var> at the {{Window}} object of the <a>top-level
@@ -343,17 +343,16 @@
           If the <a>BeforeInstallPromptEvent</a> is <em>not</em> cancelled, the
           user agent is allowed to <a>present an install prompt</a>
           (specifically, an <a>automated install prompt</a>) to the end-user.
-          Canceling the default action (via {{Event/preventDefault()}}) prevents the user
-          agent from <a>presenting an install prompt</a>. The user agent is
-          free to run <a>steps to notify that an install prompt is
-          available</a> again at a later time.
+          Canceling the default action (via {{Event/preventDefault()}})
+          prevents the user agent from <a>presenting an install prompt</a>. The
+          user agent is free to run <a>steps to notify that an install prompt
+          is available</a> again at a later time.
         </div>
         <p data-dfn-for="PromptResponseObject">
           The <dfn>PromptResponseObject</dfn> contains the result of calling
-          {{BeforeInstallPromptEvent\prompt()}}. It
-          contains one member, <dfn data-link-for=
-          "PromptResponseObject">userChoice</dfn>, which states the user's
-          chosen outcome.
+          {{BeforeInstallPromptEvent\prompt()}}. It contains one member,
+          <dfn data-link-for="PromptResponseObject">userChoice</dfn>, which
+          states the user's chosen outcome.
         </p>
         <p>
           An instance of a <a>BeforeInstallPromptEvent</a> has the following
