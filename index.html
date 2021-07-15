@@ -142,6 +142,11 @@
           <abbr title="User Interface">UI</abbr>, directly invoking the steps
           to <a>present an install prompt</a>.
         </li>
+        <li>The installation process can occur through an <dfn>automated
+        install prompt</dfn>: that is, a UI that the user agent presents to
+        the user when, for instance, there are sufficient <a>installability
+        signals</a> to warrant <a>installation</a> of the web application.
+        </li>
         <li>The installation process can occur through a <dfn>site-triggered
         install prompt</dfn>: the site can programmatically request that the
         user agent present an install prompt to the user. The user agent MAY
@@ -347,7 +352,7 @@
         </div>
         <p data-dfn-for="PromptResponseObject">
           The <dfn>PromptResponseObject</dfn> contains the result of calling
-          {{BeforeInstallPromptEvent\prompt()}}. It contains one member,
+          {{BeforeInstallPromptEvent/prompt()}}. It contains one member,
           <dfn data-link-for="PromptResponseObject">userChoice</dfn>, which
           states the user's chosen outcome.
         </p>
@@ -530,6 +535,15 @@
         </section>
       </section>
     </section>
+    <section>
+      <h3>
+        Associating a resource with a manifest
+      </h3>
+      <p>
+        A resource is said to be <dfn>associated with a manifest</dfn> if the
+        resource representation, an HTML document, has a <a href=
+        "#linking"><code>manifest</code> link relationship</a>.
+      </p>
     <section id="linking">
       <h3>
         Linking to a manifest
@@ -598,6 +612,116 @@
         {{HTMLLinkElement/media}} attribute of the [^link^] element matches the
         environment or not.
       </p>
+    </section>
+  </section>
+  <section>
+    <h2>
+      Manifest life-cycle
+    </h2>
+    <p>
+      This section defines algorithms for <a href="#obtaining">obtaining</a>,
+      <a href="#processing">processing</a>, and <a>applying</a> a
+      <a>manifest</a>.
+    </p>
+    <section id="obtaining">
+      <h3>
+        Obtaining a manifest
+      </h3>
+      <p>
+        The <dfn data-lt="obtaining the manifest|obtaining a manifest">steps
+        for obtaining a manifest</dfn> are given by the following algorithm.
+        The algorithm, if successful, returns a <a>processed manifest</a> and
+        the <var>manifest URL</var>; otherwise, it aborts prematurely and
+        returns nothing. In the case of nothing being returned, the user
+        agent MUST ignore the manifest declaration. In running these steps, a
+        user agent MUST NOT <a>delay the load event</a>.
+      </p>
+      <ol>
+        <li>From the {{Document}} of the <a>top-level browsing context</a>,
+        let <var>origin</var> be the {{Document}}'s origin, and <var>manifest
+        link</var> be the first [^link^] element in <a>tree order</a> whose
+        {{HTMLLinkElement/rel}} attribute contains the token
+        <code>manifest</code>.
+        </li>
+        <li>If <var>origin</var> is an <a>opaque origin</a>, then abort these
+        steps.
+        </li>
+        <li>If <var>manifest link</var> is <code>null</code>, then abort
+        these steps.
+        </li>
+        <li>If <var>manifest link</var>'s <code>href</code> attribute's value
+        is the empty <a>string</a>, then abort these steps.
+        </li>
+        <li>Let <var>manifest URL</var> be the result of [=URL
+        Parser|parsing=] the value of the <code>href</code> attribute,
+        relative to <a>the element's base URL</a>. If parsing fails, then
+        abort these steps.
+        </li>
+        <li>Let |request:Request| be a new <a>Request</a>.
+        </li>
+        <li>Set |request|'s [=request/URL=] to |manifest URL|.
+        </li>
+        <li>Set |request|'s [=request/initiator=] to "`manifest`".
+        </li>
+        <li>Set |request|'s [=request/destination=] to "`manifest`".
+        </li>
+        <li>If the |manifest link|'s {{HTMLLinkElement/crossOrigin}}
+        attribute's value is "`use-credentials`", then set |request|'s
+        [=request/credentials mode=] to "`include`". Otherwise, set
+        |request|'s [=request/credentials mode=] to "`omit`".
+        </li>
+        <li>Set |request|'s [=request/mode=] to "`cors`".
+        </li>
+        <li>Await the result of performing a <a>fetch</a> with
+        <var>request</var>, letting <var>response</var> be the result.
+        </li>
+        <li>If <var>response</var> is a <a>network error</a>, then abort
+        these steps.
+        </li>
+        <li>Let <var>text</var> be <a>UTF-8 decode</a> <var>response</var>'s
+        <a data-cite="FETCH#concept-request-body">body</a>.
+        </li>
+        <li>Let <var>manifest</var> be the result of running <a>processing a
+        manifest</a> given <var>text</var>, <var>manifest URL</var>, and the
+        URL that represents the address of the <a>top-level browsing
+        context</a>.
+        </li>
+        <li>Return <var>manifest</var> and <var>manifest URL</var>.
+        </li>
+      </ol>
+      <section>
+        <h4>
+          Content security policy
+        </h4>
+        <p>
+          A user agent MUST support [[CSP3]].
+        </p>
+        <div class="example">
+          <p>
+            The <a>manifest-src</a> and <a>default-src</a> directives govern
+            the origins from which a <a>user agent</a> can fetch a manifest.
+            As with other directives, by default the <a>manifest-src</a>
+            directive is <code>*</code>, meaning that a user agent can,
+            [[FETCH]]'s <abbr>CORS</abbr> permitting, fetch the manifest
+            cross-domain. Remote origins (e.g., a <abbr title=
+            "content delivery network">CDN</abbr>) wanting to host manifests
+            for various web applications will need to include the appropriate
+            <abbr>CORS</abbr> response header in their HTTP response (e.g.,
+            <code>Access-Control-Allow-Origin: https://example.com</code>).
+          </p>
+          <figure>
+            <img src="images/manifest-src-directive.svg" width="704" height=
+            "342" alt="manifest-src directive example illustrated">
+            <figcaption>
+              For a [[HTML]] document, [[CSP3]]'s <a>manifest-src</a>
+              directive controls the sources from which a [[HTML]] document
+              can load a manifest from. The same CSP policy's
+              <code>img-src</code> directive controls where the icon's images
+              can be fetched from.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
     </section>
   </body>
 </html>
