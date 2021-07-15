@@ -382,8 +382,7 @@
           <ol>
             <li>If <var>this</var>.<a>[[\userResponsePromise]]</a> is pending:
               <ol>
-                <li>If this event's <a data-cite=
-                "DOM#dom-event-istrusted"><code>isTrusted</code></a> attribute
+                <li>If this event's {{Event/isTrusted}} attribute
                 is <code>false</code>, reject
                 <var>this</var>.<a>[[\userResponsePromise]]</a> with
                 {{"NotAllowedError"}}, optionally informing the developer that
