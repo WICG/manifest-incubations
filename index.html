@@ -14,6 +14,7 @@
         editors: [{
           name: "Daniel Murphy"
         }],
+        group: "wicg",
         github: "WICG/manifest-incubations",
         shortName: "manifest-incubations",
         xref: {
@@ -47,26 +48,24 @@
         For advanced usages, the display_override member can be used to specify
         a custom fallback order of <a data-cite=
         "appmanifest#dfn-display-modes-values">display mode values</a> for
-        developers to choose their prefered <a data-cite=
+        developers to choose their preferred <a data-cite=
         "appmanifest#dfn-display-mode">display mode</a>.
       </p>
       <p>
-        The <dfn>display_override</dfn> member of the <a data-cite=
-        "appmanifest#web-application-manifest">Web Application Manifest</a> is
-        a <a>sequence</a> of <a data-cite=
+        The <dfn>display_override</dfn> member of the [[=application manifest=]
+        is a <a>sequence</a> of <a data-cite=
         "appmanifest#dfn-display-modes-values">display mode values</a>. This
         item represents the developer's preferred fallback chain for
         <a data-cite="appmanifest#dfn-display-mode">display modes</a>. This
-        field overrides the <a data-cite="appmanifest#display">display</a>
-        property. If the user agent does not support any of the display modes
-        specified here, then it falls back to considering the <a data-cite=
-        "appmanifest#display">display</a> field. See <a data-cite=
+        field overrides the [=manifest/display=] member. If the user agent does
+        not support any of the display modes specified here, then it falls back
+        to considering the [=manifest/display=] member. See <a data-cite=
         "appmanifest#dfn-display-mode">display modes</a> for the algorithm
         steps.
       </p>
       <p>
-        The following steps are added to the <a data-cite=
-        "appmanifest#dfn-extension-point">extension point</a> in <a data-cite=
+        The following steps are added to the [=application manifest/processing
+        extension-point=] in <a data-cite=
         "appmanifest#dfn-steps-for-determining-the-web-app-s-chosen-display-mode">
         determining the web app's chosen display mode</a>:
       </p>
@@ -83,9 +82,8 @@
       <p class="note">
         This member is intended to be only used for advanced cases, where the
         developer wants explicit control over the fallback order of their
-        display modes. Otherwise, the <a data-cite=
-        "appmanifest#display">display</a> should be sufficient for most use
-        cases.
+        display modes. Otherwise, the [=manifest/display=] member is sufficient
+        for most use cases.
       </p>
       <section class="informative">
         <h3>
@@ -117,16 +115,14 @@
       </section>
     </section>
     <section>
-      <h2 data-dft-for="">
-        <code>share_target</code> member
+      <h2>
+        `share_target` member
       </h2>
       <p>
         The `share_target` member registers a web application as "target" for
         share actions (e.g., for sharing a text, a URL, or a file). The
-        `share_target` member is part of the <a href=
-        "https://wicg.github.io/web-share-target/">Web Share Target</a>
-        specification, being incubated at the <a href=
-        "https://wicg.io">WICG</a>.
+        `share_target` member is part of the [[[web-share-target]]]
+        specification.
       </p>
     </section>
     <section>
@@ -292,7 +288,7 @@
         <li>The installation process can occur through an <dfn>automated
         install prompt</dfn>: that is, a UI that the user agent presents to the
         user when, for instance, there are sufficient <a>installability
-        signals</a> to warrant <a>installation</a> of the web application.
+        signals</a> to warrant installation of the web application.
         </li>
         <li>The installation process can occur through a <dfn>site-triggered
         install prompt</dfn>: the site can programmatically request that the
@@ -304,15 +300,14 @@
       </ul>
       <p>
         In any case, the user agent MUST NOT <a>present an install prompt</a>
-        if the document is not <a data-cite=
-        "appmanifest#dfn-is-installable">installable</a>.
+        if the document is not installable.
       </p>
       <p>
-        The user agent MAY, at any time (only if the document is <a data-cite=
-        "appmanifest#dfn-is-installable">installable</a>), run the <a>steps to
-        notify that an install prompt is available</a> at any time, giving the
-        site the opportunity to show a <a>site-triggered install prompt</a>
-        without the user needing to interact with the user agent UI.
+        The user agent MAY, at any time (only if the document is installable),
+        run the <a>steps to notify that an install prompt is available</a> at
+        any time, giving the site the opportunity to show a <a>site-triggered
+        install prompt</a> without the user needing to interact with the user
+        agent UI.
       </p>
       <p>
         To <dfn data-local-lt=
@@ -321,15 +316,13 @@
       </p>
       <ol>
         <li>Show some user-agent-specific UI, asking the user whether to
-        proceed with installing the app. See <a data-cite=
-        "appmanifest#installation-sec">privacy and security considerations</a>
-        for recommendations relating to this UI. The <var>result</var> of this
-        choice is either {{AppBannerPromptOutcome/accepted}} or
-        {{AppBannerPromptOutcome/dismissed}}.
+        proceed with installing the app. The <var>result</var> of this choice
+        is either {{AppBannerPromptOutcome/"accepted"}} or
+        {{AppBannerPromptOutcome/"dismissed"}}.
         </li>
         <li>Return <var>result</var>, and <a>in parallel</a>:
           <ol>
-            <li>If <var>result</var> is {{AppBannerPromptOutcome/accepted}},
+            <li>If <var>result</var> is {{AppBannerPromptOutcome/"accepted"}},
             run the <a>steps to install the web application</a>.
             </li>
           </ol>
@@ -353,17 +346,15 @@
           <a>Queue a task</a> on the <a>application life-cycle task source</a>
           to do the following:
           <ol>
-            <li>Let <var>event</var> be a newly constructed
-            {{BeforeInstallPromptEvent}} named `"beforeinstallprompt"`, with
-            its {{Event/cancelable}} attribute initialized to true.
+            <li>Let |mayShowPrompt| be the result of [=fire an event=] named
+            `"beforeinstallprompt"` at the [=top-level browsing context=]'s
+            [=relevant global object=] using the {{BeforeInstallPromptEvent}}
+            interface, with steps to initialize the {{Event/cancelable}}
+            attribute to `true`.
             </li>
-            <li>Let <var>mayShowPrompt</var> be the result of [=fire an
-            event|fire=] <var>event</var> at the {{Window}} object of the
-            <a>top-level browsing context</a>.
-            </li>
-            <li>If <var>mayShowPrompt</var> is true, then the user agent MAY,
-            <a>in parallel</a>, <a>request to present an install prompt</a>
-            with <var>event</var>.
+            <li>If |mayShowPrompt| is true, then the user agent MAY, <a>in
+            parallel</a>, <a>request to present an install prompt</a> with
+            |event|.
             </li>
           </ol>
         </li>
@@ -382,8 +373,8 @@
           following algorithm:
         </p>
         <ol>
-          <li>Let <var>manifest</var> be the manifest of an <a data-cite=
-          "appmanifest#dfn-is-installable">installable</a> document.
+          <li>Let <var>manifest</var> be the manifest of an installable
+          document.
           </li>
           <li>Perform an unspecified sequence of actions to attempt to register
           the web application in the user's operating system (e.g., create
@@ -395,9 +386,9 @@
           </li>
           <li>
             <a>Queue a task</a> on the <a>application life-cycle task
-            source</a> to <a>fire an event</a> named <code>appinstalled</code>
-            at the the {{Window}} object of the <a>top-level browsing
-            context</a> for which the installation took place.
+            source</a> to <a>fire an event</a> named `"appinstalled"` at the
+            [=top-level browsing context=]'s [=relevant global object=] for
+            which the installation took place.
           </li>
         </ol>
       </section>
@@ -409,26 +400,25 @@
           By design, this specification does not provide developers with an
           explicit API to "install" a web application. Instead, a
           <a>manifest</a> can serve as an <dfn>installability signal</dfn> to a
-          user agent that a web application can be <a>installed</a>.
+          user agent that a web application can be installed.
         </p>
         <p>
           Examples of <a>installability signals</a> for a web application:
         </p>
         <ul>
-          <li>is <a>associated with a manifest</a> with at least a
-          <code>name</code> member and a suitable icon.
+          <li>has a [=application manifest=] with an application name and a
+          suitable icon.
           </li>
-          <li>is served over a secure network connection.
+          <li>is served over a secure network connection, but also functions
+          without a network connection.
           </li>
           <li>has a sensible content security policy.
           </li>
           <li>is able to responsively adapt to display on a variety of screen
           sizes, catering for both mobile and desktop.
           </li>
-          <li>is able to function without a network connection.
-          </li>
-          <li>is repeatedly used by the end-user over some extended period of
-          time.
+          <li>shows a high degree of end-user engagement over an extended
+          period of time.
           </li>
           <li>has been explicitly marked by the user as one that they value and
           trust (e.g., by bookmarking or "starring" it).
@@ -438,7 +428,7 @@
           This list is not exhaustive and some <a>installability signals</a>
           might not apply to all user agents. How a user agent makes use of
           these <a>installability signals</a> to determine if a web application
-          can be <a>installed</a> is left to implementers.
+          can be installed is left to implementers.
         </p>
       </section>
     </section>
@@ -447,15 +437,10 @@
         Installation Events
       </h2>
       <p>
-        Installation events and supporting the {{BeforeInstallPrompt}} is
-        OPTIONAL.
-      </p>
-      <p>
-        DOM events <a>fired</a> by this specification use the <dfn>application
+        [=event|Events=] of this specification rely on the <dfn>application
         life-cycle task source</dfn>.
       </p>
-      <section data-dfn-for="BeforeInstallPromptEvent" data-link-for=
-      "BeforeInstallPromptEvent">
+      <section data-dfn-for="BeforeInstallPromptEvent">
         <h3>
           <dfn>BeforeInstallPromptEvent</dfn> Interface
         </h3>
@@ -467,30 +452,30 @@
           reasons.
         </div>
         <pre class="idl" data-cite="DOM">
-            [Exposed=Window]
-            interface BeforeInstallPromptEvent : Event {
-              constructor(DOMString type, optional EventInit eventInitDict = {});
-              Promise&lt;PromptResponseObject&gt; prompt();
-            };
-  
-            dictionary PromptResponseObject {
-              AppBannerPromptOutcome userChoice;
-            };
-  
-            enum AppBannerPromptOutcome {
-              "accepted",
-              "dismissed"
-            };
-          </pre>
+          [Exposed=Window]
+          interface BeforeInstallPromptEvent : Event {
+            constructor(DOMString type, optional EventInit eventInitDict = {});
+            Promise&lt;PromptResponseObject&gt; prompt();
+          };
+
+          dictionary PromptResponseObject {
+            AppBannerPromptOutcome userChoice;
+          };
+
+          enum AppBannerPromptOutcome {
+            "accepted",
+            "dismissed"
+          };
+        </pre>
         <p>
-          The <a>BeforeInstallPromptEvent</a> is dispatched when the site is
+          The {{BeforeInstallPromptEvent}} is dispatched when the site is
           allowed to present a <a>site-triggered install prompt</a>, or prior
           to the user agent presenting an <a>automated install prompt</a>. It
           allows the site to cancel the <a>automated install prompt</a>, as
           well as manually present the <a>site-triggered install prompt</a>.
         </p>
         <div class="note">
-          If the <a>BeforeInstallPromptEvent</a> is <em>not</em> cancelled, the
+          If the {{BeforeInstallPromptEvent}} is <em>not</em> cancelled, the
           user agent is allowed to <a>present an install prompt</a>
           (specifically, an <a>automated install prompt</a>) to the end-user.
           Canceling the default action (via {{Event/preventDefault()}})
@@ -498,11 +483,10 @@
           user agent is free to run <a>steps to notify that an install prompt
           is available</a> again at a later time.
         </div>
-        <p data-dfn-for="PromptResponseObject">
+        <p>
           The <dfn>PromptResponseObject</dfn> contains the result of calling
           {{BeforeInstallPromptEvent/prompt()}}. It contains one member,
-          <dfn data-link-for="PromptResponseObject">userChoice</dfn>, which
-          states the user's chosen outcome.
+          <dfn>userChoice</dfn>, which states the user's chosen outcome.
         </p>
         <p>
           An instance of a {{BeforeInstallPromptEvent}} has the following
@@ -513,8 +497,8 @@
             <dfn>[[\didPrompt]]</dfn>
           </dt>
           <dd>
-            A boolean, initially <code>false</code>. Represents whether this
-            event was used to <a>present an install prompt</a> to the end-user.
+            A boolean, initially `false`. Represents whether this event was
+            used to <a>present an install prompt</a> to the end-user.
           </dd>
           <dt>
             <dfn>[[\userResponsePromise]]</dfn>
@@ -533,38 +517,45 @@
             steps:
           </p>
           <ol>
-            <li>If <var>this</var>.<a>[[\userResponsePromise]]</a> is pending:
+            <li>Let |userResponsePromise| be
+            {{BeforeInstallPromptEvent/[[userResponsePromise]]}}.
+            </li>
+            <li>If |userResponsePromise| is pending:
               <ol>
-                <li>If this event's {{Event/isTrusted}} attribute is
-                <code>false</code>, reject
-                <var>this</var>.<a>[[\userResponsePromise]]</a> with
-                {{"NotAllowedError"}}, optionally informing the developer that
-                untrusted events can't call <code>prompt()</code>.
+                <li>If [=this=].{{BeforeInstallPromptEvent/[[didPrompt]]}} is
+                `true`, terminate this algorithm.
                 </li>
-                <li>Else if <var>this</var>.<a>[[\didPrompt]]</a> is
-                <code>false</code>, set <var>this</var>.<a>[[\didPrompt]]</a>
-                to <code>true</code>, then <a>in parallel</a>, <a>request to
-                present an install prompt</a> with this event. Wait, possibly
-                indefinitely, for the end-user to make a choice.
+                <li>If this event's {{Event/isTrusted}} attribute is `false`,
+                reject |userResponsePromise| with {{"NotAllowedError"}} and
+                terminate this algorithm.
+                </li>
+                <li>Set [=this=].{{BeforeInstallPromptEvent/[[didPrompt]]}} to
+                `true`.
+                </li>
+                <li>
+                  <a>In parallel</a>, <a>request to present an install
+                  prompt</a> with [=this=]. Wait, possibly indefinitely, for
+                  the end-user to make a choice.
                 </li>
               </ol>
             </li>
-            <li>Return <var>this</var>.<a>[[\userResponsePromise]]</a>.
+            <li>Return |userResponsePromise|.
             </li>
           </ol>
           <p>
             To <dfn data-noexport="">request to present an install prompt</dfn>
-            with <a>BeforeInstallPromptEvent</a> <var>event</var>:
+            with {{BeforeInstallPromptEvent}} <var>event</var>:
           </p>
           <ol>
             <li>
-              <a>Present an install prompt</a> and let <var>outcome</var> be
-              the result.
+              <a>Present an install prompt</a> and let |outcome| be the result.
             </li>
-            <li>Resolve <var>event</var>.<a>[[\userResponsePromise]]</a> with a
-            newly created <a>PromptResponseObject</a> whose <a data-link-for=
-            "PromptResponseObject">userChoice</a> member is the value of <var>
-              outcome</var>.
+            <li>Let |response| be a newly created {{PromptResponseObject}},
+            initializing its {{PromptResponseObject/userChoice}} to |outcome|.
+            </li>
+            <li>[=Resolve=]
+            |event|.{{BeforeInstallPromptEvent/[[userResponsePromise]]}} with
+            |response|.
             </li>
           </ol>
         </section>
@@ -585,16 +576,16 @@
               window.addEventListener("beforeinstallprompt", event =&gt; {
                 // Suppress automatic prompting.
                 event.preventDefault();
-  
+
                 // Show the (disabled-by-default) install button. This button
                 // resolves the installButtonClicked promise when clicked.
                 installButton.disabled = false;
-  
+
                 // Wait for the user to click the button.
                 installButton.addEventListener("click", async e =&gt; {
                   // The prompt() method can only be used once.
                   installButton.disabled = true;
-  
+
                   // Show the prompt.
                   const { userChoice } = await event.prompt();
                   console.info(`user choice was: ${userChoice}`);
@@ -610,16 +601,16 @@
             The <dfn>AppBannerPromptOutcome</dfn> enum's values represent the
             outcomes from <a>presenting an install prompt</a>.
           </p>
-          <dl data-dfn-for="AppBannerPromptOutcome">
+          <dl>
             <dt>
-              <dfn>accepted</dfn>:
+              "<dfn>accepted</dfn>":
             </dt>
             <dd>
               The end-user indicated that they would like the user agent to
-              <a>install</a> the web application.
+              install the web application.
             </dd>
             <dt>
-              <dfn>dismissed</dfn>:
+              "<dfn>dismissed</dfn>":
             </dt>
             <dd>
               The end-user dismissed the install prompt.
@@ -629,250 +620,35 @@
       </section>
       <section>
         <h3>
-          Extensions to the <code>Window</code> object
+          Extensions to the `Window` object
         </h3>
-        <p>
-          The following extensions to the <code><dfn data-cite=
-          "HTML/window-object.html#window">Window</dfn></code> object specify
-          the <a>event handler idl attribute</a> on which events relating to
-          the <a>installation</a> of a web application are <a>fired</a>.
-        </p>
         <pre class="idl" data-cite="HTML">
           partial interface Window {
             attribute EventHandler onappinstalled;
             attribute EventHandler onbeforeinstallprompt;
           };
         </pre>
-        <pre class="example js" title=
-        "Two ways of handling the 'appinstalled' event">
-          function handleInstalled(ev) {
-            const date = new Date(ev.timeStamp / 1000);
-            console.log(`Yay! Our app got installed at ${date.toTimeString()}.`);
-          }
-
-          // Using the event handler IDL attribute
-          window.onappinstalled = handleInstalled;
-
-          // Using .addEventListener()
-          window.addEventListener("appinstalled", handleInstalled);
-        </pre>
         <section data-dfn-for="Window">
           <h4>
             <code>onappinstalled</code> attribute
           </h4>
           <p>
-            The <dfn>onappinstalled</dfn> is an <a>event handler IDL
-            attribute</a> for the "<dfn>appinstalled</dfn>" event type. The
-            interface used for these events is the <a><code>Event</code>
-            interface</a> [[DOM]]. This event is dispatched as a result of a
-            successful installation (see the <a>steps to install the web
-            application</a>).
+            The <dfn>onappinstalled</dfn> <a>event handler IDL attribute</a>
+            handles "<dfn class="event">appinstalled</dfn>" events.
           </p>
         </section>
-        <section data-dfn-for="Window">
+        <section>
           <h4>
             <code>onbeforeinstallprompt</code> attribute
           </h4>
           <p>
-            The <dfn>onbeforeinstallprompt</dfn> is an <a>event handler IDL
-            attribute</a> for the "<dfn>beforeinstallprompt</dfn>" event type.
-            The interface used for these events is the
-            <a>BeforeInstallPromptEvent</a> interface (see the <a>steps to
-            notify that an install prompt is available</a>).
+            The <dfn>onbeforeinstallprompt</dfn> <a>event handler IDL
+            attribute</a> handles "<dfn class=
+            "event">beforeinstallprompt</dfn>" events.
           </p>
         </section>
       </section>
     </section>
-    <section>
-      <h3>
-        Associating a resource with a manifest
-      </h3>
-      <p>
-        A resource is said to be <dfn>associated with a manifest</dfn> if the
-        resource representation, an HTML document, has a <a href=
-        "#linking"><code>manifest</code> link relationship</a>.
-      </p>
-      <section id="linking">
-        <h3>
-          Linking to a manifest
-        </h3>
-        <p>
-          The <code>manifest</code> keyword can be used with a [[HTML]]
-          [^link^] element. This keyword creates an <a>external resource
-          link</a>.
-        </p>
-        <table class="complex data">
-          <thead>
-            <tr>
-              <th rowspan="2">
-                Link type
-              </th>
-              <th colspan="2">
-                Effect on...
-              </th>
-              <th rowspan="2">
-                Brief description
-              </th>
-            </tr>
-            <tr>
-              <th>
-                <code><a>link</a></code>
-              </th>
-              <th>
-                <code><a>a</a></code> and <code><a>area</a></code>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <code>manifest</code>
-              </td>
-              <td>
-                <a>External Resource Link</a>
-              </td>
-              <td>
-                not allowed
-              </td>
-              <td>
-                Imports or links to a <a>manifest</a>.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="note">
-          In cases where more than one [^link^] element with a
-          <code>manifest</code> link type appears in a {{Document}}, the user
-          agent uses the first [^link^] element in tree order and ignores all
-          subsequent [^link^] elements with a <code>manifest</code> link type
-          (even if the first element was erroneous). See the steps for
-          <a>obtaining a manifest</a>.
-        </p>
-        <p>
-          To obtain a manifest, the user agent MUST run the steps for
-          <a data-lt="obtaining the manifest">obtaining a manifest</a>. The
-          appropriate time to obtain the manifest is left up to
-          implementations. A user agent MAY opt to delay fetching a manifest
-          until after the document and its other resources have been fully
-          loaded (i.e., to not delay the availability of content and scripts
-          required by the <a>document</a>).
-        </p>
-        <p>
-          A <a>manifest</a> is obtained and applied regardless of the
-          {{HTMLLinkElement/media}} attribute of the [^link^] element matches
-          the environment or not.
-        </p>
-      </section>
-    </section>
-    <section>
-      <h2>
-        Manifest life-cycle
-      </h2>
-      <p>
-        This section defines algorithms for <a href="#obtaining">obtaining</a>,
-        <a href="#processing">processing</a>, and <a>applying</a> a
-        <a>manifest</a>.
-      </p>
-      <section id="obtaining">
-        <h3>
-          Obtaining a manifest
-        </h3>
-        <p>
-          The <dfn data-lt="obtaining the manifest|obtaining a manifest">steps
-          for obtaining a manifest</dfn> are given by the following algorithm.
-          The algorithm, if successful, returns a <a>processed manifest</a> and
-          the <var>manifest URL</var>; otherwise, it aborts prematurely and
-          returns nothing. In the case of nothing being returned, the user
-          agent MUST ignore the manifest declaration. In running these steps, a
-          user agent MUST NOT <a>delay the load event</a>.
-        </p>
-        <ol>
-          <li>From the {{Document}} of the <a>top-level browsing context</a>,
-          let <var>origin</var> be the {{Document}}'s origin, and <var>manifest
-          link</var> be the first [^link^] element in <a>tree order</a> whose
-          {{HTMLLinkElement/rel}} attribute contains the token
-          <code>manifest</code>.
-          </li>
-          <li>If <var>origin</var> is an <a>opaque origin</a>, then abort these
-          steps.
-          </li>
-          <li>If <var>manifest link</var> is <code>null</code>, then abort
-          these steps.
-          </li>
-          <li>If <var>manifest link</var>'s <code>href</code> attribute's value
-          is the empty <a>string</a>, then abort these steps.
-          </li>
-          <li>Let <var>manifest URL</var> be the result of [=URL
-          Parser|parsing=] the value of the <code>href</code> attribute,
-          relative to <a>the element's base URL</a>. If parsing fails, then
-          abort these steps.
-          </li>
-          <li>Let |request:Request| be a new <a>Request</a>.
-          </li>
-          <li>Set |request|'s [=request/URL=] to |manifest URL|.
-          </li>
-          <li>Set |request|'s [=request/initiator=] to "`manifest`".
-          </li>
-          <li>Set |request|'s [=request/destination=] to "`manifest`".
-          </li>
-          <li>If the |manifest link|'s {{HTMLLinkElement/crossOrigin}}
-          attribute's value is "`use-credentials`", then set |request|'s
-          [=request/credentials mode=] to "`include`". Otherwise, set
-          |request|'s [=request/credentials mode=] to "`omit`".
-          </li>
-          <li>Set |request|'s [=request/mode=] to "`cors`".
-          </li>
-          <li>Await the result of performing a <a>fetch</a> with
-          <var>request</var>, letting <var>response</var> be the result.
-          </li>
-          <li>If <var>response</var> is a <a>network error</a>, then abort
-          these steps.
-          </li>
-          <li>Let <var>text</var> be <a>UTF-8 decode</a> <var>response</var>'s
-          <a data-cite="FETCH#concept-request-body">body</a>.
-          </li>
-          <li>Let <var>manifest</var> be the result of running <a>processing a
-          manifest</a> given <var>text</var>, <var>manifest URL</var>, and the
-          URL that represents the address of the <a>top-level browsing
-          context</a>.
-          </li>
-          <li>Return <var>manifest</var> and <var>manifest URL</var>.
-          </li>
-        </ol>
-        <section>
-          <h4>
-            Content security policy
-          </h4>
-          <p>
-            A user agent MUST support [[CSP3]].
-          </p>
-          <div class="example">
-            <p>
-              The <a>manifest-src</a> and <a>default-src</a> directives govern
-              the origins from which a <a>user agent</a> can fetch a manifest.
-              As with other directives, by default the <a>manifest-src</a>
-              directive is <code>*</code>, meaning that a user agent can,
-              [[FETCH]]'s <abbr>CORS</abbr> permitting, fetch the manifest
-              cross-domain. Remote origins (e.g., a <abbr title=
-              "content delivery network">CDN</abbr>) wanting to host manifests
-              for various web applications will need to include the appropriate
-              <abbr>CORS</abbr> response header in their HTTP response (e.g.,
-              <code>Access-Control-Allow-Origin: https://example.com</code>).
-            </p>
-            <figure>
-              <img src="images/manifest-src-directive.svg" width="704" height=
-              "342" alt="manifest-src directive example illustrated">
-              <figcaption>
-                For a [[HTML]] document, [[CSP3]]'s <a>manifest-src</a>
-                directive controls the sources from which a [[HTML]] document
-                can load a manifest from. The same CSP policy's
-                <code>img-src</code> directive controls where the icon's images
-                can be fetched from.
-              </figcaption>
-            </figure>
-          </div>
-        </section>
-      </section>
-    </section>
+    <section id="conformance"></section>
   </body>
 </html>
