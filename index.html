@@ -150,7 +150,8 @@
       </p>
       <section>
         <h3>
-          <code><dfn data-dfn-for="note_taking">new_note_url</dfn></code> member
+          <code><dfn data-dfn-for="note_taking">new_note_url</dfn></code>
+          member
         </h3>
         <p>
           The [=note_taking=] `new_note_url` member is a [=string=] that
@@ -160,17 +161,16 @@
           shortcut icon or keyboard shortcut).
         </p>
         <p>
-          The `new_note_url` member is purely advisory,
-          and a user agent MAY <a data-cite="appmanifest#dfn-ignore">ignore</a>
-          it or provide the end-user the choice of whether to use it. The user
-          agent MAY provide the end-user the choice to modify it.
+          The `new_note_url` member is purely advisory, and a user agent MAY
+          <a data-cite="appmanifest#dfn-ignore">ignore</a> it or provide the
+          end-user the choice of whether to use it. The user agent MAY provide
+          the end-user the choice to modify it.
         </p>
         <aside class="note">
           <p>
-            The `new_note_url` member is parsed with
-            <a data-cite="appmanifest#dfn-manifest-url">manifest URL</a> as the
-            base URL and is ignored if not [=manifest/within scope=] of the
-            manifest.
+            The `new_note_url` member is parsed with <a data-cite=
+            "appmanifest#dfn-manifest-url">manifest URL</a> as the base URL and
+            is ignored if not [=manifest/within scope=] of the manifest.
           </p>
         </aside>
       </section>
@@ -204,20 +204,20 @@
         <p>
           To <dfn>process the `note_taking` member</dfn>, given [=ordered map=]
           |json:ordered map|, [=ordered map=] |manifest:ordered map|, [=URL=]
-          |manifest_URL:URL|, run the following during the
-          <a data-cite=
+          |manifest_URL:URL|, run the following during the <a data-cite=
           "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
           point</a> in [=processing a manifest=]:
         </p>
         <ol class="algorithm">
-          <li>If |json|["note_taking"] does not [=map/exist=], return.</li>
-          <li>If the type of |json|["note_taking"] is not [=ordered map=],
-            return.
+          <li>If |json|["note_taking"] does not [=map/exist=], return.
           </li>
-          <li>Set |manifest|["note_taking"] to a new [=ordered map=].</li>
+          <li>If the type of |json|["note_taking"] is not [=ordered map=],
+          return.
+          </li>
+          <li>Set |manifest|["note_taking"] to a new [=ordered map=].
+          </li>
           <li>[=process the `new_note_url` member=] passing
-            |json|["note_taking"], |manifest|["note_taking"], and
-            |manifest URL|.
+          |json|["note_taking"], |manifest|["note_taking"], and |manifest URL|.
           </li>
         </ol>
       </section>
@@ -226,25 +226,26 @@
           Processing the `new_note_url` member
         </h3>
         <p>
-          To <dfn>process the `new_note_url` member</dfn>, given [=ordered map=]
-          |json_note_taking:ordered map|, [=ordered map=]
+          To <dfn>process the `new_note_url` member</dfn>, given [=ordered
+          map=] |json_note_taking:ordered map|, [=ordered map=]
           |manifest_note_taking:ordered map|, [=URL=] |manifest_URL:URL|, run
           the following:
         </p>
         <ol class="algorithm">
           <li>If |json_note_taking|["new_note_url"] does not [=map/exist=],
-            return.
+          return.
           </li>
           <li>If the type of |json_note_taking|["new_note_url"] is not
-            [=string=], return.
+          [=string=], return.
           </li>
           <li>Let |new_note_url:URL| be the result of [=URL Parser|parsing=]
-            |json_note_taking|["new_note_url"] with |manifest URL| as the
-            base URL.
+          |json_note_taking|["new_note_url"] with |manifest URL| as the base
+          URL.
           </li>
-          <li>If |new_note_url| is failure, return.</li>
+          <li>If |new_note_url| is failure, return.
+          </li>
           <li>If |new_note_url| is not [=manifest/within scope=] of |manifest
-            URL|, return.
+          URL|, return.
           </li>
           <li>Set manifest_note_taking["new_note_url"] to |new_note_url|.
           </li>
@@ -260,18 +261,19 @@
           |manifest:processed manifest|, run the following steps:
         </p>
         <ol>
-          <li>If |manifest|["note_taking"] does not [=map/exist=], return.</li>
+          <li>If |manifest|["note_taking"] does not [=map/exist=], return.
+          </li>
           <li>If |manifest|["note_taking"]["new_note_url"] does not
-            [=map/exist=], return.
+          [=map/exist=], return.
           </li>
           <li>If the type of |manifest|["note_taking"]["new_note_url"] is not
-            [=URL=], return.
+          [=URL=], return.
           </li>
           <li>Let |browsing context:Browsing Context| be the result of creating
-            a new [=top-level browsing context=].
+          a new [=top-level browsing context=].
           </li>
           <li>[=Navigate=] |browsing context| to resource
-            |manifest|["note_taking"]["new_note_url"].
+          |manifest|["note_taking"]["new_note_url"].
           </li>
         </ol>
       </section>
