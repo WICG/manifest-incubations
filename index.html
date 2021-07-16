@@ -535,23 +535,28 @@
             steps:
           </p>
           <ol>
-            <li>If <var>this</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a> is pending:
+            <li>If
+            <var>this</var>.{{BeforeInstallPromptEvent/[[userResponsePromise]]}}
+            is pending:
               <ol>
                 <li>If this event's {{Event/isTrusted}} attribute is
                 <code>false</code>, reject
-                <var>this</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a> with
-                {{"NotAllowedError"}}, optionally informing the developer that
-                untrusted events can't call <code>prompt()</code>.
+                <var>this</var>.{{BeforeInstallPromptEvent/[[userResponsePromise]]}}
+                with {{"NotAllowedError"}}, optionally informing the developer
+                that untrusted events can't call <code>prompt()</code>.
                 </li>
-                <li>Else if <var>this</var>.<a>[[\didPrompt]]</a> is
-                <code>false</code>, set <var>this</var>.<a>[[\didPrompt]]</a>
-                to <code>true</code>, then <a>in parallel</a>, <a>request to
+                <li>Else if
+                <var>this</var>.{{BeforeInstallPromptEvent/[[didPrompt]]}} is
+                <code>false</code>, set
+                <var>this</var>.{{BeforeInstallPromptEvent/[[didPrompt]]}} to
+                <code>true</code>, then <a>in parallel</a>, <a>request to
                 present an install prompt</a> with this event. Wait, possibly
                 indefinitely, for the end-user to make a choice.
                 </li>
               </ol>
             </li>
-            <li>Return <var>this</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a>.
+            <li>Return
+            <var>this</var>.{{BeforeInstallPromptEvent/[[userResponsePromise]]}}.
             </li>
           </ol>
           <p>
@@ -563,10 +568,11 @@
               <a>Present an install prompt</a> and let <var>outcome</var> be
               the result.
             </li>
-            <li>Resolve <var>event</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a> with a
-            newly created <a>PromptResponseObject</a> whose <a data-link-for=
-            "PromptResponseObject">userChoice</a> member is the value of <var>
-              outcome</var>.
+            <li>Resolve
+            <var>event</var>.{{BeforeInstallPromptEvent/[[userResponsePromise]]}}
+            with a newly created <a>PromptResponseObject</a> whose
+            <a data-link-for="PromptResponseObject">userChoice</a> member is
+            the value of <var>outcome</var>.
             </li>
           </ol>
         </section>
