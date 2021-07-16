@@ -535,11 +535,11 @@
             steps:
           </p>
           <ol>
-            <li>If <var>this</var>.<a>[[\userResponsePromise]]</a> is pending:
+            <li>If <var>this</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a> is pending:
               <ol>
                 <li>If this event's {{Event/isTrusted}} attribute is
                 <code>false</code>, reject
-                <var>this</var>.<a>[[\userResponsePromise]]</a> with
+                <var>this</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a> with
                 {{"NotAllowedError"}}, optionally informing the developer that
                 untrusted events can't call <code>prompt()</code>.
                 </li>
@@ -551,7 +551,7 @@
                 </li>
               </ol>
             </li>
-            <li>Return <var>this</var>.<a>[[\userResponsePromise]]</a>.
+            <li>Return <var>this</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a>.
             </li>
           </ol>
           <p>
@@ -563,7 +563,7 @@
               <a>Present an install prompt</a> and let <var>outcome</var> be
               the result.
             </li>
-            <li>Resolve <var>event</var>.<a>[[\userResponsePromise]]</a> with a
+            <li>Resolve <var>event</var>.<a>{{BeforeInstallPromptEvent/[[\userResponsePromise]]</a> with a
             newly created <a>PromptResponseObject</a> whose <a data-link-for=
             "PromptResponseObject">userChoice</a> member is the value of <var>
               outcome</var>.
