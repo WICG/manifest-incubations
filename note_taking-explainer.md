@@ -49,6 +49,12 @@ properties, such as
 [link capturing](
 https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md).
 
+The user agent can choose (or let the user choose) what to do with web apps
+identified as note-taking apps. For example, it may surface the apps in its own
+UI or integrate those apps with some OS-level functionality for taking notes. If
+multiple note-taking apps are identified, it could integrate them all or choose
+(or let the user choose) some subset to integrate.
+
 By using a dictionary we can easily add other note-taking app functionality or
 extend the current functionality, and it keeps the manifest organised with
 related functionality together. It also means note-taking can be specified
