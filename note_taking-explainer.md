@@ -2,20 +2,33 @@
 
 ## Overview
 
-Note-taking apps have special integrations in some user agents and OSs to take a
-quick note. Examples:
+Note-taking apps have special integrations in some User Agents and Operating
+Systems as a convenient way for the user to take a quick note. Some examples:
 
-- [keyboard shortcut on Windows](https://support.microsoft.com/en-us/office/create-quick-notes-0f126c7d-1e62-483a-b027-9c31c78dad99)
-- [action center button on Windows](https://www.windowscentral.com/how-change-note-button-action-open-other-note-taking-apps-windows-10)
-- [stylus tools button on CrOS](https://support.google.com/chromebook/answer/7073299)
-- [Google Assistant on Android](https://support.google.com/assistant/answer/9053424)
-- [touch bar or Siri on OSX](https://support.apple.com/en-au/guide/notes/not9474646a9/mac)
+* ["Quick Note" keyboard shortcut on Windows](
+  https://support.microsoft.com/en-us/office/create-quick-notes-0f126c7d-1e62-483a-b027-9c31c78dad99)
+* ["Note" action center button on Windows](
+  https://www.windowscentral.com/how-change-note-button-action-open-other-note-taking-apps-windows-10)
+* ["New note" stylus tools button on CrOS](
+  https://support.google.com/chromebook/answer/7073299)
+* ["Take a note" in Google Assistant on Android](
+  https://support.google.com/assistant/answer/9053424)
+* ["New Note" touch bar button or "Create a note" with Siri on OSX](
+  https://support.apple.com/en-au/guide/notes/not9474646a9/mac)
 
-Such integrations could begin to be supported for web apps too, if they had a
-way to identify themselves as note-taking apps and a URL to launch for taking
-new note. It wouldn't cover all the use-cases linked above (eg. voice assistant
-actually adding items to the note) but it covers the core flow of adding a new
+However, these integrations currently work only for native apps. Such
+integrations could be supported for web apps too, if they had a way to identify
+themselves as note-taking apps and a URL to launch for taking new note. It
+wouldn't cover all of the use-cases linked above (eg. voice assistant actually
+adding items to the note) but it covers the core & common flow of adding a new
 note.
+
+This explainer proposes a way for web apps to:
+* declare themselves as note-taking apps
+* declare a URL to launch for taking a new note
+
+which will allow UAs and OSs to provide convenient integrations with note-taking
+web apps, if they choose to do so.
 
 ### Background
 
@@ -48,6 +61,12 @@ properties, such as
 [display mode](https://www.w3.org/TR/appmanifest/#display-member) and
 [link capturing](
 https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md).
+
+The user agent can choose (or let the user choose) what to do with web apps
+identified as note-taking apps. For example, it may surface the apps in its own
+UI or integrate those apps with some OS-level functionality for taking notes. If
+multiple note-taking apps are identified, it could integrate them all or choose
+(or let the user choose) some subset to integrate.
 
 By using a dictionary we can easily add other note-taking app functionality or
 extend the current functionality, and it keeps the manifest organised with
