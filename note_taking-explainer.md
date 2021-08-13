@@ -1,5 +1,7 @@
 # Note Taking Web Apps
 
+Author: Glen Robertson (glenrob@chromium.org)
+
 ## Overview
 
 Note-taking apps have special integrations in some User Agents and Operating
