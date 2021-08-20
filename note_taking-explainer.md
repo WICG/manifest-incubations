@@ -61,8 +61,8 @@ app, and `new_note_url` is a simple note-taking app capability. The url is
 launched in the same way as the `start_url`, so is affected by the app's other
 properties, such as
 [display mode](https://www.w3.org/TR/appmanifest/#display-member) and
-[link capturing](
-https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md).
+[launch handlers](
+https://github.com/WICG/sw-launch/blob/main/launch_handler.md).
 
 The user agent can choose (or let the user choose) what to do with web apps
 identified as note-taking apps. For example, it may surface the apps in its own
@@ -75,6 +75,16 @@ extend the current functionality, and it keeps the manifest organised with
 related functionality together. It also means note-taking can be specified
 largely orthogonally to other manifest specification changes, which helps to
 keep the manifest specification modular and manageable.
+
+By launching the `new_note_url` using the same launch mechanism as
+the `start_url` apps can use a [launch handler](
+https://github.com/WICG/sw-launch/blob/main/launch_handler.md) to
+determine what happens when the URL is launched. For example, the app could
+choose to receive the launch as an event in an existing app instance, instead of
+opening a new instance of the app, and the app could handle the event by showing
+a new note in the existing UI. This allows apps a lot of flexibility in
+customising their behaviour in response to a launch, without complicating this
+API.
 
 ### Future Considerations
 
@@ -168,6 +178,34 @@ anyway, so we get little benefit from grouping like this. In fact there might be
 a drawback to grouping disparate features and tying their specification together
 rather than having separate tiny specifications. This "integrations" member is
 really serving the same purpose as the root manifest object.
+
+### An Event
+
+Another option would have been to have a note-taking app register an event
+handler for a "new note" event. It could potentially have a dictionary of
+parameters to allow a high degree of flexibility and added functionality in the
+future.
+
+However, such flexibility actually reduces the ability for the API to declare
+capabilities. Unlike an event registration, the proposed New Note URL is known
+as soon as the manifest is parsed, and relatively fixed, so it is clear to the
+UA when a given app starts/stops self-identifying as a note-taking app capable
+of the "new note" action. By contrast, an event handler might only be registered
+in certain conditions and provides no assurance of being registered again in the
+future. If new functionality is added to the New Note URL in the future, it
+could be added with explicit parameters or another URL declared in the manifest,
+which again acts as a declaration of capabilities. By contrast for an event with
+a dictionary of parameters, the UA cannot know whether the app is capable of
+handling new parameters. For example, if adding a text parameter to a "new note"
+event's parameters, older apps may ignore this extra parameter and lose some
+input text.
+
+An event also complicates launching. Opening a URL is a natural way to launch a
+web app from outside the app (the UA or OS), whereas an event requires that the
+app is first launched or is already running. An event allows more customisation
+of the app's launch behaviour, but similar customisation is possible with launch
+URLs using [launch handlers](
+https://github.com/WICG/sw-launch/blob/main/launch_handler.md).
 
 ## Security and Privacy Considerations
 
