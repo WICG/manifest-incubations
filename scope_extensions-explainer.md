@@ -92,28 +92,46 @@ associated origins.
 
 ## Security Considerations
 
-### Declarative link capturing events
+User agents may perform link capturing for user navigations within a web app's
+extended scope and launch the web app instead of performing the navigation.
 
-Capturing user navigations via `"capture_links": "existing-client-event"` has
-the potential for the web app to spoof its associated origins. Event link
-capturing must not be supported for associated origins unless they specify
-`"authorize": ["intercept-links"]` in their entry for the associated web app.
-This opt-in is used as a signal of trust between the associated origin and the
-web app.
+The [launch handler][launch-handler] proposal enables sites to reroute app
+launches into existing web app contexts.
+
+The combination of link capturing, launch handler and scope extensions leads to
+the following attack vector:
+1. User installs the TestApp web app from app.com.
+1. TestApp's scope includes site.com with valid origin associations.
+1. TestApp sets its `launch_handler` to
+   ```
+   {
+     "route_to": "existing-client-retain"
+   }
+   ```
+1. User clicks on a link to site.com.
+1. Navigation is captured by an existing TestApp window that is brought into
+   focus and has a LaunchParam is enqueued.
+1. *TestApp is now aware that the user is navigating to site.com and could
+   perform a fake navigation with the intention of duping the user into thinking
+   they're on site.com.*
+
+To mitigate this risk origins must explicitly grant web apps this ability via an
+`"authorize"` field in the corresponding web-app-origin-association.json entry
+set to a list including the value `"intercept-links"`. This opt-in is used as a
+signal of trust between the associated origin and the web app.
 
 
 ## Related Proposals
 
-### [URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
+### [URL Handlers][url-handlers]
 
 The Scope Extensions proposal is intended to be a replacement for the
-[URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
-proposal with the following changes:
+[URL Handlers][url-handlers] proposal with the following changes:
  - Re-orient the goal to be focused just on expanding the set of origins/URLs in
    the web app's scope. Remove the goal of registering web apps as URL handlers
-   in the user's operating system. That behaviour will be covered by the
-   [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-   proposal instead.
+   in the user's operating system. That behaviour will be covered by individual
+   browsers optionally offering users the choice to capture link navigations as
+   web app launches.
  - Rename the new manifest field from `url_handlers` to `scope_extensions` to
    reflect the change in goals.
  - Move the association file from "<origin>/web-app-origin-association.json" to
@@ -121,18 +139,14 @@ proposal with the following changes:
    with [RFC 8615](https://datatracker.ietf.org/doc/html/rfc8615).
  - Change the association file entries to be keyed on the web app identifier
    rather than the web app's manifest URL. This aligns with the recent
-   [PWA Unique ID](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md)
-   proposal.
+   [PWA Unique ID][unique-id] proposal.
  - Rename `"paths"` to `"include_paths"` in the association file entries.
  - Add an "authorize" field to the association file entries for the associated
    origin to provide explicit opt-in signals for security sensitive
    capabilities.
 
-### [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
 
-Scope extensions can be considered the first stage in the link capturing
-pipeline. This proposal allows developers to control the set of user navigation
-URLs that the web app is intended to capture. The
-[Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-proposal allows developers to control the action that is taken once a user
-navigation is captured e.g. open a new app context or navigate an existing one.
+[launch-handler]: https://github.com/WICG/sw-launch/blob/main/launch_handler.md
+[url-handlers]: https://github.com/WICG/pwa-url-handler/blob/main/explainer.md
+[dlc]: https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md
+[unique-id]: https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md
