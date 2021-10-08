@@ -290,15 +290,17 @@
         via custom protocol links.
       </p>
       <p>
-        How protocol handlers are presented, and how many of them are shown
-        to the user, is at the discretion of the user agent and/or operating
-        system.
+        On installation, a user agent SHOULD register protocol handlers with the operating system via interactions that are consistent with:
+        <ul>
+          <li>If there are multiple registered handlers for a protocol, the OS allows the user to select which app should open it, and also allows the user to set a default app.</li>
+          <li>clicking on a registered protocol will launch the registered application. If this is the web app, then execute the [=invoke a protocol handler=] steps defined in [=HTML=], where the user agent SHOULD navigate to [=url=] and the appropriate browsing context is set to a new top level browsing context.</li>
+        </ul>
       </p>
       <section>
         <h3>Processing the `protocol_handlers` member</h3>
         <p>
           To <dfn>process the `protocol_handlers` member</dfn>, given
-          [=object=] |json:JSON|, |manifest:ordered map|, and |manifest
+          [=object=] |json:JSON|, |manifest:ordered map|, and |start
           URL:URL|:
         </p>
         <ol>
@@ -323,7 +325,7 @@
                 object=]. If the result is failure, [=iteration/continue=].
               </li>
               <li>If [=normalizedUrl=] is not [=manifest/within scope=] of
-              <var>manifest URL</var>, [=iteration/continue=].
+              <var>start URL</var>, [=iteration/continue=].
               </li>
               <li>If [=normalizedUrl=] already exists in
               <var>processedProtocolHandlers</var>, [=iteration/continue=].
@@ -455,6 +457,10 @@
             new top level browsing context.
           </p>
         </section>
+      </section>
+      <section>
+        <h2>Privacy consideration: Default protocol handler</h2>
+        <p>Depending on the operating system capabilities, the protocol handler could become a 'default' handler (e.g. handling launches of a given protocol automatically) of a given protocol without the explicit knowledge of the user. To protect against possible mis-use, user agents MAY require explicit user consent to begin with the process to execute a protocol handler launch. If consent is denied, the user agent MAY remove the web application's OS registration as a protocol handling entity.</p>
       </section>
     </section>
     <section data-cite="DOM">
