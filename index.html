@@ -280,28 +280,38 @@
       </h2>
       <p>
         The [=manifest's=] <code><dfn data-dfn-for=
-        "manifest">protocol_handlers</dfn></code> member is an array
-        of <a>protocol handler description</a>s that allows a web application
-        to handle URL protocols.
+        "manifest">protocol_handlers</dfn></code> member is an array of
+        <a>protocol handler description</a>s that allows a web application to
+        handle URL protocols.
       </p>
-      <p class="example">
+      <p>
+        On installation, a user agent SHOULD register protocol handlers with
+        the Operating System via interactions that are consistent with:
+      </p>
+      <ul>
+        <li>If there are multiple registered handlers for a protocol, the OS
+        allows the user to select which app should open it, and also allows the
+        user to set a default app.
+        </li>
+        <li>clicking on a registered protocol will launch the registered
+        application. If this is the web app, then execute the [=invoke a
+        protocol handler=] steps defined in [=HTML=], where the user agent
+        SHOULD navigate to [=url=] and the appropriate browsing context is set
+        to a new top level browsing context.
+        </li>
+      </ul>
+      <aside class="note">
         Protocol handlers could, for instance, be used for web app
         communication where one app directly invokes another and passes data
         via custom protocol links.
-      </p>
-      <p>
-        On installation, a user agent SHOULD register protocol handlers with the operating system via interactions that are consistent with:
-        <ul>
-          <li>If there are multiple registered handlers for a protocol, the OS allows the user to select which app should open it, and also allows the user to set a default app.</li>
-          <li>clicking on a registered protocol will launch the registered application. If this is the web app, then execute the [=invoke a protocol handler=] steps defined in [=HTML=], where the user agent SHOULD navigate to [=url=] and the appropriate browsing context is set to a new top level browsing context.</li>
-        </ul>
-      </p>
+      </aside>
       <section>
-        <h3>Processing the `protocol_handlers` member</h3>
+        <h3>
+          Processing the `protocol_handlers` member
+        </h3>
         <p>
           To <dfn>process the `protocol_handlers` member</dfn>, given
-          [=object=] |json:JSON|, |manifest:ordered map|, and |start
-          URL:URL|:
+          [=object=] |json:JSON|, |manifest:ordered map|, and |start URL:URL|:
         </p>
         <ol>
           <li>Let <var>processedProtocolHandlers</var> be a new [=list=] of
@@ -389,8 +399,8 @@
         </h2>
         <p>
           Each <dfn>protocol handler description</dfn> is an [=object=] that
-          represents a protocol that the web application wants to handle. It has
-          the following members:
+          represents a protocol that the web application wants to handle. It
+          has the following members:
         </p>
         <ul>
           <li>[=`protocol`=]
@@ -399,10 +409,10 @@
           </li>
         </ul>
         <p>
-          A user agent SHOULD use these values to register the web application as
-          a handler with the operating system. When the user activates a protocol
-          handler URL, the user agent SHOULD run <a>handling a protocol
-          launch</a>.
+          A user agent SHOULD use these values to register the web application
+          as a handler with the operating system. When the user activates a
+          protocol handler URL, the user agent SHOULD run <a>handling a
+          protocol launch</a>.
         </p>
         <p class="note">
           [[HTML]]'s {{NavigatorContentUtils/registerProtocolHandler()}} allows
@@ -419,8 +429,8 @@
           </h3>
           <p>
             The <dfn>protocol</dfn> member of a <a>protocol handler
-            description</a> is a <a>string</a> that represents the protocol to be
-            handled, such as `mailto` or `web+auth`.
+            description</a> is a <a>string</a> that represents the protocol to
+            be handled, such as `mailto` or `web+auth`.
           </p>
           <p>
             The <a>protocol</a> member of a <a>protocol handler description</a>
@@ -434,8 +444,8 @@
             `url` member
           </h3>
           <p>
-            The <dfn>url</dfn> member of a <a>protocol handler description</a> is
-            the <a>URL</a> [=manifest/within scope=] of the application that
+            The <dfn>url</dfn> member of a <a>protocol handler description</a>
+            is the <a>URL</a> [=manifest/within scope=] of the application that
             opens when the associated protocol is activated.
           </p>
           <p>
@@ -453,14 +463,38 @@
             <var>protocol_handler</var> having [=manifest=] <var>manifest</var>
             is invoked, it goes through the same steps used to [=invoke a
             protocol handler=] defined in [=HTML=], where the user agent SHOULD
-            navigate to [=url=] and the appropriate browsing context is set to a
-            new top level browsing context.
+            navigate to [=url=] and the appropriate browsing context is set to
+            a new top level browsing context.
           </p>
         </section>
       </section>
       <section>
-        <h2>Privacy consideration: Default protocol handler</h2>
-        <p>Depending on the operating system capabilities, the protocol handler could become a 'default' handler (e.g. handling launches of a given protocol automatically) of a given protocol without the explicit knowledge of the user. To protect against possible mis-use, user agents MAY require explicit user consent to begin with the process to execute a protocol handler launch. If consent is denied, the user agent MAY remove the web application's OS registration as a protocol handling entity.</p>
+        <h2>
+          Privacy consideration: Default protocol handler
+        </h2>
+        <p>
+          Depending on the operating system capabilities, the protocol handler
+          could become a 'default' handler (e.g. handling launches of a given
+          protocol automatically) of a given protocol without the explicit
+          knowledge of the user. To protect against possible misuse, user
+          agents MAY employ protections such as:
+        </p>
+        <ul>
+          <li>Requiring explicit user consent before executing the process to
+          [=invoke a protocol handler=].
+          </li>
+          <li>Removing the web application's OS registration as a protocol
+          handling entity, either in response to the above dialog or by user
+          action.
+          </li>
+          <li>Confirming protocol handler registrations on [=installation=].
+          </li>
+        </ul>
+        <p>
+          If a user agent removes the the registration of the protocol handler
+          entity it SHOULD provide UX for the user to re-register the web app
+          and protocol with the operating system.
+        </p>
       </section>
     </section>
     <section data-cite="DOM">
@@ -557,7 +591,7 @@
       </h2>
       <section>
         <h2>
-          Installation process
+          <dfn>Installation</dfn> process
         </h2>
         <p>
           The <dfn>steps to install the web application</dfn> are given by the
