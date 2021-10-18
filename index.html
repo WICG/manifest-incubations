@@ -293,7 +293,7 @@
         allows the user to select which app should open it, and also allows the
         user to set a default app.
         </li>
-        <li>clicking on a registered protocol will launch the registered
+        <li>Clicking on a registered protocol will launch the registered
         application. If this is the web app, then execute the [=invoke a
         protocol handler=] steps defined in [=HTML=], where the user agent
         SHOULD navigate to [=url=] and the appropriate browsing context is set
@@ -311,37 +311,37 @@
         </h3>
         <p>
           To <dfn>process the `protocol_handlers` member</dfn>, given
-          [=object=] |json:JSON|, |manifest:ordered map|, and |start URL:URL|:
+          [=object=] |json:JSON|, |manifest:ordered map|, and [=manifest/within
+          scope=] of the |manifest|:
         </p>
         <ol>
-          <li>Let <var>processedProtocolHandlers</var> be a new [=list=] of
-          |json:JSON|["<var>protocol_handlers</var>"].
+          <li>Let |processedProtocolHandlers| be a new [=list=] of
+          |json:JSON|["|protocol_handlers|"].
           </li>
-          <li>Set manifest["<var>protocol_handlers</var>"] to
-          <var>processedProtocolHandlers</var>.
+          <li>Set manifest["|protocol_handlers|"] to
+          |processedProtocolHandlers|.
           </li>
-          <li>[=list/For each=] <var>protocol_handler</var> (<a>protocol
-          handler description</a>):
+          <li>[=list/For each=] |protocol_handler| (<a>protocol handler
+          description</a>):
             <ol>
               <li>If |protocol_handler|["protocol"] or
-              <var>protocol_handler</var>["url"] is undefined,
-              [=iteration/continue=].
+              |protocol_handler|["url"] is undefined, [=iteration/continue=].
               </li>
               <li>Let (<dfn>normalizedProtocol</dfn>, <dfn>normalizedUrl</dfn>)
               be the result of running [=normalize protocol handler
-              parameters=] with <var>protocol_handler</var>["protocol"], <var>
-                protocol_handler</var>["url"] using <var>manifest URL</var> as
-                the base URL, and [=this=]'s relevant [=environment settings
-                object=]. If the result is failure, [=iteration/continue=].
+              parameters=] with |protocol_handler|["protocol"], |
+              protocol_handler|["url"] using |manifest URL| as the base URL,
+              and [=this=]'s relevant [=environment settings object=]. If the
+              result is failure, [=iteration/continue=].
               </li>
               <li>If [=normalizedUrl=] is not [=manifest/within scope=] of
-              <var>start URL</var>, [=iteration/continue=].
+              |start URL|, [=iteration/continue=].
               </li>
-              <li>If [=normalizedUrl=] already exists in
-              <var>processedProtocolHandlers</var>, [=iteration/continue=].
+              <li>If |processedProtocolHandlers| [=list/contains=] the
+              [=normalizedUrl=], [=iteration/continue=].
               </li>
               <li>[=List/Append=] |protocol_handler| to
-              <var>processedProtocolHandlers</var>.
+              |processedProtocolHandlers|.
               </li>
             </ol>
           </li>
@@ -351,25 +351,24 @@
         </ol>
         <p>
           A user agent SHOULD ask users for permission before registering a
-          <a>protocol handler description</a> <var>protocol_handler</var>s as
-          the default handler for a protocol with the host operating system. A
-          user agent MAY truncate the list of <a>protocol handler
-          description</a> <var>protocol_handlers</var> presented in order to
-          remain consistent with the conventions or limitations of the host
-          operating system.
+          [=protocol handler description=] <var>protocol_handler</var>s as the
+          default handler for a protocol with the host operating system. A user
+          agent MAY truncate the list of [=protocol handler description=]
+          <var>protocol_handlers</var> presented in order to remain consistent
+          with the conventions or limitations of the host operating system.
         </p>
         <aside class="example">
           <p>
-            In the following example, the developer has included two
-            <a>protocol handler description</a> <var>protocol_handler</var>s.
-            Assuming the the manifest's URL is
+            In the following example, the developer has included two [=protocol
+            handler description=] <var>protocol_handler</var>s. Assuming the
+            the manifest's URL is
             <samp>https://example.com/manifest.webmanifest</samp>:
           </p>
           <ul>
             <li>The first protocol handler would register to handle "web+music"
             URLs (e.g.: web+music://#1234). When activated, the user agent
-            would instantiate a new <a>top-level browsing context</a> and
-            navigate to
+            would instantiate a new[=top-level browsing context=] and navigate
+            to
             <samp>https://example.com/play?songId=web+music://%231234</samp>.
             </li>
             <li>The second protocol handler would be ignored, as the protocol
@@ -377,7 +376,7 @@
             [=safelisted schemes=].
             </li>
           </ul>
-          <pre class="example json">
+          <pre class="json">
             {
               "protocol_handlers": [
                 {
