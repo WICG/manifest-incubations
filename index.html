@@ -311,8 +311,7 @@
         </h3>
         <p>
           To <dfn>process the `protocol_handlers` member</dfn>, given
-          [=object=] |json:JSON|, |manifest:ordered map|, and [=manifest/within
-          scope=] of the |manifest|:
+          [=object=] |json:JSON|, |manifest:ordered map|:
         </p>
         <ol>
           <li>Let |processedProtocolHandlers| be a new [=list=] of
@@ -335,7 +334,7 @@
               result is failure, [=iteration/continue=].
               </li>
               <li>If [=normalizedUrl=] is not [=manifest/within scope=] of
-              |start URL|, [=iteration/continue=].
+              |manifest|, [=iteration/continue=].
               </li>
               <li>If |processedProtocolHandlers| [=list/contains=] the
               [=normalizedUrl=], [=iteration/continue=].
