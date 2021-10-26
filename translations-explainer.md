@@ -1,6 +1,6 @@
 # Web App Translations
 
-Authors: Louise Brett (loubrett@google.com), Glen Robertson (glenrob@chromium.org)
+Authors: [Aaron Gustafson](https://github.com/aarongustafson), Louise Brett (loubrett@google.com), Glen Robertson (glenrob@chromium.org)
 
 ## Overview
 
