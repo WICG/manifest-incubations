@@ -54,6 +54,34 @@ Not every field in the Web App Manifest needs to be localizable. The fields whic
 *   `screenshots`
 *   `shortcuts`
 
+For complex fields such as `shortcuts` where only a subset of its fields can be translated (e.g. `name` but not `url`), only the fields to be translated should be redefined in `translations`. The ordering of the shortcuts will be used to match it’s translation. Therefore the number of shortcuts defined in the translations should match the number defined at the top level.
+
+
+```
+"shortcuts": [
+  {
+    "name": "Pet Me",
+    "url": "/pet-me"
+  },
+  {
+     "name": "Feed Me",
+     "url": "/feed-me"
+  }
+],
+"translations": {
+  "fr": {
+    "shortcuts": [
+      {
+        "name": "Caressez-moi"
+      },
+      {
+        "name": "Nourrissez-moi"
+      }
+    ]
+  }
+},
+```
+
 ## Possible extensions
 
 In addition to the language string mapping to an object containing the translations as proposed, it could map to a string that defines the location of a separate JSON file containing the translations.
