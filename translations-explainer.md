@@ -54,7 +54,7 @@ Not every field in the Web App Manifest needs to be localizable. The fields whic
 *   `screenshots`
 *   `shortcuts`
 
-For complex fields such as `shortcuts` where only a subset of its fields can be translated (e.g. `name` but not `url`), only the fields to be translated should be redefined in `translations`. The ordering of the shortcuts will be used to match it’s translation. Therefore the number of shortcuts defined in the translations should match the number defined at the top level.
+For complex fields such as `shortcuts` where only a subset of its fields can be translated (e.g. `name` but not `url`), only the fields to be translated should be redefined in `translations`. The ordering of the shortcuts will be used to match its translation. Therefore the number of shortcuts defined in the translations would need to exactly match the number defined at the top level. A drawback of this approach is if the number of shortcuts do not exactly match (which could happen accidentally when a new shortcut is added), this could be treated as an error, breaking the shortcuts translations.
 
 
 ```
