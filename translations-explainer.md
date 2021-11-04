@@ -4,7 +4,7 @@ Authors: [Aaron Gustafson](https://github.com/aarongustafson), Louise Brett (lou
 
 ## Overview
 
-This document proposes a new `translations` manifest member that enables web apps to provide alternate values for manifest fields for different languages. 
+This document proposes a new `translations` manifest member that enables web apps to provide alternate values for manifest members in specific languages. 
 
 ## Problem
 
@@ -22,42 +22,67 @@ There are several problems with these approaches:
 
 ## Proposal
 
-Add a new dictionary manifest entry `translations`, mapping locale strings to an object containing the translations.
+Add a new dictionary manifest entry `translations`, mapping locale strings to a [`ManifestOverride` object](#manifestoverride-object).
 
-```
-{
-  "name": "Good dog",
-  "description": "An app for dogs",
-  "icons": [],
-  "screenshots": [],
-  "lang": "en",
-  "translations": {
-    "fr": {
-      "name": "Bon chien",
-      "description": "Une application pour chiens",
-      "icons": [],
-      "screenshots": []
-    }
-  },
-}
-```
 
-When the user agent language matches a language present in the translations entry, those fields can be used instead of the top-level fields. If none of the provided languages match, the top-level fields can be used.
+### `ManifestOverride` Object
 
-Not every field in the Web App Manifest needs to be localizable. The fields which could be localizable and able to be provided in the translations are:
+A `ManifestOverride` is a generic object that contains a subset of redefined manifest properties appropriate to the context in which the `ManifestOverride` is being used. The context (e.g., `translations`) will define which properties may be redefined. Any properties not allowed within the context will be ignored.
+
+If the condition governing a `ManifestOverride` is met (e.g., the locale string matches the user agent language), the override is active. When active,
+
+* Redefined string properties will override the initial value set in the root of the Manifest.
+* Redefined array items
+  * **Will be overridden in the order they are authored.** When redefining objects (e.g., `ShortcutItem`, `ImageResource`), authors will only be able to redefine specific properties of that object. In order to ensure all overrides are applied correctly, the order must match the original array (i.e., each `ShortcutItem` must be redefined in order, as must their `icons`, if they also require re-definition).
+  * **Should be equal in number to the array being overridden**. If there is a mismatch in the number of items in either array, any excess items will be ignored. This is only an issue if the original array has more items than the override array, because any excess items within the original array will not be re-defined.
+
+<p id="translatable-members">In the context of the `translations` member, acceptable keys for the `ManifestOverride` include:</p>
 
 *   `dir`
 *   `name`
 *   `short_name`
 *   `description`
 *   `icons`
+    * `src`
+    * `type`
 *   `screenshots`
+    * `src`
+    * `type`
+    * `label`
 *   `shortcuts`
+    * `name`
+    * `short_name`
+    * `description`
+    * `icons`
+      * `src`
+      * `type`
 
-For complex fields such as `shortcuts` where only a subset of its fields can be translated (e.g. `name` but not `url`), only the fields to be translated should be redefined in `translations`. The ordering of the shortcuts will be used to match its translation. Therefore the number of shortcuts defined in the translations would need to exactly match the number defined at the top level. A drawback of this approach is if the number of shortcuts do not exactly match (which could happen accidentally when a new shortcut is added), this could be treated as an error, breaking the shortcuts translations.
+### Simple `translations` Example
 
+When the user agent language matches a language code key in the `translations` object, those fields can be used instead of the top-level fields. If none of the provided languages match, the top-level fields can be used.
 
+```json
+{
+  "lang": "en",
+  "name": "Good dog",
+  "description": "An app for dogs",
+  "translations": {
+    "fr": {
+      "name": "Bon chien",
+      "description": "Une application pour chiens",
+    }
+  }
+}
 ```
+
+In the above example, people who have their language set to French would install a web app named "Bon chien," whereas people who have their language set to anything other than French would install a web app named "Good dog."
+
+### Complex `translations` Example
+
+For array members (e.g., `icons`, `screenshots`, `shortcuts`), only a subset of each item’s properties are open to redefinition. For example, a `ShortcutItem`’s `name` may be translated, but its `url` cannot be changed. [A complete list of translatable properties can be found above](#translatable-members). Any attempts to redefine properties other than those allowed will be ignored.
+
+
+```json
 "shortcuts": [
   {
     "name": "Pet Me",
@@ -82,11 +107,19 @@ For complex fields such as `shortcuts` where only a subset of its fields can be 
 },
 ```
 
+To ensure translations for these complex constructs do not get out of sync with their counterparts in the original arrays, it’s imperative that developers pay close attention to both the number and order of array members. Failure to do so, creates an opportunity for any/all of the following:
+
+* The first and second `ShortcutItem`s are swapped, but the corresponding translations are not. When this happens, the wrong translations are applied and users will be incredibly confused.
+* A new `ShortcutItem` is appended to the array, without corresponding translation(s). When this happens, the last shortcut would remain untranslated and appear in the default language of the Manifest.
+* A new `ShortcutItem` is prepended to the array, without corresponding translation(s). When this happens, the translations get out of sync, with the original translation(s) of the first `ShortcutItem` being applied to the new item, and the final `ShortcutItem` would not be translated. Users will be incredibly confused.
+
+
 ## Possible extensions
 
 In addition to the language string mapping to an object containing the translations as proposed, it could map to a string that defines the location of a separate JSON file containing the translations.
 
-```
+```json
+// manifest.json
 {
   "name": "Good dog",
   "description": "An app for dogs",
@@ -97,11 +130,9 @@ In addition to the language string mapping to an object containing the translati
     "fr": "manifest.fr.json"
   }
 }
-```
 
-manifest.fr.json:
 
-```
+// manifest.fr.json:
 {
   "name": "Bon chien",
   "description": "Une application pour chiens",
