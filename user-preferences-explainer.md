@@ -8,6 +8,8 @@ Currently in the web app manifest a `theme_color` and `background_color` can be 
 
 This document proposes a new `user_preferences` manifest member that enables web apps to provide alternate values for manifest members given specific user preferences. The structure of this `user_preferences` field matches the structure of the proposed <code>[translations](https://github.com/WICG/manifest-incubations/blob/gh-pages/translations-explainer.md)</code> member.
 
+This new member is inspired by the [CSS media queries user preferences](https://drafts.csswg.org/mediaqueries-5/#mf-user-preferences). The keys are simple strings but they are derived from the CSS media query syntax and can easily be converted back if necessary.
+
 ## Proposal
 
 Add a new dictionary manifest entry `user_preferences`, mapping preference strings to a [`ManifestOverride` object](#manifestoverride-object).
