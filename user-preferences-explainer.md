@@ -16,7 +16,7 @@ Initially, the valid keys of the `user_preferences` member are `color_scheme_dar
 
 ### `ManifestOverride` Object
 
-The `ManifestOverride` is a generic object that contains a subset of redefined manifest properties appropriate to the context (e.g. `user_preferences`) in which the `ManifestOverride` is being used. The properties which may be redefined in the ManifestOverride object depends on the context (e.g. `user_preferences`). Any properties not allowed within the context will be ignored. The redefined fields override the values set in the root of the manifest.
+The `ManifestOverride` is a generic object that contains a subset of redefined manifest properties appropriate to the context (e.g. `user_preferences`) in which the `ManifestOverride` is being used. The properties which may be redefined in the `ManifestOverride` object depend on the context (e.g. `user_preferences`). Any properties not allowed within the context will be ignored. The redefined fields override the values set in the root of the manifest.
 
 For the `user_preferences` member, the acceptable keys for the `ManifestOverride` include:
 
