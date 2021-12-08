@@ -65,7 +65,7 @@ There are minimal security and privacy concerns with this proposal. This will al
 
 ## Alternatives considered
 
-Use the CSS media query syntax for the keys (e.g. `(prefers-color-scheme: dark)`) and parse this as CSS. However, using the CSS parser adds a lot of complexity which we would like to avoid during manifest parsing.
+It would also be possible to use the CSS media query syntax for the keys (e.g. `(prefers-color-scheme: dark)`) and parse this as CSS instead of using fixed keys as proposed. However, using the CSS parser adds a lot of complexity which we would like to avoid. Before a web app can launch, the CSS parser would need to be run to analyze the media query. This would also allow media queries which don’t make sense for this proposal, such as window size.
 
 ## Open questions
 
