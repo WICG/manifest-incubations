@@ -8,7 +8,7 @@ Currently in the web app manifest a `theme_color` and `background_color` can be 
 
 This document proposes a new `user_preferences` manifest member that enables web apps to provide alternate values for manifest members given specific user preferences. The structure of this `user_preferences` field matches the structure of the proposed <code>[translations](https://github.com/WICG/manifest-incubations/blob/gh-pages/translations-explainer.md)</code> member.
 
-This new member is inspired by the [CSS media queries user preferences](https://drafts.csswg.org/mediaqueries-5/#mf-user-preferences). The keys are simple strings but they are derived from the CSS media query syntax and can easily be converted back if necessary.
+This new member is inspired by the [CSS media queries user preferences](https://drafts.csswg.org/mediaqueries-5/#mf-user-preferences). The keys are simple strings but they are derived from the CSS media query syntax.
 
 ## Proposal
 
@@ -18,7 +18,7 @@ Initially, the valid keys of the `user_preferences` member are `color_scheme_dar
 
 ### `ManifestOverride` Object
 
-The `ManifestOverride` is a generic object that contains a subset of redefined manifest properties appropriate to the context (e.g. `user_preferences`) in which the `ManifestOverride` is being used. The properties which may be redefined in the `ManifestOverride` object depend on the context (e.g. `user_preferences`). Any properties not allowed within the context will be ignored. The redefined fields override the values set in the root of the manifest.
+The `ManifestOverride` is a generic object that contains a subset of redefined manifest properties appropriate to the context (e.g. `user_preferences`) in which the `ManifestOverride` is being used. The properties that may be redefined in the `ManifestOverride` object depend on the context (e.g. `user_preferences`). Any properties not allowed within the context will be ignored. The redefined fields override the values set in the root of the manifest.
 
 For the `user_preferences` member, the acceptable keys for the `ManifestOverride` include:
 
@@ -63,6 +63,12 @@ In addition to the preferences `color_scheme_dark` and `color_scheme_light`, oth
 
 There are minimal security and privacy concerns with this proposal. This will allow sites to know what user preferences are set and use this for fingerprinting, however this information is already exposed through CSS.
 
+## Alternatives considered
+
+Use the CSS media query syntax for the keys (e.g. `(prefers-color-scheme: dark)`) and parse this as CSS. However, using the CSS parser adds a lot of complexity which we would like to avoid during manifest parsing.
+
 ## Open questions
 
 How does this interact with `translations`  for fields that can be overridden by either `user_preferences` or `translations`, such as icons?
+
+For sites that have an in app dark mode setting, how can they communicate that the selected theme is different from the system theme?
