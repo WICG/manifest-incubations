@@ -37,11 +37,11 @@ For the `user_preferences` member, the acceptable keys for the `ManifestOverride
 ```json
 "user_preferences": {
     "color_scheme_dark": {
-        "theme_color": "#000"
+        "theme_color": "#000",
         "background_color": "#000"
     },
     "color_scheme_light": {
-        "theme_color": "#fff"
+        "theme_color": "#fff",
         "background_color": "#fff"
     }
   }
