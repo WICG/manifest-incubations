@@ -709,7 +709,7 @@
             </ul>
           </li>
           <li>Let |url:URL| be the result of [=URL Parser|parsing=]
-          |item|["action"] with |start_url URL| as the base URL.
+          |item|["action"] with |manifest_url URL| as the base URL.
           </li>
           <li>If |url| is failure, return failure.
           </li>
@@ -1407,6 +1407,8 @@
         <ol class="algorithm">
           <li>If |params| is null, set |params| to a new {{LaunchParams}} with
           {{LaunchParams/targetURL}} set to [=manifest/start_url=].
+          </li>
+          <li>Create a new top level browsing context and navigate it to |params.targetUrl|.
           </li>
           <li>Append |params| to the [=unconsumed launch params=] of the
           launched document's {{Window.LaunchQueue}}.
