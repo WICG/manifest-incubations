@@ -673,11 +673,12 @@
           </p>
           <p>
             When a [=file handler=] is determined to match a set of files, the
-            [=file handler/launch_type=] will control whether the app is
-            launched once for each file (`"multiple-clients"`), or one time for
-            all files (`"single-client"`). See {{LaunchParams/files}}. The user
-            agent MUST NOT coalesce files from different [=file handlers=] into
-            a single launch event.
+            [=user agent=] SHOULD use [=file handler/launch_type=] to control
+            whether the app is launched once for each file
+            (`"multiple-clients"`), or one time for all files
+            (`"single-client"`). See {{LaunchParams/files}}. The user agent
+            MUST NOT coalesce files from different [=file handlers=] into a
+            single launch event.
           </p>
           <aside class="note">
             <p>
@@ -691,7 +692,7 @@
               launches an app with multiple files, but will launch a single app
               multiple times with one file each. As such, this field has no
               effect on Windows and all launches are effectively
-              `"mulitiple-clients"`.
+              `"multiple-clients"`.
             </p>
           </aside>
         </section>
