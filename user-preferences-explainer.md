@@ -34,9 +34,9 @@ For the `user_preferences` member, the acceptable keys for the `ManifestOverride
         *   `src`
         *   `type`
 
-For user_preferences which the host OS supports, implementers should make the relevant overrides available to the OS. For example, if an OS supports dark mode and an app has specified icon overrides for dark mode, the implementer should download these icons in addition to the icons they already download.
+For `user_preferences` which the host OS supports, implementers should make the relevant overrides available to the OS. For example, if an OS supports dark mode and an app has specified icon overrides for dark mode, the implementer should download these icons in addition to the icons they already download.
  
-SVG icons natively support user_preferences through CSS. Therefore SVG manifest icons (if supported) should also be rendered under all the OS supported user_preferences.
+SVG icons natively support `user_preferences` through CSS. Therefore SVG manifest icons (if supported) should also be rendered under all the OS supported `user_preferences`.
 
 ### Example
 
