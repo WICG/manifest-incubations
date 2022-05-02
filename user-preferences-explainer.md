@@ -20,6 +20,8 @@ Initially, the valid keys of the `user_preferences` member are `color_scheme_dar
 
 The `ManifestOverride` is a generic object that contains a subset of redefined manifest properties appropriate to the context (e.g. `user_preferences`) in which the `ManifestOverride` is being used. The properties that may be redefined in the `ManifestOverride` object depend on the context (e.g. `user_preferences`). Any properties not allowed within the context will be ignored. The redefined fields override the values set in the root of the manifest.
 
+For more detail on the `ManifestOverride` object, see [translations](https://github.com/WICG/manifest-incubations/blob/gh-pages/translations-explainer.md).
+
 For the `user_preferences` member, the acceptable keys for the `ManifestOverride` include:
 
 *   `theme_color`
@@ -31,6 +33,10 @@ For the `user_preferences` member, the acceptable keys for the `ManifestOverride
     *   `icons`
         *   `src`
         *   `type`
+
+For `user_preferences` which the host OS supports, implementers should make the relevant overrides available to the OS. For example, if an OS supports dark mode and an app has specified icon overrides for dark mode, the implementer should download these icons in addition to the icons they already download.
+ 
+SVG icons natively support `user_preferences` through CSS. Therefore SVG manifest icons (if supported) should also be rendered under all the OS supported `user_preferences`.
 
 ### Example
 
