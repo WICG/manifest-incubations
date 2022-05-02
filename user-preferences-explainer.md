@@ -41,16 +41,18 @@ SVG icons natively support `user_preferences` through CSS. Therefore SVG manifes
 ### Example
 
 ```json
-"user_preferences": {
+{
+  "user_preferences": {
     "color_scheme_dark": {
-        "theme_color": "#000"
-        "background_color": "#000"
+      "theme_color": "#000",
+      "background_color": "#000"
     },
     "color_scheme_light": {
-        "theme_color": "#fff"
-        "background_color": "#fff"
+      "theme_color": "#fff",
+      "background_color": "#fff"
     }
   }
+}
 ```
 
 When a user has dark mode enabled, the fields redefined for `color_scheme_dark` will be used instead of the top level fields.
