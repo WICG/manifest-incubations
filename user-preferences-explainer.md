@@ -14,7 +14,9 @@ This new member is inspired by the [CSS media queries user preferences](https://
 
 Add a new dictionary manifest entry `user_preferences`, mapping preference strings to a [`ManifestOverride` object](#manifestoverride-object).
 
-Initially, the valid keys of the `user_preferences` member are `color_scheme_dark` and `color_scheme_light`. This could be expanded in the future to include other [user preference media features](#possible-extensions).
+Initially, the only valid key of the `user_preferences` member is `color_scheme`, which can have the keys `dark` and `light`. This could be expanded in the future to include other [user preference media features](#possible-extensions).
+
+In the previous version, the valid keys of the `user_preferences` member were `color_scheme_dark` and `color_scheme_light`.
 
 ### `ManifestOverride` Object
 
@@ -43,6 +45,26 @@ SVG icons natively support `user_preferences` through CSS. Therefore SVG manifes
 ```json
 {
   "user_preferences": {
+    "color_scheme": {
+      "dark": {
+        "theme_color": "#000",
+        "background_color": "#000"
+      },
+      "light": {
+        "theme_color": "#fff",
+        "background_color": "#fff"
+      }
+    }
+  }
+}
+```
+
+When a user has dark mode enabled, the fields redefined for `color_scheme.dark` will be used instead of the top level fields.
+
+Example of previous version:
+```json
+{
+  "user_preferences": {
     "color_scheme_dark": {
       "theme_color": "#000",
       "background_color": "#000"
@@ -55,11 +77,9 @@ SVG icons natively support `user_preferences` through CSS. Therefore SVG manifes
 }
 ```
 
-When a user has dark mode enabled, the fields redefined for `color_scheme_dark` will be used instead of the top level fields.
-
 ## Possible extensions
 
-In addition to the preferences `color_scheme_dark` and `color_scheme_light`, other CSS [user preference media features](https://drafts.csswg.org/mediaqueries-5/#mf-user-preferences) could be added as valid keys. These include:
+In addition to the `color_scheme` preference, other CSS [user preference media features](https://drafts.csswg.org/mediaqueries-5/#mf-user-preferences) could be added as valid keys. These include:
 
 *   Prefers reduced motion
 *   Prefers reduced transparency
