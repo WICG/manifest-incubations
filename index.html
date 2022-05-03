@@ -1088,10 +1088,15 @@
           By design, this specification does not provide developers with an
           explicit API to "install" a web application. Instead, a
           <a>manifest</a> can serve as an <dfn>installability signal</dfn> to a
-          user agent that a web application can be installed.
+          user agent that a web application can be installed. These signals
+          will vary per user agent, as each user agent will have its own
+          heuristics to determine whether a web site is elegible of an install
+          prompt. Implementers generally will provide documentation that describe their particular installabilty signals
+          or other relevant criteria a web application needs to meet to be deemed installable.
         </p>
         <p>
-          Examples of <a>installability signals</a> for a web application:
+          Examples of possible <a>installability signals</a> for a web
+          application that a user agent might implement:
         </p>
         <ul>
           <li>has a [=application manifest=] with an application name and a
