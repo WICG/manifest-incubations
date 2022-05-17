@@ -51,6 +51,15 @@ The proposed format makes it easy to add more fields to the `tab_strip` member i
 
 A possible extension to the home tab is a `scope` field. This could allow for the home tab to navigate within that scope, and only open links in new tabs that are outside the scope.
 
+### Combining with other display modes
+
+Some apps may want to use a combination of display modes together. An example of this is using [window controls overlay](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/TitleBarCustomization/explainer.md) with tabbed mode.
+
+These could be supported by adding more display override values, e.g. `window-controls-overlay-tabbed`, but this doesn’t scale well if many more display modes are added in the future.
+
+Another solution is to allow apps to create custom display modes. See the [display override explainer](https://github.com/WICG/display-override/blob/main/explainer.md#custom-display-mode-names-with-display-modifiers-style-specification) for more detail.
+
+
 ## Security and Privacy
 
 There are minimal security and privacy concerns with this proposal. Navigating out-of-scope will show the same out-of-scope UI that is used in standalone apps. This UI should only be shown on the out-of-scope tab.
