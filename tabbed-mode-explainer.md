@@ -35,7 +35,7 @@ The home tab is a pinned tab that, if enabled for an app, should always be prese
 
 The new tab button, if present, should open a new tab at a URL that is within the scope of the app. The app may choose to set a custom URL and icon for this button.
 
-If the `tab_strip` field is not present, the particular subfields' `auto` values should be used. The user agent can decide what values to use for `auto`. For example it might set `url` to be the `start_url`.
+If the `tab_strip` field is not present, the particular subfields' `auto` values should be used. The user agent can decide what values to use for `auto`. For example it might set `new_tab_button.url` to be the `start_url`.
 
 User agents can decide how to handle dragging these tabs around to create new windows or combine with browser tabs.
 
@@ -53,12 +53,11 @@ A possible extension to the home tab is a `scope` field. This could allow for th
 
 ### Combining with other display modes
 
-Some apps may want to use a combination of display modes together. An example of this is using [window controls overlay](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/TitleBarCustomization/explainer.md) with tabbed mode.
+Some apps may want to use a combination of display modes together. An example of this is using [window controls overlay](https://wicg.github.io/window-controls-overlay/) with tabbed mode.
 
-These could be supported by adding more display override values, e.g. `window-controls-overlay-tabbed`, but this doesn’t scale well if many more display modes are added in the future.
+These could be supported by adding more display override values, e.g., `window-controls-overlay-tabbed`, but this doesn’t scale well if many more display modes are added in the future.
 
-Another solution is to allow apps to create custom display modes. See the [display override explainer](https://github.com/WICG/display-override/blob/main/explainer.md#custom-display-mode-names-with-display-modifiers-style-specification) for more detail.
-
+Another solution is to allow apps to create custom display modes. See the [Display Mode Override Proposal](https://github.com/WICG/display-override/blob/main/explainer.md#custom-display-mode-names-with-display-modifiers-style-specification) for more detail.
 
 ## Security and Privacy
 
