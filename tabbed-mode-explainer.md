@@ -4,7 +4,7 @@ Author: Louise Brett (loubrett@google.com)
 
 ## Overview
 
-Currently PWAs in a standalone window can only have one page open at a time. Some apps expect users to have many pages open at once. Tabbed mode adds a tab strip to standalone web apps that allows multiple tabs (within the app's scope) to be open at once.
+Currently PWAs in a standalone window can only have one page open at a time. Some apps expect users to have many pages open at once. Tabbed mode adds a tab strip to standalone web apps that allows multiple tabs to be open at once.
 
 This document describes a new display mode `tabbed` and a new manifest member `tab_strip` which lets apps enable the tab strip and customize it.
 
