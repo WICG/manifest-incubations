@@ -49,7 +49,7 @@ A use case for an `absent` new tab button would be if the home tab is present an
 
 The proposed format makes it easy to add more fields to the `tab_strip` member in the future.
 
-A possible extension to the home tab is a `scope` field. This could allow for the home tab to navigate within that scope, and only open links in new tabs that are outside the scope.
+A possible extension to the home tab is a `scope` field (which could be a [URLPattern](https://wicg.github.io/urlpattern/#urlpattern)). This could allow for the home tab to navigate within that scope, and only open links in new tabs that are outside the scope.
 
 ### Combining with other display modes
 
