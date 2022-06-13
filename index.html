@@ -495,6 +495,139 @@
         </p>
       </section>
     </section>
+    <section data-cite="image-resource">
+      <h2>
+        Manifest override objects
+      </h2>
+      <p>
+        Each <dfn>manifest override object</dfn> is a generic object value
+        that allows for certain manifest properties to be overridden within
+        a particular context.
+      </p>
+      <p>The structure of a [=manifest override object=] is as follows:</p>
+      <pre class="json">
+        {
+          "context_key": {
+            "property": "new value"
+          }
+        }
+      </pre>
+      <p>
+        Each manifest property that accepts a [=manifest override object=]
+        as its value will define the contexts it supports and which
+        properties it supports overriding. User agents MUST ignore any contexts
+        that are not supported by the property as well as any override
+        properties not explicitly allowed within it.
+      </p>
+      <p>
+        When the manifest property’s context is applicable, the value of each
+        allowable override will be used in place of the original value defined
+        in the Manifest.
+      </p>
+      <p>
+        Redefined array items will be overridden in the order they are authored.
+        When redefining objects (e.g., [=manifest/shortcuts=], [=manifest/icons=]),
+        authors will only be able to redefine specific properties of that object.
+        In order to ensure all overrides are applied correctly, the order must
+        match the original array (i.e., each [=manifest/shortcut=] must be redefined
+        in order, as must their icons, if they also require re-definition).
+      </p>
+        Redefined array items must also be equal in number to the array being
+        overridden. If there is a mismatch in the number of items in either array,
+        any excess items will be ignored. This is only an issue if the original
+        array has more items than the override array, because any excess items
+        within the original array will not be re-defined.
+      </p>
+      <p>
+        When there is a conflict because two different properties are attempting
+        to override the same value in their respective active contexts, the one
+        defined last will win. By way of example, consider the following:
+      </p>
+      <pre class="json">
+        {
+          "lang": "en-US",
+          "icons": [
+            {
+              "src": "icon.png",
+              "sizes": "128x128",
+              "type": "image/png"
+            }
+          ],
+          "translations": {
+            "es": {
+              "icons": [
+                {
+                  "src": "icon-es.png"
+                }
+              ]
+            }
+          },
+          "user_preferences": {
+            "color_scheme_dark": {
+              "icons": [
+                {
+                  "src": "icon-dark.png"
+                }
+              ]
+            }
+          }
+        }
+      </pre>
+      <p>
+        In this example, if the user’s primary language is Español, but 
+        their preferred color scheme was set to "dark", the icon supploed 
+        would be the dark version and not the localized one. For this reason,
+        it is imperative that properties taking a [=manifest override object=]
+        as their value consider whether any other properties that also enable
+        overrides should be able to be redefined within them. In the above
+        example, the author’s intent would likely have been better realized
+        if `user_preference` was put before `translations` and the localized
+        context block redefined the `user_preferences` value for that language:
+      </p>
+      <pre class="json">
+        {
+          "lang": "en-US",
+          "icons": [
+            {
+              "src": "icon.png",
+              "sizes": "128x128",
+              "type": "image/png"
+            }
+          ],
+          "user_preferences": {
+            "color_scheme_dark": {
+              "icons": [
+                {
+                  "src": "icon-dark.png"
+                }
+              ]
+            }
+          },
+          "translations": {
+            "es": {
+              "icons": [
+                {
+                  "src": "icon-es.png"
+                }
+              ],
+              "user_preferences": {
+                "color_scheme_dark": {
+                  "icons": [
+                    {
+                      "src": "icon-es-dark.png"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          
+        }
+      </pre>
+      <p>
+        User agents MAY ignore any override properties they do not support.
+      </p>
+    </section>
     <section data-cite="DOM">
       <h2>
         Installation prompts
