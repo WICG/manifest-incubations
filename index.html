@@ -495,6 +495,110 @@
         </p>
       </section>
     </section>
+    <section>
+      <h2>
+        <code><dfn>user_preferences</dfn></code> member
+      </h2>
+      <p>
+        The `user_preferences` member of the [=application manifest=] is an
+        object that can be used to override values of manfiest members depending
+        on which user preferences are set. It has the following members:
+      </p>
+      <ul>
+        <li>[=user_preferences/color_scheme=]
+        </li>
+      </ul>
+      <p>
+        The user agent SHOULD use the override values instead of the value of
+        the corresponding member defined at the top level on the manifest.
+      </p>
+      <p>
+        To <dfn>process the `user_preferences` member</dfn>, given
+        [=ordered map=] |json:ordered_map|, [=ordered map=] |manifest:ordered map|,
+        run the following during the [=application manifest/processing 
+        extension-point=] in [=processing a manifest=]:
+      </p>
+      <ol class="algorithm">
+        <li>If |json|["user_preferences"] does not [=map/exist=], return.
+        </li>
+        <li>If the type of |json|["user_preferences"] is not [=ordered map=],
+        return.
+        </li>
+        <li>Set |manifest|["user_preferences"] to a new [=ordered map=].
+        </li>
+        <li>[=Process the `color_scheme` member=] passing
+        |json|["user_preferences"] and |manifest|["user_preferences"].
+        </li>
+      </ol>
+      <section>
+        <h3>
+          <code><dfn data-dfn-for="user_prefences">color_scheme</dfn></code>
+          member
+        </h3>
+        <p>
+          The [=user_prefences=] `color_scheme` member is an object that 
+          contains the overrides for color scheme preferences. It has the
+          following members:
+        </p>
+        <p>
+          The <code><dfn data-dfn-for="color_scheme">dark</dfn></code> member 
+          specifies the manifest overrides to use when the user prefers a 
+          dark theme.
+        </p>
+        <p>
+          The <code><dfn data-dfn-for="color_scheme">light</dfn></code> member 
+          specifies the manifest overrides to use when the user prefers a 
+          light theme.
+        </p>
+        <p>
+          To <dfn>process the `color_scheme` member</dfn>, given [=ordered map=] 
+          |json_user_preferences:ordered_map|, [=ordered map=] 
+          |manifest_user_preferences:ordered map|, run the following:
+        </p>
+        <ol class="algorithm">
+          <li>If |json_user_preferences|["color_scheme"] does not [=map/exist=],
+            return.
+          </li>
+          <li>If the type of |json_user_preferences|["color_scheme"] is not
+            [=ordered map=], return.
+          </li>
+          <li>Set |manifest_user_preferences|["color_scheme"] to a new 
+            [=ordered map=].
+          </li>
+          <li>[=list/For each=] |member:string| of [=list=] « "dark", "light" »:
+            <ol>
+              <li>Let |overrides:ordered map| be the result of processing a 
+                manifest override object.
+              </li>
+              <li>Set |manifest_user_preferences|["color_scheme"][member] to 
+                |overrides|.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Overridable properties
+        </h3>
+        <p>
+          The proterties that user_preferences can override in the 
+          [=manfiest override obeject=] are:
+        </p>
+        <ul>
+          <li>[=manifest/theme_color=] member.
+          </li>
+          <li>[=manifest/background_color=] member.
+          </li>
+          <li>[=Shortcut item's=] [=shortcut item/icons=] member.
+          </li>
+          <li>[=Icons=] [=icons/src=] member.
+          </li>
+          <li>[=Icons=] [=icons/type=] member.
+          </li>
+        </ul>
+      </section>
+    </section>
     <section data-cite="image-resource">
       <h2>
         Manifest override objects
