@@ -508,9 +508,17 @@
         <li>[=user_preferences/color_scheme=]
         </li>
       </ul>
+      <p class="note">
+        This list of members is expected to expand in the future to include
+        other <a data-cite="mediaqueries-5/#mf-user-preferences">user 
+        preference media features</a> such as <a data-cite=
+        "mediaqueries-5/#prefers-contrast">contrast</a> and 
+        <a data-cite="mediaqueries-5/#forced-colors">forced-colors</a>,
+        as defined in [=CSS=].
+      </p>
       <p>
         The user agent SHOULD use the override values instead of the value of
-        the corresponding member defined at the top level on the manifest.
+        the corresponding member defined at the top level of the manifest.
       </p>
       <p>
         To <dfn>process the `user_preferences` member</dfn>, given
@@ -532,11 +540,11 @@
       </ol>
       <section>
         <h3>
-          <code><dfn data-dfn-for="user_prefences">color_scheme</dfn></code>
+          <code><dfn data-dfn-for="user_preferences">color_scheme</dfn></code>
           member
         </h3>
         <p>
-          The [=user_prefences=] `color_scheme` member is an object that 
+          The [=user_preferences=] `color_scheme` member is an object that 
           contains the overrides for color scheme preferences. It has the
           following members:
         </p>
@@ -570,8 +578,8 @@
               <li>Let |overrides:ordered map| be the result of processing a 
                 manifest override object.
               </li>
-              <li>Set |manifest_user_preferences|["color_scheme"][member] to 
-                |overrides|.
+              <li>Set |manifest_user_preferences|["color_scheme"][|member:string|]
+                to |overrides|.
               </li>
             </ol>
           </li>
@@ -582,19 +590,23 @@
           Overridable properties
         </h3>
         <p>
-          The proterties that user_preferences can override in the 
-          [=manfiest override obeject=] are:
+          The proterties that [=user_preferences=] can override in the 
+          [=manifest override object=] are:
         </p>
         <ul>
           <li>[=manifest/theme_color=] member.
           </li>
           <li>[=manifest/background_color=] member.
           </li>
-          <li>[=Shortcut item's=] [=shortcut item/icons=] member.
+          <li>[=manifest/Shortcut item's=] <a data-cite=
+            "appmanifest#icons-member-0">icons</a> [=image resource/src=] member.
           </li>
-          <li>[=Icons=] [=icons/src=] member.
+          <li>[=manifest/Shortcut item's=] <a data-cite=
+             "appmanifest#icons-member-0">icons</a> [=image resource/type=] member.
           </li>
-          <li>[=Icons=] [=icons/type=] member.
+          <li>[=manifest/icons=] [=image resource/src=] member.
+          </li>
+          <li>[=manifest/icons=] [=image resource/type=] member.
           </li>
         </ul>
       </section>
