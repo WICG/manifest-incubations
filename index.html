@@ -753,6 +753,29 @@
       <p>
         User agents MAY ignore any override properties they do not support.
       </p>
+      <p>
+        To <dfn>apply a manifest override object</dfn>, given [=ordered_map=] 
+        |overrides:json|, [=ordered map=] 
+        |manifest:ordered map|, and [=array=] |allowed_properties:array| run the following:
+        </p>
+        <ol class="algorithm">
+          <li>Let |allowed_overrides| be a new [=ordered map=].
+          </li>
+          <li>[=list/For each=] |member:string| of |overrides|:
+            <ol>
+              <li>If |member| is not in |allowed_properties|, continue.
+              </li>
+              <li>Set |allowed_overrides|[|member|] to |overrides[|member|]|.
+              </li>
+            </ol>
+          </li>
+          <li>Let |overriden_manifest| be the result of creating a new [=ordered map=] 
+            by merging |manifest| with |allowed_overrides|.
+          </li>
+          <li>
+            Set |manifest| to |overriden_manifest|.
+          </li>
+        </ol>
     </section>
     <section data-cite="DOM">
       <h2>
