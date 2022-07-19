@@ -63,12 +63,11 @@ associated origins.
    {
      "web_apps": {
         "https://example.com/": {
-          "include_paths": ["/*"],
+          "scope": "/",
           "authorize": ["intercept-links"]
         },
         "https://associated.site.com/": {
-          "include_paths": ["/*"],
-          "exclude_paths": ["/settings/*"]
+          "scope": "/",
         }
       }
     }
@@ -80,8 +79,8 @@ associated origins.
     - Has an origin with a valid
       `<origin>/.well-known/web-app-origin-association.json` association file
       with an association entry keyed by the web app's identifier.
-    - Matches an `include_paths` entry in the association entry.
-    - Does not match as `exclude_paths` entry in the association entry.
+    - Matches a `scope` entry in the association entry. This entry behaves 
+      similarly to the `scope` field in the web app manifest spec.
 
 1. Replace the constraint on manifest URLs that are bound by scope (except for
    `start_url`) to instead be bound by the extended scope. Validation of the
