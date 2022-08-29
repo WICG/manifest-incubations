@@ -18,13 +18,19 @@
         github: "WICG/manifest-incubations",
         shortName: "manifest-incubations",
         xref: {
-          specs: ["appmanifest", "dom", "mimesniff", "file-system-access"],
+          specs: [
+            "appmanifest",
+            "dom",
+            "file-system-access",
+            "mimesniff",
+            "window-controls-overlay"
+          ],
           profile: "web-platform",
         },
       };
     </script>
   </head>
-  <body>
+  <body data-cite="MEDIAQUERIES-5">
     <section id="abstract">
       <p>
         Feature specifications for <a href=
@@ -49,21 +55,23 @@
       <p>
         For advanced usages, the [=manifest/display_override=] member can be
         used to specify a custom fallback order of <a data-cite=
-        "appmanifest#dfn-display-modes-values">display mode values</a> for
+        "appmanifest#dfn-display-modes-list">display mode list values</a> for
         developers to choose their preferred <a data-cite=
-        "appmanifest#dfn-display-mode">display mode</a>.
+        "appmanifest#dfn-display">display mode</a> for the web application.
+        Its value is a [=display mode=].
       </p>
       <p>
         The [=manifest/display_override=] member of the [=application manifest=]
         is a <a>sequence</a> of <a data-cite=
-        "appmanifest#dfn-display-modes-values">display mode values</a>. This
-        item represents the developer's preferred fallback chain for
-        <a data-cite="appmanifest#dfn-display-mode">display modes</a>. This
-        field overrides the [=manifest/display=] member. If the user agent does
-        not support any of the display modes specified here, then it falls back
-        to considering the [=manifest/display=] member. See <a data-cite=
-        "appmanifest#dfn-display-mode">display modes</a> for the algorithm
-        steps.
+        "appmanifest#dfn-display-modes-list">display mode list values</a>
+        including extensions like [=display mode/window-controls-overlay=].
+        This member represents the developer's preferred fallback chain for
+        [=display mode=]s. This field overrides the [=manifest/display=] member.
+        If the user agent does not support any of the [=display mode=]s
+        specified here, then it falls back to considering the
+        [=manifest/display=] member. See <a data-cite=
+        "appmanifest#dfn-process-the-display-member">processing the display
+        members</a> for the algorithm steps.
       </p>
       <p>
         The following steps are added to the [=application manifest/processing
@@ -74,9 +82,15 @@
       <ol>
         <li>[=list/For each=] |candidate_display_mode:DisplayModeType| of
         |manifest:ordered map|.[=manifest/display_override=] member:
-          <ol>
-            <li>If the user agent supports the |candidate_display_mode|, then
-            return |candidate_display_mode|.
+          <ol class="algorithm">
+            <li>If <a data-cite="appmanifest/#dfn-display-modes-list">display
+              modes list</a> contains |candidate_display_mode:DisplayModeType|,
+              return that |candidate_display_mode:DisplayModeType|
+            </li>
+            <li>If |candidate_display_mode:DisplayModeType| is
+              [=display mode/window-controls-overlay=] and the user agent
+              supports this, then return that
+              |candidate_display_mode:DisplayModeType|.
             </li>
           </ol>
         </li>
