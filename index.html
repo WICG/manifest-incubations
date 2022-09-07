@@ -41,18 +41,20 @@
       </p>
     </section>
     <section>
-      <h2 data-dfn-for="">
-        <code>display_override</code> member
+      <h2>
+        <code>
+          <dfn data-export="" data-dfn-for="manifest">display_override</dfn>
+        </code> member
       </h2>
       <p>
-        For advanced usages, the display_override member can be used to specify
-        a custom fallback order of <a data-cite=
+        For advanced usages, the [=manifest/display_override=] member can be
+        used to specify a custom fallback order of <a data-cite=
         "appmanifest#dfn-display-modes-values">display mode values</a> for
         developers to choose their preferred <a data-cite=
         "appmanifest#dfn-display-mode">display mode</a>.
       </p>
       <p>
-        The <dfn>display_override</dfn> member of the [=application manifest=]
+        The [=manifest/display_override=] member of the [=application manifest=]
         is a <a>sequence</a> of <a data-cite=
         "appmanifest#dfn-display-modes-values">display mode values</a>. This
         item represents the developer's preferred fallback chain for
@@ -71,7 +73,7 @@
       </p>
       <ol>
         <li>[=list/For each=] |candidate_display_mode:DisplayModeType| of
-        |manifest|.{{display_override}}:
+        |manifest:ordered map|.[=manifest/display_override=] member:
           <ol>
             <li>If the user agent supports the |candidate_display_mode|, then
             return |candidate_display_mode|.
