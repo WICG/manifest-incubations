@@ -23,7 +23,7 @@
             "dom",
             "file-system-access",
             "mimesniff",
-            "web-app-launch",
+            "web-app-launch"
             "window-controls-overlay"
           ],
           profile: "web-platform",
@@ -476,13 +476,13 @@
             <var>protocol_handler</var> having [=manifest=] <var>manifest</var>
             is invoked, it goes through the same steps used to [=invoke a
             protocol handler=] where the user agent, instead of [=navigating=]
-            to |resultURL|, SHOULD [=launch a web application=] passing
-            <var>manifest</var> and |resultURL|.
+            to <var>resultURL</var>, SHOULD [=launch a web application=]
+            passing <var>manifest</var> and <var>resultURL</var>.
           </p>
           <p class="issue">
             This should not invoke and alter [=invoke a protocol handler=] in
-            this way. The computation of |resultURL| should be extracted out
-            into a separate algorithm for general use.
+            this way. The computation of <var>resultURL</var> should be
+            extracted out into a separate algorithm for general use.
           </p>
         </section>
       </section>
@@ -860,7 +860,7 @@
                       a single element that is a {{FileSystemHandle}}
                       corresponding to |file|.
                       </li>
-                      <li>[=Launch a web application with handling=] passing
+                      <li><a data-cite="web-app-launch#dfn-launch-a-web-application-with-handling">Launch a web application with handling</a> passing
                       |manifest| and |params|.
                       </li>
                     </ol>
@@ -874,7 +874,7 @@
                   {{FileSystemHandle}}s that correspond to the file paths named
                   by |files|.
                   </li>
-                  <li>[=Launch a web application with handling=] passing
+                  <li><a data-cite="web-app-launch#dfn-launch-a-web-application-with-handling">Launch a web application with handling</a> passing
                   |manifest| and |params|.
                 </ol>
               </li>
