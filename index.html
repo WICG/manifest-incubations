@@ -282,8 +282,9 @@
           <li>If the type of |manifest|["note_taking"]["new_note_url"] is not
           [=URL=], return.
           </li>
-          <li>Run the steps to [=launch a web app with handling=] passing
-          |manifest| and |manifest|["note_taking"]["new_note_url"].
+          <li>Run the steps to [=launch a web application=] setting |manifest|
+          to |manifest| and |target URL| to
+          |manifest|["note_taking"]["new_note_url"].
           </li>
         </ol>
       </section>
@@ -474,10 +475,14 @@
             When a <a>protocol handler description</a>
             <var>protocol_handler</var> having [=manifest=] <var>manifest</var>
             is invoked, it goes through the same steps used to [=invoke a
-            protocol handler=] defined in [=HTML=] where the user agent,
-            instead of [=navigating=] to [=url=], SHOULD
-            [=launch a web app with handling=] passing <var>manifest</var> and
-            [=url=].
+            protocol handler=] where the user agent, instead of [=navigating=]
+            to |resultURL|, SHOULD [=launch a web application=] passing
+            <var>manifest</var> and |resultURL|.
+          </p>
+          <p class="issue">
+            This should not invoke and alter [=invoke a protocol handler=] in
+            this way. The computation of |resultURL| should be extracted out
+            into a separate algorithm for general use.
           </p>
         </section>
       </section>
@@ -855,8 +860,8 @@
                       a single element that is a {{FileSystemHandle}}
                       corresponding to |file|.
                       </li>
-                      <li>[=Launch a web app with handling=] passing |manifest|
-                      and |params|.
+                      <li>[=Launch a web application with handling=] passing
+                      |manifest| and |params|.
                       </li>
                     </ol>
                   </li>
@@ -869,8 +874,8 @@
                   {{FileSystemHandle}}s that correspond to the file paths named
                   by |files|.
                   </li>
-                  <li>[=Launch a web app with handling=] passing |manifest| and
-                  |params|.
+                  <li>[=Launch a web application with handling=] passing
+                  |manifest| and |params|.
                 </ol>
               </li>
             </ol>
