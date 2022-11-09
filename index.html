@@ -281,10 +281,8 @@
           <li>If the type of |manifest|["note_taking"]["new_note_url"] is not
           [=URL=], return.
           </li>
-          <li>Let |browsing context:Browsing Context| be the result of creating
-          a new [=top-level browsing context=].
-          </li>
-          <li>[=Navigate=] |browsing context| to resource
+          <li>Run the steps to [=launch a web application=] setting |manifest|
+          to |manifest| and |target URL| to
           |manifest|["note_taking"]["new_note_url"].
           </li>
         </ol>
@@ -476,9 +474,14 @@
             When a <a>protocol handler description</a>
             <var>protocol_handler</var> having [=manifest=] <var>manifest</var>
             is invoked, it goes through the same steps used to [=invoke a
-            protocol handler=] defined in [=HTML=], where the user agent SHOULD
-            navigate to [=url=] and the appropriate browsing context is set to
-            a new top level browsing context.
+            protocol handler=] where the user agent, instead of [=navigating=]
+            to <var>resultURL</var>, SHOULD [=launch a web application=]
+            passing <var>manifest</var> and <var>resultURL</var>.
+          </p>
+          <p class="issue">
+            This should not invoke and alter [=invoke a protocol handler=] in
+            this way. The computation of <var>resultURL</var> should be
+            extracted out into a separate algorithm for general use.
           </p>
         </section>
       </section>
@@ -851,12 +854,17 @@
                 <ol>
                   <li>[=list/for each=] |file| of |files|
                     <ol>
-                      <li>Let |params:LaunchParams| be a new {{LaunchParams}}
-                      with {{LaunchParams/files}} set to a {{FrozenArray}} with
-                      a single element that is a {{FileSystemHandle}}
-                      corresponding to |file|.
+
+                      <li>Let |params:LaunchParams| be a new
+                      <a href="https://wicg.github.io/web-app-launch/#dom-launchparams">
+                      LaunchParams</a> with
+                      <a href="https://wicg.github.io/web-app-launch/#dom-launchparams-files">
+                      files</a> set to a {{FrozenArray}} with a single element
+                      that is a {{FileSystemHandle}} corresponding to |file|.
                       </li>
-                      <li>[=launch a web app=] with |params|.
+                      <li><a href="https://wicg.github.io/web-app-launch/#dfn-launching-a-web-application-with-handling">
+                      Launch a web application with handling</a> passing
+                      |manifest| and |params|.
                       </li>
                     </ol>
                   </li>
@@ -864,12 +872,16 @@
               </li>
               <li>Else,
                 <ol>
-                  <li>Let |params:LaunchParams| be a new {{LaunchParams}} with
-                  {{LaunchParams/files}} set to a {{FrozenArray}} of
-                  {{FileSystemHandle}}s that correspond to the file paths named
-                  by |files|.
+                  <li>Let |params:LaunchParams| be a new
+                  <a href="https://wicg.github.io/web-app-launch/#dom-launchparams">
+                  LaunchParams</a> with
+                  <a href="https://wicg.github.io/web-app-launch/#dom-launchparams-files">
+                  files</a> set to a {{FrozenArray}} of {{FileSystemHandle}}s
+                  that correspond to the file paths named by |files|.
                   </li>
-                  <li>[=launch a web app=] with |params|.
+                  <li><a href="https://wicg.github.io/web-app-launch/#dfn-launching-a-web-application-with-handling">
+                  Launch a web application with handling</a> passing |manifest|
+                  and |params|.
                   </li>
                 </ol>
               </li>
@@ -1356,118 +1368,6 @@
             "event">beforeinstallprompt</dfn>" events.
           </p>
         </section>
-      </section>
-    </section>
-    <section data-cite="file-system-access permissions">
-      <h2>
-        Launch queue and launch params
-      </h2>
-      <section data-dfn-for="LaunchParams">
-        <h3>
-          <dfn>LaunchParams</dfn> interface
-        </h3>
-        <pre class="idl">
-          [Exposed=Window] interface LaunchParams {
-            readonly attribute DOMString? targetURL;
-            readonly attribute FrozenArray&lt;FileSystemHandle&gt; files;
-          };
-        </pre>
-        <p>
-          {{LaunchParams/targetURL}} represents the [=URL=] of the launch which
-          MUST be [=manifest/within scope=] of the application.
-        </p>
-        <p>
-          For every |file handle:FileSystemHandle| in {{LaunchParams/files}},
-          querying the file system permission with
-          {{FileSystemPermissionDescriptor/mode}} set to
-          {{FileSystemPermissionMode/"readwrite"}} MUST return
-          {{PermissionState/"granted"}}.
-        </p>
-      </section>
-      <section data-dfn-for="LaunchConsumer">
-        <h3>
-          <dfn>LaunchConsumer</dfn> function
-        </h3>
-        <pre class="idl">
-          callback LaunchConsumer = any (LaunchParams params);
-        </pre>
-      </section>
-      <section data-dfn-for="LaunchQueue">
-        <h3>
-          <dfn>LaunchQueue</dfn> interface
-        </h3>
-        <pre class="idl">
-          partial interface Window {
-            readonly attribute LaunchQueue launchQueue;
-          };
-
-          [Exposed=Window] interface LaunchQueue {
-            undefined setConsumer(LaunchConsumer consumer);
-          };
-        </pre>
-        <p>
-          {{LaunchQueue}} has an <dfn>unconsumed launch params</dfn> which is a
-          [=list=] of {{LaunchParams}} that is initially empty.
-        </p>
-        <p>
-          {{LaunchQueue}} has an <dfn>assigned launch consumer</dfn> which is
-          initially null.
-        </p>
-        <section>
-          <h2>
-            <dfn>setConsumer</dfn> method
-          </h2>
-          <p>
-            The {{LaunchQueue/setConsumer(consumer)}} method steps are:
-          </p>
-          <ol class="algorithm">
-            <li>Set the [=assigned launch consumer=] to |consumer|.
-            </li>
-            <li>[=list/For each=] |launch_params:LaunchParams| of [=unconsumed
-            launch params=]:
-              <ol>
-                <li>Invoke |consumer| with |launch_params|.
-                </li>
-              </ol>
-            </li>
-            <li>Set [=unconsumed launch params=] to the empty [=list=].
-            </li>
-          </ol>
-        </section>
-      </section>
-      <section>
-        <h3>
-          Handling Web App Launches
-        </h3>
-        <p>
-          The steps to <dfn>launch a web app</dfn> are given by the following
-          algorithm. The algorithm takes {{LaunchParams}}
-          |params:LaunchParams|.
-        </p>
-        <ol class="algorithm">
-          <li>If |params| is null, set |params| to a new {{LaunchParams}} with
-          {{LaunchParams/targetURL}} set to [=manifest/start_url=].
-          </li>
-          <li>Create a new top level browsing context and navigate it to
-          |params.targetUrl|.
-          </li>
-          <li>Append |params| to the [=unconsumed launch params=] of the
-          launched document's {{Window.LaunchQueue}}.
-          </li>
-          <li>If the [=assigned launch consumer=] |consumer| is set:
-            <ol>
-              <li>[=list/For each=] |launch_params:LaunchParams| of
-              [=unconsumed launch params=]:
-                <ol>
-                  <li>Invoke |consumer| with |launch_params|.
-                  </li>
-                </ol>
-              </li>
-              <li>Set [=unconsumed launch params=] to the empty list.
-              </li>
-            </ol>
-          </li>
-        </ol>
       </section>
     </section>
     <section id="conformance"></section>
