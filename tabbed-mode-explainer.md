@@ -30,7 +30,7 @@ Add a new manifest field `tab_strip` which allows apps to customize the tab stri
 },
 ```
 
-The home tab is a pinned tab that, if enabled for an app, should always be present when the app is open. This tab should not navigate outside of the home tab scope (as specified by `scope_patterns`), so navigation outside of this scope should open in a new tab. If the `home_tab` field is unset it will default to `absent`. Apps can choose to customize the icon displayed on the tab.
+The home tab is a pinned tab that, if enabled for an app, should always be present when the app is open. This tab should not navigate outside of the home tab scope (as specified by `scope_patterns`), so navigation outside of this scope should open in a new tab. If the `home_tab` field is unset, it will default to `absent`. Apps can choose to customize the icon displayed on the tab.
 
 The `home_tab.scope_patterns` field allows the app to set a list of [URLPatterns](https://wicg.github.io/urlpattern/#urlpattern) to define the scope of the home tab. Navigation outide of this scope will be opened in a new tab, and navigation to a URL within the home tab scope will happen in the home tab. Only the pathname component of URLPattern will be used. If this field is unset, then the home tab scope will only include the `start_url`.
 
@@ -50,7 +50,7 @@ The proposed format makes it easy to add more fields to the `tab_strip` member i
 
 The home tab field could have a `url` field, if an app wanted the home tab to open at a different URL to the `start_url`.
 
-The new_tab_button could have an `icons` field to customize the icon shown on the new tab button.
+The `new_tab_button` could have an `icons` field to customize the icon shown on the new tab button.
 
 ### Combining with other display modes
 
