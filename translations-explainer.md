@@ -2,6 +2,8 @@
 
 Authors: [Aaron Gustafson](https://github.com/aarongustafson), Louise Brett (loubrett@google.com), Glen Robertson (glenrob@chromium.org)
 
+TODO: This explainer needs to be updated to match the [Web Manifest Overrides](https://github.com/w3c/manifest/issues/1045) proposal.
+
 ## Overview
 
 This document proposes a new `translations` manifest member that enables web apps to provide alternate values for manifest members in specific languages. 
