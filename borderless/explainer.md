@@ -15,7 +15,7 @@ Related documents:
 - [Borderless Explainer](#borderless-explainer)
   - [Table of contents](#table-of-contents)
   - [Introduction](#introduction)
-  - [Example of a complex title bar with window-controls-overlay](#example-of-a-complex-title-bar-with-window-controls-overlay)
+  - [Example of a remote-app in VDI context with window-controls-overlay](#example-of-a-remote-app-in-vdi-context-with-window-controls-overlay)
   - [Goals](#goals)
   - [Non-goals](#non-goals)
   - [Proposal](#proposal)
@@ -26,8 +26,7 @@ Related documents:
       - [Enabling Window Management](#enabling-window-management)
       - [Disabling Window Management](#disabling-window-management)
     - [5. Isolated Web App check](#5-isolated-web-app-check)
-  - [Related features](#related-features)
-    - [Displaying app’s origin in the app settings UI](#displaying-apps-origin-in-the-app-settings-ui)
+    - [Displaying app’s origin](#displaying-apps-origin)
     - [Privacy indicators](#privacy-indicators)
   - [Other notable details](#other-notable-details)
     - [“Settings and more” three-dot button](#settings-and-more-three-dot-button)
@@ -49,35 +48,38 @@ Related documents:
 
 ## Introduction
 
-[VDI](https://www.softwaretestinghelp.com/best-vdi-software/#What_Is_Virtual_Desktop_Infrastructure)
-(Virtual Desktop Infrastructure) providers attempt to mirror remote applications
-to the local desktop. For example, the VDI provider's cloud is running a Text
-Processor (a desktop application window), which is to be presented on the client
-desktop as if the application was running locally.
+Currently all the possible app display and
+[display_override](https://developer.mozilla.org/en-US/docs/Web/Manifest/display_override#values)
+modes rely on apps having at least some format of a title bar - something
+between the full Chrome title bar and currently most minimized
+[`window-controls-overlay`](https://developer.mozilla.org/en-US/docs/Web/API/Window_Controls_Overlay_API) (WCO).
+Despite WCO having some same qualities to what we are trying to achieve, it is
+still not offering enough flexibility for some use-cases.
 
-Installed web apps define their display mode in the manifest.json using display
-and
-[display_override](https://github.com/WICG/display-override/blob/main/explainer.md)
-fields. Currently
-[supported values for display modes](<https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/public/mojom/manifest/display_mode.mojom?q=-file:(test%7CDebug%7C%5C.xtb$)%20case:yes%20third_party%2Fblink%2Fpublic%2Fmojom%2Fmanifest%2Fdisplay_mode.mojom&ss=chromium>)
-are `window-controls-overlay`, `tabbed`, `minimal-ui`, `standalone`, `browser`
-and `fullscreen`. See
-[Manifest/display_override#values](https://developer.mozilla.org/en-US/docs/Web/Manifest/display_override#values)
-for more. From the before-mentioned options, `window-controls-overlay` has some
-same qualities to what we are trying to achieve. However, it is still not
-offering enough native-like experience for some of the use-cases and thus this
-explainer will explain how the title bar will be totally removed and enabling
-so-called borderless mode where the title bar area would be replaced with web
-content and so giving the developers full control on how the title bar would
-look like.
+Some example use-cases for borderless (with no host-native title bar) could be:
 
-## Example of a complex title bar with window-controls-overlay
+1. Apps that want to fully customize their title bar to still have the same
+   functionality, but with their own style, like
+   [Steam](https://cdn.yurishwedoff.com/will_steam_ever_update_its_ui.jpg).
+2. Apps that want to completely remove the title bar and provide no controls 
+   (which can be seen sometimes in native apps for dialogs like splash screens).
+3. [VDI](https://www.softwaretestinghelp.com/best-vdi-software/#What_Is_Virtual_Desktop_Infrastructure)
+   (Virtual Desktop Infrastructure) providers that want to mirror a remote app
+   drawing a remote-OS-native title bar and we want to avoid drawing a second
+   host-native title bar over the top of it or above it.
 
-Some highly customized title bars would still look clumsy with
-`window-controls-overlay` enforcing the style of the windowing controls
-(minimize, maximize, close etc.).
+To enable such use-cases, this explainer will explain how the title bar will be
+completely removed and so-called borderless mode enabled. This way the title bar
+area is replaced with web content and so giving the developers full control on
+how the title bar would look like.
 
-![clumsy app with WCO](./images/clumsy-app-with-wco.png)
+## Example of a remote-app in VDI context with window-controls-overlay
+
+When app is streamed through VDI, an enforced `window-controls-overlay` title
+bar could still look clumsy. This is because it's a remote title bar that we
+have no control over.
+
+![A clumsy VDI app with WCO](./images/clumsy-app-with-wco.png)
 
 ## Goals
 
@@ -91,7 +93,7 @@ Some highly customized title bars would still look clumsy with
   which is another closely-related project
 - Making borderless mode dynamic (with e.g. JavaScript APIs or something else)
 - Changing display mode in app settings (e.g. from borderless to standalone)
-- Support for mobileOSs/macOS/windows
+- Support for mobileOSs as there would be very little distinction from full-screen mode
 - Support for non-IWAs (Isolated Web Apps)
 
 ## Proposal
@@ -108,11 +110,10 @@ The solution proposed consists of the following parts:
 ### 1. Setting the `display_override` to borderless
 
 To provide the maximum addressable area for web content, the User Agent (UA)
-will create a frameless window removing all UA provided Chrome, leaving only
-resizing of the window from its borders. The removed window controls will be
-enabled using AWC and HTML/JavaScript/CSS (see non-goals and
+will create a frameless window removing all UA provided by the browser, leaving
+only resizing of the window from its borders. The removed window controls will
+be enabled using AWC and HTML/JavaScript/CSS (see non-goals and
 [additional-windowing-controls explainer](<[http://go/additional-windowing-controls](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)>)).
-Additionally to hiding the native title bar, also the menu button is hidden.
 
 Example apps in borderless mode could look e.g. like below but the appearance
 would eventually fully depend on what the developer would implement.
@@ -120,9 +121,10 @@ would eventually fully depend on what the developer would implement.
 ![Example borderless PWA](./images/borderless-app-with-AWC.png)
 
 The desire to remove the title bar will be declared within the web app manifest
-by setting the `display_override` to `borderless`. The display_override value
-will be ignored on unsupported OSs and they will follow the normal display mode
-hierarchy.
+by setting the `display_override` to `borderless`. The `display_override` value
+will be ignored on unsupported OSs and it will act as a `standalone` window.
+This is because Isolated Web Apps default are not supported to open in `browser` 
+display mode.
 
 ```
 {
@@ -134,7 +136,9 @@ hierarchy.
 
 When the app enters the borderless mode,
 [draggable regions](https://github.com/WICG/window-controls-overlay/blob/main/explainer.md#defining-draggable-regions-in-web-content)
-`-webkit-app-region: drag;` will be enabled.
+`-webkit-app-region: drag;` will be enabled. Note that the
+[standardization process for app-region](https://github.com/w3c/csswg-drafts/issues/7017)
+is on-going.
 
 ### 3. CSS display-mode media query for borderless
 
@@ -150,8 +154,7 @@ Example media query with borderless:
 }
 ```
 
-See:
-[https://developer.mozilla.org/en-US/docs/Web/CSS/@media/display-mode](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/display-mode)
+See [documentation of @media/display-mode](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/display-mode).
 
 ### 4. Leveraging Window Management permission for borderless
 
@@ -162,6 +165,10 @@ JavaScript.
 For the **managed** context, permission prompts can be by-passed with a policy
 set by an admin and later on edited in the app’s settings. For the **unmanaged**
 context, the Window management API permission must be granted.
+
+In case the Window management permission is not provided, the app will act like
+a `standalone` app as Isolated Web Apps do not support being opened in `browser`
+mode.
 
 #### Enabling Window Management
 
@@ -185,147 +192,58 @@ navigator.permissions.query({name:'window-placement'})
   });
 ```
 
+If the user fails to grant the permission (e.g. clicks Block by accident), they
+can also enable the permission from the app's settings.
+
 #### Disabling Window Management
 
 To disable borderless mode, the user can disable the Window Management
-permission in App Settings.
-
-In case the Window management permission is not provided or no longer in place,
-the app will follow the normal display mode hierarchy based on the
-`display_override` and display values on the `manifest.json`. In case no other
-display mode is provided, it will
-[default to standalone mode](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/web_applications/web_app_proto_utils.cc;drc=4a8573cb240df29b0e4d9820303538fb28e31d84;l=161)
-similarly to WCO and other `display_override` modes.
+permission from the app's settings.
 
 ### 5. Isolated Web App check
 
 Borderless mode is only available for
 [Isolated Web Apps (IWAs)](https://github.com/WICG/isolated-web-apps).
 
-## Related features
-
-- [app-details feature](crbug.com/1225871) (Googlers-only)
-- [go/cros-privacy-indicators-design](go/cros-privacy-indicators-design)
-  (Googlers-only)
-- [additional windowing controls](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)
-
-### Displaying app’s origin in the app settings UI
+### Displaying app’s origin
 
 Since without the title bar and the 3-dot menu, the app’s origin won’t be visible
-anymore, it needs to be shown somewhere, in this case in App Settings. This
-work has been completed as part of the [app-details feature](crbug.com/1225871),
-but it is pending its launch.
+anymore, it should be shown somewhere else depending on each OS. E.g. for
+ChromeOS it is intended to be displayed in App Settings.
 
-Displaying the origin is mainly necessary for debugging purposes. Until the app
-details get launched, an alternative way to get the origin of an IWA in
-borderless mode is via the developer console with
+Displaying the origin is a security requirement for web apps. However Isolated
+Web Apps are shifting away from origins and towards app names. One way to still
+be able to see the apps origin is via the developer console with
 [`document.location.href`](https://developer.mozilla.org/en-US/docs/Web/API/Location/href).
-
-In the future when app details have been launched and origin is available, the
-app settings can be accessed via opening the system’s settings and then looking
-for the right app or by right clicking the app’s icon on the shelf. Or by
-visiting the app's OS-settings in the following type of URL:
-<span style="text-decoration:underline;">chrome://os-settings/app-management/detail?id=&lt;APP_ID></span>
-
-Mock of app settings UI with app’s origin:  
-![App settings UI mock](./images/app-settings-ui.png)
 
 ### Privacy indicators
 
-Removing the title bar also removes the area where critical privacy indicators
-would live, e.g. for camera and microphone access. However there is already
-another on-going project to move those privacy indicators to the shelf.
+On some OSs removing the title bar might also remove the area for some critical
+privacy indicators, e.g. for camera and microphone access. This is again
+OS-dependant on where those indicators should be shown instead. One option is to
+move them to the shelf.
 
-![Example privacy indicator](./images/privacy-indicators-in-shelf.png)
-
-See (Googlers only)
-[go/cros-privacy-indicators-design](go/cros-privacy-indicators-design) for more.
+Example on ChromeOS:
+![Example privacy indicator on ChromeOS](./images/privacy-indicators-in-shelf.png)
 
 ## Other notable details
 
 ### “Settings and more” three-dot button
 
-Since the three-dot button (which gives users access to extensions, security
-information about the page, access to cookies, etc.) will be disappearing, the
-most critical information (app’s origin) will be displayed in the app settings.
+Some implementations of PWAs, e.g. Chrome and Edge, show a three-dot menu
+button. This gives users access to capabilities like for example extensions,
+copy URL, open in browser, zoom, print, find, cast, cut, copy, paste etc
+depending on the browser.
 
-The menu behind the three-dots button contains the following:
+User agents in borderless mode will want to find some other place to put these,
+or developers need to understand that they won't have all those options. Many of
+them are still available using keyboard shorcuts though.
 
-<img src="./images/three-dot-menu.png" alt="Three-dot menu" width="450">
-
-<table>
-  <tr>
-   <td><strong>Button</strong></td>
-   <td><strong>Status</strong></td>
-  </tr>
-  <tr>
-   <td>App info</td>
-   <td>
-    <ul>
-      <li>App’s origin will be added to App settings.</li>
-      <li>Cookies will be only accessible through developer console.</li>
-      <li>Connection security will be only accessible through developer console.</li>
-    </ul>
-   </td>
-  </tr>
-  <tr>
-   <td>Extensions</td>
-   <td>Will not be supported in the first version. This is something that can be considered and implemented later if needed.
-   </td>
-  </tr>
-  <tr>
-   <td>Copy URL</td>
-   <td>Will not be supported in the first version. This is something that can be considered and implemented later if needed.
-   </td>
-  </tr>
-  <tr>
-   <td>Open in Chrome</td>
-   <td>Will not be supported in the first version. This is something that can be considered and implemented later if needed.
-   </td>
-  </tr>
-  <tr>
-   <td>Zoom</td>
-   <td>Will still work using shortcuts (Ctrl++ & Ctrl+- & Ctrl+0).</td>
-  </tr>
-  <tr>
-   <td>Print</td>
-   <td>Will still work using shortcuts (Ctrl+P).</td>
-  </tr>
-  <tr>
-   <td>Find</td>
-   <td>Will still work using shortcuts (Ctrl+F).</td>
-  </tr>
-  <tr>
-   <td>Cast</td>
-   <td>Will not be supported in the first version. This is something that can be considered and implemented later if needed.
-   </td>
-  </tr>
-  <tr>
-   <td>Cut</td>
-   <td>Will still work using shortcuts (Ctrl+X).</td>
-  </tr>
-  <tr>
-   <td>Copy</td>
-   <td>Will still work using shortcuts (Ctrl+C).</td>
-  </tr>
-  <tr>
-   <td>Paste</td>
-   <td>Will still work using shortcuts (Ctrl+V).</td>
-  </tr>
-</table>
-
-A way to get the three-dots menu working would be that it could be part of the
-AWC feature, but that discussion should rather be part of the AWC feature. This
-could also be something considered to implement later on if seen necessary.
+Another way to get the three-dots menu working would be that it could be part of
+the AWC feature, but that discussion should rather be part of the AWC feature.
+This could also be something considered to implement later on if seen necessary.
 
 ## Demo
-
-Flags to enable:
-
-- <span style="text-decoration:underline;">chrome://flags#enable-desktop-pwas-borderless</span> (Linux/ChromeOS only)
-- <span style="text-decoration:underline;">chrome://flags#enable-isolated-web-apps</span>
-- <span style="text-decoration:underline;">chrome://flags#enable-isolated-web-app-dev-mode</span>
-- Path of your Isolated Web App file <span style="text-decoration:underline;">chrome://flags#install-isolated-web-app-from-file</span>
 
 Demo app:
 [https://github.com/sonkkeli/borderless/blob/main/webpack.swbn](webpack.swbn)
@@ -344,7 +262,6 @@ find the IWA related implementation details from IWA related documents.
 ```
 {
   "name": "Borderless title bar example",
-  "display": "standalone",
   "display_override": ["borderless"]
 }
 ```
@@ -458,7 +375,7 @@ required.
 ### New JS APIs
 
 Entering and existing borderless mode using JS APIs. On top of the manifest’s
-display_override “borderless” value and user permission, these APIs would enable
+display_override `borderless` value and user permission, these APIs would enable
 manual toggling of the borderless mode. Calling the APIs in JS could look
 something like this: `window.requestBorderless()` and `window.exitBorderless()`
 
@@ -509,4 +426,4 @@ custom tab bar stating the current origin:
 
 ### Iframes
 
-- Borderless mode should not be available for iframes embedded inside of an IWA.
+- Display modes cannot be enabled on embedded pages.
