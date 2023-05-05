@@ -134,11 +134,12 @@ display mode.
 
 ### 2. Enabling draggable regions
 
-When the app enters the borderless mode,
+When the app enters the borderless mode, app-defined 
 [draggable regions](https://github.com/WICG/window-controls-overlay/blob/main/explainer.md#defining-draggable-regions-in-web-content)
-`-webkit-app-region: drag;` will be enabled. Note that the
-[standardization process for app-region](https://github.com/w3c/csswg-drafts/issues/7017)
-is on-going.
+will be enabled. Currently on many browsers, this is activated on elements with
+`-webkit-app-region: drag;` there is an ongoing
+[standards effort](https://github.com/w3c/csswg-drafts/issues/7017) to rename
+this to `app-region`.
 
 ### 3. CSS display-mode media query for borderless
 
@@ -236,8 +237,10 @@ copy URL, open in browser, zoom, print, find, cast, cut, copy, paste etc
 depending on the browser.
 
 User agents in borderless mode will want to find some other place to put these,
-or developers need to understand that they won't have all those options. Many of
-them are still available using keyboard shorcuts though.
+or developers need to understand that they won't have all those options. Note
+that other platforms (like Android) have already solved this by moving some of
+the settings into the OS notifications tray, so this is not unprecedented. Also
+many of them are still available using keyboard shorcuts.
 
 Another way to get the three-dots menu working would be that it could be part of
 the AWC feature, but that discussion should rather be part of the AWC feature.
