@@ -64,12 +64,12 @@
         The [=manifest/display_override=] member of the [=application manifest=]
         is a <a>sequence</a> of <a data-cite=
         "appmanifest#dfn-display-modes-list">display mode list values</a>
-        including extensions like [=display mode/window-controls-overlay=].
-        This member represents the developer's preferred fallback chain for
-        [=display mode=]s. This field overrides the [=manifest/display=] member.
-        If the user agent does not support any of the [=display mode=]s
-        specified here, then it falls back to considering the
-        [=manifest/display=] member. See <a data-cite=
+        including extensions like [=display mode/window-controls-overlay=] and
+        [=display mode/borderless=]. This member represents the developer's
+        preferred fallback chain for [=display mode=]s. This field overrides the
+        [=manifest/display=] member. If the user agent does not support any of
+        the [=display mode=]s specified here, then it falls back to considering
+        the [=manifest/display=] member. See <a data-cite=
         "appmanifest#dfn-process-the-display-member">processing the display
         members</a> for the algorithm steps.
       </p>
@@ -101,35 +101,116 @@
         display modes. Otherwise, the [=manifest/display=] member is sufficient
         for most use cases.
       </p>
-      <section class="informative">
+
+      <section>
+        <h3>Concepts</h3>
+        <ul>
+          <li>
+            <dfn data-lt="controls of the window">Window controls</dfn>:
+            interface elements that the operating system uses consistently across
+            applications to enable the user to perform certain actions to control
+            the application. Common actions in the [=window controls=] include
+            minimize, maximize/restore, and close buttons.
+          </li>
+          <li>
+            <dfn>Additional Window Controls</dfn>: feature to replace
+            [=window controls=] by calling the minimize/maximize/close etc APIs
+            directly without the need to use browser's native window controls.
+          </li>
+          <li>
+            <dfn data-lt="IWA">Isolated Web App</dfn>: feature for installed
+            and signed web applications which are packaged as Web Bundles and
+            can be used offline instead of being fetched over HTTPS.
+            See <a href="https://github.com/WICG/isolated-web-apps">explainer</a>.
+          </li>
+        </ul>
+      </section>
+
+      <section>
         <h3>
-          Usage Example
+          Display mode extensions
         </h3>
         <p>
-          The following shows a [=manifest=] that prefers the
-          <code>minimal-ui</code> <a data-cite=
-          "appmanifest#dfn-display-mode">display mode</a> over
-          <code>standalone</code>, but if <code>minimal-ui</code> isn't
-          supported, falls back to <code>standalone</code> as opposed to
-          <code>browser</code>.
+          Additionally to the normal
+          <a data-cite="appmanifest#dfn-display-modes-list">display modes</a>,
+          [=manifest/display_override=] also supports certain extensions to it.
         </p>
-        <pre class="example json" title="Advanced display usage manifest">
-          {
-            "name": "Recipe Zone",
-            "description": "All of the recipes!",
-            "icons": [{
-              "src": "icon/hd_hi",
-              "sizes": "128x128"
-            }],
-            "start_url": "/index.html",
-            "display_override": ["minimal-ui"],
-            "display": "standalone",
-            "theme_color": "yellow",
-            "background_color": "red"
-          }
-        </pre>
+        
+        <dt>
+          <dfn data-export="" data-dfn-for="display mode">
+            borderless
+          </dfn>
+        </dt>
+        <dd>
+          The web application does not have any host-native title bar or
+          [=window controls=] visible and with the web contents extended to the
+          whole title bar area. The app can specify [=draggable region=]s in the
+          web contents to create a customized title bar. The user agent may
+          change the title bar state depending on various security
+          considerations, like an out-of-scope navigation.
+        </dd>
+
+        <dt>
+          [=display mode/window-controls-overlay=]
+        </dt>
+
+        <section class="informative">
+          <h4>
+            [=manifest/display_override=] usage example
+          </h4>
+          <p>
+            The following shows a [=manifest=] that prefers the
+            <code>minimal-ui</code> <a data-cite=
+            "appmanifest#dfn-display-mode">display mode</a> over
+            <code>standalone</code>, but if <code>minimal-ui</code> isn't
+            supported, falls back to <code>standalone</code> as opposed to
+            <code>browser</code>.
+          </p>
+          <pre class="example json" title="display_override usage manifest">
+            {
+              "name": "Recipe Zone",
+              "description": "All of the recipes!",
+              "icons": [{
+                "src": "icon/hd_hi",
+                "sizes": "128x128"
+              }],
+              "start_url": "/index.html",
+              "display_override": ["minimal-ui"],
+              "display": "standalone",
+              "theme_color": "yellow",
+              "background_color": "red"
+            }
+          </pre>
+        </section>
+      </section>
+      <section>
+        <h3>
+          Defining <dfn data-export="" data-lt="draggable region">draggable
+            regions</dfn>
+        </h3>
+          <p class="issue" title="At risk feature">
+            [=app-region=] CSS property has not been implemented in any user
+            agent, so it is at risk. Note that some user agents use the
+            non-standard CSS property <dfn data-export=""
+            data-lt="-webkit-app-region">`-webkit-app-region`</dfn> for the same
+            purpose.
+          </p>
+          <p>
+            The <dfn data-export="" data-lt="app-region">`app-region` </dfn>
+            property can be used to define with CSS which regions or elements in
+            for example a title bar are draggable.
+          </p>
+          <ul>
+            <li>
+              To enable dragging an element, shall be set to `drag`.
+            </li>
+            <li>
+              To disable dragging an element, shall be set to `no-drag`.
+            </li>
+          </ul>
       </section>
     </section>
+
     <section>
       <h2>
         `share_target` member
