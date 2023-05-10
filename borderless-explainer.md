@@ -110,9 +110,9 @@ The solution proposed consists of the following parts:
 ### 1. Setting the `display_override` to borderless
 
 To provide the maximum addressable area for web content, the User Agent (UA)
-will create a frameless window removing all UA provided by the browser, leaving
-only resizing of the window from its borders. The removed window controls will
-be enabled using AWC and HTML/JavaScript/CSS (see non-goals and
+will create a frameless window removing all UI, leaving only resizing of the
+window from its borders. The removed window controls will be enabled using AWC
+and HTML/JavaScript/CSS (see non-goals and
 [additional-windowing-controls explainer](<[http://go/additional-windowing-controls](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)>)).
 
 Example apps in borderless mode could look e.g. like below but the appearance
@@ -265,6 +265,7 @@ find the IWA related implementation details from IWA related documents.
 ```
 {
   "name": "Borderless title bar example",
+  "display": "standalone",
   "display_override": ["borderless"]
 }
 ```
