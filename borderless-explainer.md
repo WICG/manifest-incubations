@@ -60,7 +60,7 @@ Some example use-cases for borderless (with no host-native title bar) could be:
 
 1. Apps that want to fully customize their title bar to still have the same
    functionality, but with their own style, like
-   [Steam](https://cdn.yurishwedoff.com/will_steam_ever_update_its_ui.jpg).
+   [Steam](https://store.steampowered.com/).
 2. Apps that want to completely remove the title bar and provide no controls 
    (which can be seen sometimes in native apps for dialogs like splash screens).
 3. [VDI](https://www.softwaretestinghelp.com/best-vdi-software/#What_Is_Virtual_Desktop_Infrastructure)
