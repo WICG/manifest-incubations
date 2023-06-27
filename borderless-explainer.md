@@ -6,8 +6,8 @@ Related documents:
 
 - [window-controls-overlay explainer](https://github.com/WICG/window-controls-overlay/blob/main/explainer.md)
 - [additional-windowing-controls explainer](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)
-- [ChromeOS app-details](crbug.com/1225871) (Googlers-only)
-- [go/cros-privacy-indicators-design](go/cros-privacy-indicators-design)
+- [ChromeOS app-details](https://crbug.com/1225871) (Googlers-only)
+- [go/cros-privacy-indicators-design](http://go/cros-privacy-indicators-design)
   (Googlers-only)
 
 ## Table of contents
