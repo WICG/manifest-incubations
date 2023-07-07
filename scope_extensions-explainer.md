@@ -52,42 +52,30 @@ associated origins.
    In this example the "Example" app is extending its app scope to all its
    subdomains along with its `.co.uk` site and its subdomains.
 
-1. Specify a `web-app-origin-association.json` file format that must be located
-   at `https://<associated origin>/.well-known/web-app-origin-association.json`
-   on the associated origin's domain. This specifies the set of web apps that
-   may include it as a scope extension keyed on each web app's identifier.
+1. Specify a `web-app-origin-association` file format that must be located
+   at `https://<associated origin>/.well-known/web-app-origin-association`
+   on the associated origin's domain. This specifies a list of web apps that
+   may include it as a scope extension.
 
    Example association file located at
-   `https://example.co.uk/.well-known/web-app-origin-association.json`:
+   `https://example.co.uk/.well-known/web-app-origin-association`:
    ```json
    {
-     "web_apps": {
-        "https://example.com/": {
-          "scope": "/",
-          "authorize": ["intercept-links"]
-        },
-        "https://associated.site.com/": {
-          "scope": "/",
-        }
-      }
-    }
+     "web_apps": [{
+       "web_app_identity": "https://example.com/"
+     }, {
+       "web_app_identity": "https://associated.site.com/"
+     }]
+   }
    ```
 
-1. Let the extended scope be the set of URLs that:
+1. Let the extended scope of a web app be the set of URLs that:
     - Has an origin that matches one of the origin patterns in the manifest's
       `scope_extensions` list.
     - Has an origin with a valid
-      `<origin>/.well-known/web-app-origin-association.json` association file
-      with an association entry keyed by the web app's identifier.
-    - Matches a `scope` entry in the association entry. This entry behaves 
-      similarly to the `scope` field in the web app manifest spec.
-
-1. Replace the constraint on manifest URLs that are bound by scope (except for
-   `start_url`) to instead be bound by the extended scope. Validation of the
-   associated origins is not required for these URLs to be part of a valid
-   manifest. Prior to validation the URLs must be treated as if they were not
-   specified.
-
+      `<origin>/.well-known/web-app-origin-association` association file
+      with an association entry matching the web app's
+      [identity](https://w3c.github.io/manifest/#dfn-identity).
 
 ## Security Considerations
 
@@ -100,6 +88,20 @@ capturing must not be supported for associated origins unless they specify
 This opt-in is used as a signal of trust between the associated origin and the
 web app.
 
+
+## Future extensions
+
+- More specific scoping e.g. scope suffix or include/exclude lists or
+  [URL patterns](https://wicg.github.io/urlpattern/).
+  - To be able to apply these more specific scoping rules to the primary
+    scope (including exclusion).
+    One possible approach is to have the primary origin specified in the
+    `scope_extensions` list and have it override the behaviour of `scope`.
+- Replace the constraint on manifest URLs that are bound by scope (except for
+  `start_url`) to instead be bound by the extended scope. Validation of the
+  associated origins is not required for these URLs to be part of a valid
+  manifest. Prior to validation the URLs must be treated as if they were not
+  specified.
 
 ## Related Proposals
 
@@ -116,7 +118,7 @@ proposal with the following changes:
  - Rename the new manifest field from `url_handlers` to `scope_extensions` to
    reflect the change in goals.
  - Move the association file from "<origin>/web-app-origin-association.json" to
-   "<origin>/.well-known/web-app-origin-association.json". This better conforms
+   "<origin>/.well-known/web-app-origin-association". This better conforms
    with [RFC 8615](https://datatracker.ietf.org/doc/html/rfc8615).
  - Change the association file entries to be keyed on the web app identifier
    rather than the web app's manifest URL. This aligns with the recent
