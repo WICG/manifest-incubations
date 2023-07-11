@@ -186,7 +186,7 @@ which will also enable borderless capability in case the permission is given.
 Later on, the state of the permission can be queried with the following script:
 
 ```
-navigator.permissions.query({name:'window-placement'})
+navigator.permissions.query({name:'window-management'})
   .then((status) => {
     // Do what you need with the permission state.
     console.log(status.state)
@@ -249,10 +249,10 @@ This could also be something considered to implement later on if seen necessary.
 ## Demo
 
 Demo app:
-[https://github.com/sonkkeli/borderless/blob/main/webpack.swbn](webpack.swbn)
+[webpack.swbn](https://github.com/sonkkeli/borderless/blob/main/webpack.swbn)
 
 Demo app’s full code:
-[https://github.com/sonkkeli/borderless/demo-app/](https://github.com/sonkkeli/borderless/demo-app/)
+[github.com/sonkkeli/borderless/demo-app/](https://github.com/sonkkeli/borderless/demo-app/)
 
 The implementation details presented here are the ones considered most important
 to be able to create **a simple MVP using borderless mode**. There can be more
@@ -345,11 +345,10 @@ otherwise, the user experience is strange. So AWC needs to know about other
 screens and their resolution. In the end, it seems like AWC would be able to
 create a new window on any screen with arbitrary size and/or move an existing
 window there. This is possible with the
-[multi-screen window placement (MSWP)](https://github.com/w3c/window-placement/blob/main/EXPLAINER.md)
-(after renaming Window Management) permission.
+[Window Management permission](https://github.com/w3c/window-management/blob/main/EXPLAINER.md).
 
 If all (borderless & AWC) would be separate permissions, their management in
-SiteSettings would be extremely complicated and bug--prone, because only
+SiteSettings would be extremely complicated and bug-prone, because only
 enabling some of them might lead to a broken user experience. Also one would
 need to explain to the users that they cannot disable some of them and keep the
 others.
@@ -398,8 +397,8 @@ spoof content in what was previously a trusted, UA-controlled region. To
 mitigate the threat of spoofing, the feature is (at least for now) only targeted
 to be available for Isolated Web Apps and users will have to opt-in to the
 feature via a window management permission prompt or via admins’ policies. The
-title bar can be returned via App settings by toggling off the borderless mode
-capability.
+title bar can be returned via App settings by revoking the window-management
+permission.
 
 ### Out-of-scope Navigation
 
@@ -416,8 +415,8 @@ the following information:
   navigates back into scope, the standalone title bar will be removed again and
   the borderless mode enabled.
 
-Example of when out-of-scope, so reverting to the standalone title bar with
-custom tab bar stating the current origin:
+Example sketch of an out-of-scope navigation and reverting to standalone title
+bar with custom tab bar stating the current origin:
 
 ![Example of out of scope navigation layout](./images/out-of-scope-navigation.png)
 
