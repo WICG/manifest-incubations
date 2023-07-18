@@ -21,20 +21,19 @@ Add a new manifest field `tab_strip` which allows apps to customize the tab stri
 ```
 "tab_strip": {
     "home_tab": "absent" | {
-        "icons": [...],
         "scope_patterns": [{"pathname": "..."}]
     },
-    "new_tab_button": "absent" | {
+    "new_tab_button": {
         "url": <url>,
     },
 },
 ```
 
-The home tab is a pinned tab that, if enabled for an app, should be present in all app windows. Navigations outside of the home tab scope (as specified by `scope_patterns`) should open in a new tab instead of navigating the home tab. If the `home_tab` field is unset, it will default to `absent`. Apps can choose to customize the icon displayed on the tab.
+The home tab is a pinned tab that, if enabled for an app, should be present in all app windows. Navigations outside of the home tab scope (as specified by `scope_patterns`) should open in a new tab instead of navigating the home tab. If the `home_tab` field is unset, it will default to `absent`.
 
 The `home_tab.scope_patterns` field allows the app to set a list of [URLPatterns](https://wicg.github.io/urlpattern/#urlpattern) to define the scope of the home tab. Navigation within the home tab going outside of this scope will be opened in a new tab, and navigation to a URL within the home tab scope will happen in the home tab. The [`URLPattern.baseURL`](https://wicg.github.io/urlpattern/#dom-urlpatterninit-baseurl) will be initialized to the parsed app scope, and apps will only be able to specify the pathname component of URLPattern. If the `scope_patterns` field is unset, then the home tab scope will only include the `start_url`.
 
-The new tab button, if present, should open a new tab at a URL that is within the scope of the app. The app may choose to set a custom URL to be opened. If this URL is not specified or is out of scope, it will default to the `start_url`. If the `new_tab_button` field is unset, it will default to an object with its subfields default values set.
+The new tab button, should open a new tab at a URL that is within the scope of the app. The app may choose to set a custom URL to be opened. If this URL is not specified or is out of scope, it will default to the `start_url`. If the `new_tab_button` field is unset, it will default to an object with its subfields default values set. If the new tab URL is within the scope of the home tab, the new tab button will be hidden.
 
 If the `tab_strip` field is unset, it will default to the following object:
 ```
@@ -52,13 +51,13 @@ User agents can decide how to handle dragging these tabs around to create new wi
 
 A use case for the pinned home tab is productivity apps that allow editing multiple documents at once. The home tab can be used as a menu to open existing files, all of which would then open in their own tab. These apps may also use a custom URL for the new tab button to quickly create a new document.
 
-A use case for an `absent` new tab button would be if the home tab is present and that page is sufficient to navigate the app. For example a news site where articles are opened from the home tab.
+A use case for having the new tab button hidden is when the home tab is present and that page is sufficient to navigate the app. For example a news site where articles are opened from the home tab.
 
 ## Possible extensions
 
 The proposed format makes it easy to add more fields to the `tab_strip` member in the future.
 
-The `home_tab` field could have a `url` field, if an app wanted the home tab to open at a different URL to the `start_url`.
+The `home_tab` field could have a `url` field, if an app wanted the home tab to open at a different URL to the `start_url` and an `icons` field to customize the icon displayed on the home tab.
 
 The `new_tab_button` could have an `icons` field to customize the icon shown on the new tab button.
 
@@ -66,6 +65,7 @@ The `new_tab_button` could have an `icons` field to customize the icon shown on 
 "tab_strip": {
     "home_tab": {
         "url": <url>,
+        "icons": [...],
     },
     "new_tab_button": {
         "icons": [...],
