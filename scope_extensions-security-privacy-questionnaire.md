@@ -4,7 +4,7 @@ Security and Privacy questionnaire for [`scope_extensions`](https://github.com/W
 
 ## What information might this feature expose to Web sites or other parties, and for what purposes is that exposure necessary?
 
-The feature does not expose any information to web sites or other parties.
+If an URL in extended scope is captured by an app that has `launch_handler: { client_mode: "focus-existing" }` set in its manifest, the URL is made visible to the app through `Window.launchQueue` instead of causing a top level navigation. Without `scope_extensions`, this URL must be from the same origin as the app scope. With `scope_extensions`, this exposed URL can be from a different origin within extended scope.
 
 ## Do features in your specification expose the minimum amount of information necessary to enable their intended uses?
 
