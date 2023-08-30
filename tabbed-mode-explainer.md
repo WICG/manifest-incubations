@@ -47,9 +47,15 @@ If the `tab_strip` field is unset, it will default to the following object:
 
 User agents can decide how to handle dragging these tabs around to create new windows or combine with browser tabs.
 
+Apps can detect whether they have the tab strip enabled by checking the display mode with a media query. Eg. `media="(display-mode: tabbed)"`.
+
 ## Use cases
 
-A use case for the pinned home tab is productivity apps that allow editing multiple documents at once. The home tab can be used as a menu to open existing files, all of which would then open in their own tab. These apps may also use a custom URL for the new tab button to quickly create a new document.
+Tabbed mode is useful for any site where it is common to have more than one instance open at a time. Without tabbed mode, this would mean opening multiple windows for a single app which quickly becomes difficult to manage.
+
+This can also be used instead of sites creating their own HTML-based tab strip.
+
+The pinned home tab is suited for any site with a well defined home page that can be used to navigate the site. For example, productivity apps that have a home page with a gallery of current documents and a way to create a new documents. The home tab can be used as a menu to open existing files, all of which would then open in their own tab. These apps may also use a custom URL for the new tab button to quickly create a new document.
 
 A use case for having the new tab button hidden is when the home tab is present and that page is sufficient to navigate the app. For example a news site where articles are opened from the home tab.
 
@@ -80,6 +86,10 @@ Some apps may want to use a combination of display modes together. An example of
 These could be supported by adding more display override values, e.g., `window-controls-overlay-tabbed`, but this doesn’t scale well if many more display modes are added in the future.
 
 Another solution is to allow apps to create custom display modes. See the [Display Mode Override Proposal](https://github.com/WICG/display-override/blob/main/explainer.md#custom-display-mode-names-with-display-modifiers-style-specification) for more detail.
+
+## Interaction with Launch Handler API
+
+The [Launch Handler API](https://wicg.github.io/web-app-launch/) lets sites sites redirect app launches into existing app windows to prevent duplicate windows being opened. When a tabbed app sets `"client_mode": "navigate-new"`, app launches will open a new tab in an existing app window.
 
 ## Security and Privacy
 
