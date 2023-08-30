@@ -47,7 +47,17 @@ If the `tab_strip` field is unset, it will default to the following object:
 
 User agents can decide how to handle dragging these tabs around to create new windows or combine with browser tabs.
 
-Apps can detect whether they have the tab strip enabled by checking the display mode with a media query. Eg. `media="(display-mode: tabbed)"`.
+Apps can detect whether they have the tab strip enabled by checking the display mode with a media query.
+
+```css
+@media (display-mode: tabbed) {
+  /* CSS to apply in tabbed application mode. */
+}
+```
+
+```js
+const tabbedApplicationModeEnabled = window.matchMedia('(display-mode: tabbed)').matches;
+```
 
 ## Use cases
 
@@ -89,7 +99,7 @@ Another solution is to allow apps to create custom display modes. See the [Displ
 
 ## Interaction with Launch Handler API
 
-The [Launch Handler API](https://wicg.github.io/web-app-launch/) lets sites sites redirect app launches into existing app windows to prevent duplicate windows being opened. When a tabbed app sets `"client_mode": "navigate-new"`, app launches will open a new tab in an existing app window.
+The [Launch Handler API](https://wicg.github.io/web-app-launch/) lets sites redirect app launches into existing app windows to prevent duplicate windows being opened. When a tabbed app sets `"client_mode": "navigate-new"`, app launches will open a new tab in an existing app window.
 
 ## Security and Privacy
 
