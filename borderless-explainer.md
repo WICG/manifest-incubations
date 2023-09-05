@@ -5,7 +5,7 @@
 Related documents:
 
 - [window-controls-overlay explainer](https://github.com/WICG/window-controls-overlay/blob/main/explainer.md)
-- [additional-windowing-controls explainer](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)
+- [additional-windowing-controls (AWC) explainer](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)
 - [ChromeOS app-details](https://crbug.com/1225871) (Googlers-only)
 - [go/cros-privacy-indicators-design](http://go/cros-privacy-indicators-design)
   (Googlers-only)
@@ -62,7 +62,11 @@ Some example use-cases for borderless (with no host-native title bar) could be:
    functionality, but with their own style, like
    [Steam](https://store.steampowered.com/).
 2. Apps that want to completely remove the title bar and provide no controls 
-   (which can be seen sometimes in native apps for dialogs like splash screens).
+   (which can be seen sometimes in native apps e.g. for dialogs like splash
+   screens, or for drop-down menus). Some of these want to be completely
+   non-draggable and without any window controls. For example for a drop-down
+   menu, there would not be any draggable area and clicking anywhere would call
+   the API to close the drop-down menu window.
 3. [VDI](https://www.softwaretestinghelp.com/best-vdi-software/#What_Is_Virtual_Desktop_Infrastructure)
    (Virtual Desktop Infrastructure) providers that want to mirror a remote app
    drawing a remote-OS-native title bar and we want to avoid drawing a second
@@ -430,3 +434,43 @@ bar with custom tab bar stating the current origin:
 ### Iframes
 
 - Display modes cannot be enabled on embedded pages.
+
+## Accessibility
+
+### Risks
+- Non-draggable windows
+- Non-closable windows
+- Non-implemented windowing controls
+
+### Existing mitigations
+
+**IWAs**: The main mitigation is that borderless mode will only be available for 
+high-trust environments (IWAs). Web content itself allows the creation of
+accessible websites. We would expect our trusted partners (which will be the
+first target group to leverage IWAs) to take advantage of those existing
+accessibility capabilities to build accessibile apps.
+
+**Closing**: Any malicious borderless app can be closed / uninstalled from by
+right-clicking the app's icon or another platform-specific place for app
+settings.
+
+**Draggability**: This is actually a wanted feature.
+
+### WIP "mitigation"
+
+Related [AWC](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md)
+feature, when appropriately used will provide the means for building borderless
+IWAs, which are as accessible, as the non-borderless counter-parts would be.
+
+### Future mitigation ideas, if the scope would increase
+
+Further steps to mitigate the accessibility concerns should be taken, in case
+borderless mode would be concidered to be used outside of IWAs / when IWAs
+would become a thing of the open web. Some examples of possible mitigations
+could be e.g.,
+- Limiting borderless mode to a set of appIDs specified by a policy
+  (enterprice-only).
+- Relying on malicious apps being blocked from a potential future app store.
+- Making it easier to revoke the permission to be able to escape borderless mode
+  more easily. This would then be a platform-specific decision on how this would
+  work.
