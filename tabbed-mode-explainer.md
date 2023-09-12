@@ -20,7 +20,7 @@ Add a new manifest field `tab_strip` which allows apps to customize the tab stri
 
 ```
 "tab_strip": {
-    "home_tab": "absent" | {
+    "home_tab": {
         "scope_patterns": [{"pathname": "..."}]
     },
     "new_tab_button": {
@@ -29,7 +29,7 @@ Add a new manifest field `tab_strip` which allows apps to customize the tab stri
 },
 ```
 
-The home tab is a pinned tab that, if enabled for an app, should be present in all app windows. Navigations outside of the home tab scope (as specified by `scope_patterns`) should open in a new tab instead of navigating the home tab. If the `home_tab` field is unset, it will default to `absent`.
+The home tab is a pinned tab that, if enabled for an app, should be present in all app windows. Navigations outside of the home tab scope (as specified by `scope_patterns`) should open in a new tab instead of navigating the home tab. If the `home_tab` field is unset, then the app will not have a home tab.
 
 The `home_tab.scope_patterns` field allows the app to set a list of [URLPatterns](https://wicg.github.io/urlpattern/#urlpattern) to define the scope of the home tab. Navigation within the home tab going outside of this scope will be opened in a new tab, and navigation to a URL within the home tab scope will happen in the home tab. The [`URLPattern.baseURL`](https://wicg.github.io/urlpattern/#dom-urlpatterninit-baseurl) will be initialized to the parsed app scope, and apps will only be able to specify the pathname component of URLPattern. If the `scope_patterns` field is unset, then the home tab scope will only include the `start_url`.
 
@@ -38,7 +38,6 @@ The new tab button, should open a new tab at a URL that is within the scope of t
 If the `tab_strip` field is unset, it will default to the following object:
 ```
 "tab_strip": {
-    "home_tab": "absent",
     "new_tab_button": {
         "url": <start_url>,
     },
