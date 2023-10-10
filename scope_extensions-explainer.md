@@ -79,14 +79,14 @@ associated origins.
 
 ## Security Considerations
 
-### Declarative link capturing events
+### [Launch handling params](https://github.com/WICG/web-app-launch/blob/main/launch_handler.md)
 
-Capturing user navigations via `"capture_links": "existing-client-event"` has
-the potential for the web app to spoof its associated origins. Event link
-capturing must not be supported for associated origins unless they specify
-`"authorize": ["intercept-links"]` in their entry for the associated web app.
-This opt-in is used as a signal of trust between the associated origin and the
-web app.
+If an URL in extended scope is captured by an app that has 
+launch_handler: { client_mode: "focus-existing" } set in its manifest, the URL 
+is made visible to the app through Window.launchQueue instead of causing a top 
+level navigation. Without scope_extensions, this URL must be from the same 
+origin as the app scope. With scope_extensions, this exposed URL can be from a
+different origin within extended scope.
 
 
 ## Future extensions
