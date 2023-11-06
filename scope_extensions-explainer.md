@@ -38,13 +38,14 @@ associated origins.
    Example manifest located at `https://example.com/manifest.webmanifest`:
    ```json
    {
-     "id": "",
+     "id": "/",
      "name": "Example",
      "display": "standalone",
      "start_url": "/index.html",
      "scope_extensions": [
        {"origin": "*.example.com"},
        {"origin": "example.co.uk"},
+       {"origin": "*.example.co.uk"},
        {"origin": "*.example.co.uk"}
      ]
    }
