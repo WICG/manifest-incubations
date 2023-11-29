@@ -23,6 +23,7 @@
             "dom",
             "file-system-access",
             "mimesniff",
+            "web-app-launch",
             "window-controls-overlay"
           ],
           profile: "web-platform",
@@ -935,16 +936,12 @@
                 <ol>
                   <li>[=list/for each=] |file| of |files|
                     <ol>
-
-                      <li>Let |params:LaunchParams| be a new
-                      <a href="https://wicg.github.io/web-app-launch/#dom-launchparams">
-                      LaunchParams</a> with
-                      <a href="https://wicg.github.io/web-app-launch/#dom-launchparams-files">
-                      files</a> set to a {{FrozenArray}} with a single element
-                      that is a {{FileSystemHandle}} corresponding to |file|.
+                      <li>Let |params:LaunchParams| be a new {{LaunchParams}}
+                      with {{LaunchParams/files}} set to a {{FrozenArray}} with
+                      a single element that is a {{FileSystemHandle}}
+                      corresponding to |file|.
                       </li>
-                      <li><a href="https://wicg.github.io/web-app-launch/#dfn-launching-a-web-application-with-handling">
-                      Launch a web application with handling</a> passing
+                      <li>[=Launch a web application with handling=] passing
                       |manifest| and |params|.
                       </li>
                     </ol>
@@ -953,16 +950,13 @@
               </li>
               <li>Else,
                 <ol>
-                  <li>Let |params:LaunchParams| be a new
-                  <a href="https://wicg.github.io/web-app-launch/#dom-launchparams">
-                  LaunchParams</a> with
-                  <a href="https://wicg.github.io/web-app-launch/#dom-launchparams-files">
-                  files</a> set to a {{FrozenArray}} of {{FileSystemHandle}}s
-                  that correspond to the file paths named by |files|.
+                  <li>Let |params:LaunchParams| be a new {{LaunchParams}} with
+                  {{LaunchParams/files}} set to a {{FrozenArray}} of
+                  {{FileSystemHandle}}s that correspond to the file paths named
+                  by |files|.
                   </li>
-                  <li><a href="https://wicg.github.io/web-app-launch/#dfn-launching-a-web-application-with-handling">
-                  Launch a web application with handling</a> passing |manifest|
-                  and |params|.
+                  <li>[=Launch a web application with handling=] passing
+                  |manifest| and |params|.
                   </li>
                 </ol>
               </li>
