@@ -250,6 +250,214 @@
         <li>[=tab_strip/new_tab_button=]
         </li>
       </ul>
+      <section>
+        <h3>
+          home_tab member
+        </h3>
+        <p>
+          The home_tab member of the tab_strip object is an ordered map that
+          contains information about a specially marked application context
+          that, if it exists, is in every app window. This application context
+          has special properties compared to other application contexts, such
+          as restricted navigation and it SHOULD have a different appearance.
+        </p>
+        <p>
+          A home tab context is the application context in which these special
+          properties are applied.
+        </p>
+        <aside class="note">
+          The home tab is intended to serve as a top level menu for the app.
+        </aside>
+        <p>
+          If the home_tab member is not present, then the application is not
+          intended to have a home tab context, otherwise it is an ordered map
+          with the following members:
+        </p>
+        <ul>
+          <li>[=home_tab/scope_patterns=]
+          </li>
+        </ul>
+        <p>
+          How the home tab context is presented is at the discretion of the
+          user agent.
+        </p>
+        <p>
+          The home tab scope is the set of URLs to which the home tab context
+          can be navigated to. All navigations within the application to a URL
+          within the home tab scope will be done in the home tab context, and
+          all other navigations will be done in a different application
+          context.
+        </p>
+        <p>
+          The home tab scope consists of the start_url and URLs that match a
+          pattern specified in the scope_patterns field.
+        </p>
+        <aside class="note">
+          Navigation to a URL within the home tab scope will open in the home
+          tab, leaving behind the tab that initiated the navigation. Developers
+          should ensure the tab left behind does not end up in an unexpected
+          state.
+        </aside>
+        <section>
+          <h4>
+            scope_patterns member
+          </h4>
+          <p>
+            The home tab scope_patterns member is a list of URLPatterns that
+            define the scope of the home tab.
+          </p>
+          <p>
+            If navigating from the home tab context to a URL url that is
+            outside of the home tab scope the following steps are run:
+          </p>
+          <ol>
+            <li>Create a new application context in the current window.
+            </li>
+            <li>Navigate it to url.
+            </li>
+          </ol>
+          <p>
+            If navigating to a URL url within the home tab scope, the following
+            steps are run:
+          </p>
+          <ol>
+            <li>Focus the home tab context.
+            </li>
+            <li>Navigate it to url.
+            </li>
+          </ol>
+        </section>
+      </section>
+      <section>
+        <h3>
+          new_tab_button member
+        </h3>
+        <p>
+          The tab_strip new_tab_button member is an ordered map that describes
+          the behaviour of a UI affordance (such as a button) which, when
+          clicked/activated, opens a new application context within the
+          application window. It has the following members:
+        </p>
+        <ul>
+          <li>[=new_tab_button/url=]
+          </li>
+        </ul>
+        <p>
+          If url is within the home tab scope, then the new tab button may be
+          hidden.
+        </p>
+        <section>
+          <h4>
+            url member
+          </h4>
+          <p>
+            The new_tab_button’s url member is a string that represents a URL
+            relative to the manifest URL that is within scope of a processed
+            manifest. This URL will be navigated to when the new tab button is
+            activated.
+          </p>
+        </section>
+      </section>
+      <section>
+        <h2>
+          Processing tab_strip member
+        </h2>To process the tab_strip member, given ordered map json, ordered
+        map manifest, URL manifest_URL, run the following during the extension
+        point in processing a manifest:
+        <ol>
+          <li>Set manifest["tab_strip"] to a new ordered map.
+          </li>
+          <li>Set manifest["tab_strip"]["new_tab_button"]["url"] to start_url.
+          </li>
+          <li>If json["tab_strip"] does not exist, return.
+          </li>
+          <li>If the type of json["tab_strip"] is not ordered map, return.
+          </li>
+          <li>Process the home_tab member passing json["tab_strip"],
+          manifest["tab_strip"], and manifest_URL.
+          </li>
+          <li>Process the new_tab_button member passing json["tab_strip"],
+          manifest["tab_strip"], and manifest_URL.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>
+          Processing home_tab member
+        </h2>To process the home_tab member, given ordered map json, ordered
+        map manifest_tab_strip, URL manifest_URL, run the following:
+        <ol>
+          <li>If json["home_tab"] does not exist, or is not an ordered map,
+          return.
+          </li>
+          <li>Let home_tab be a new ordered map.
+          </li>
+          <li>Process the scope_patterns member passing
+          json["home_tab"]["scope_patterns"], home_tab.
+          </li>
+          <li>Set manifest_tab_strip["home_tab"] to home_tab.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>
+          Processing the new_tab_button member
+        </h2>To process the new_tab_button member, given ordered map json,
+        ordered map manifest_tab_strip, URL manifest_URL, run the following:
+        <ol>
+          <li>Set manifest_tab_strip["new_tab_button"]["url"] to start_url.
+          </li>
+          <li>If json["new_tab_button"] does not exist, or is not an ordered
+          map, return.
+          </li>
+          <li>Let url be the result of parsing json["new_tab_button"]["url"]
+          with manifest_URL as the base URL.
+          </li>
+          <li>If url is failure, return.
+          </li>
+          <li>If url is not within scope of manifest_URL, return.
+          </li>
+          <li>Set manifest_tab_strip["new_tab_button"]["url"] to url.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>
+          Processing the scope_patterns member
+        </h2>To process the scope_patterns member, given ordered map json,
+        ordered map manifest_home_tab, run the following:
+        <ol>
+          <li>Let processedScopePatterns be a new list.
+          </li>
+          <li>Set manifest_home_tab["scope_patterns"] to
+          processedScopePatterns.
+          </li>
+          <li>If json["scope_patterns"] doesn't exist or json["scope_patterns"]
+          is not a list, return.
+          </li>
+          <li>For each entry of json["scope_patterns"]:
+            <ol>
+              <li>If entry is not an ordered map, continue.
+              </li>
+              <li>If entry["pathname"] does not exist, or is not a string,
+              continue.
+              </li>
+              <li>Let pattern be a URLPattern.
+              </li>
+              <li>Run the steps to initialize a URLPattern given pattern,
+              entry["pathname"], scope and default options.
+              </li>
+              <li>Append pattern to processedScopePatterns.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <aside class="warning">
+        TODO: The above algorithms need to be properly formatted and concepts
+        linked. (I am working off a source document where links have been set
+        up already.)
+      </aside>
     </section>
     <section>
       <h2>
