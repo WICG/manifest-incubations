@@ -145,6 +145,15 @@
           <dt>
             [=display mode/window-controls-overlay=]
           </dt>
+          <dt>
+            <dfn data-export="" data-dfn-for="display mode">tabbed</dfn>
+          </dt>
+          <dd>
+            The web application can have multiple application contexts combined
+            in a single operating-system-level window. For example, this could
+            mean the user agent displays a tab strip UI to allow the user to
+            switch between the application contexts.
+          </dd>
         </dl>
         <section class="informative">
           <h4>
@@ -223,6 +232,24 @@
         and |manifest URL|.
         </li>
       </ol>
+    </section>
+    <section>
+      <h2>
+        <code><dfn>tab_strip</dfn></code> member
+      </h2>
+      <p>
+        The `tab_strip` member of the <a data-cite=
+        "appmanifest#web-application-manifest">Web Application Manifest</a> is
+        an <a data-cite="appmanifest#dfn-object">object</a> that contains
+        information about how the application is intended to behave in the
+        [=display mode/tabbed=] display mode. It has the following members:
+      </p>
+      <ul>
+        <li>[=tab_strip/home_tab=]
+        </li>
+        <li>[=tab_strip/new_tab_button=]
+        </li>
+      </ul>
     </section>
     <section>
       <h2>
