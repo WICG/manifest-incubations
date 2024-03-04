@@ -252,109 +252,110 @@
       </ul>
       <section>
         <h3>
-          home_tab member
+          <code><dfn>home_tab</dfn></code> member
         </h3>
         <p>
-          The home_tab member of the tab_strip object is an ordered map that
-          contains information about a specially marked application context
-          that, if it exists, is in every app window. This application context
-          has special properties compared to other application contexts, such
-          as restricted navigation and it SHOULD have a different appearance.
+          The `home_tab` member of the [=tab_strip=] object is an ordered map
+          that contains information about a specially marked [=application
+          context=] that, if it exists, is in every app window. This
+          application context has special properties compared to other
+          application contexts, such as restricted navigation and it SHOULD
+          have a different appearance.
         </p>
         <p>
-          A home tab context is the application context in which these special
-          properties are applied.
+          A <dfn>home tab context</dfn> is the [=application context=] in which
+          these special properties are applied.
         </p>
         <aside class="note">
           The home tab is intended to serve as a top level menu for the app.
         </aside>
         <p>
-          If the home_tab member is not present, then the application is not
-          intended to have a home tab context, otherwise it is an ordered map
-          with the following members:
+          If the [=tab_strip/home_tab=] member is not present, then the
+          application is not intended to have a home tab context, otherwise it
+          is an ordered map with the following members:
         </p>
         <ul>
           <li>[=home_tab/scope_patterns=]
           </li>
         </ul>
         <p>
-          How the home tab context is presented is at the discretion of the
+          How the [=home tab context=] is presented is at the discretion of the
           user agent.
         </p>
         <p>
-          The home tab scope is the set of URLs to which the home tab context
-          can be navigated to. All navigations within the application to a URL
-          within the home tab scope will be done in the home tab context, and
-          all other navigations will be done in a different application
-          context.
+          The <dfn>home tab scope</dfn> is the set of URLs to which the home
+          tab context can be navigated to. All navigations within the
+          application to a URL within the home tab scope will be done in the
+          [=home tab context=], and all other navigations will be done in a
+          different [=application context=].
         </p>
         <p>
-          The home tab scope consists of the start_url and URLs that match a
-          pattern specified in the scope_patterns field.
+          The [=home tab scope=] consists of the [=start URL=] and URLs that
+          match a pattern specified in the [=scope_patterns=] field.
         </p>
         <aside class="note">
-          Navigation to a URL within the home tab scope will open in the home
-          tab, leaving behind the tab that initiated the navigation. Developers
-          should ensure the tab left behind does not end up in an unexpected
-          state.
+          Navigation to a URL within the [=home tab scope=] will open in the
+          home tab, leaving behind the tab that initiated the navigation.
+          Developers should ensure the tab left behind does not end up in an
+          unexpected state.
         </aside>
         <section>
           <h4>
-            scope_patterns member
+            <code><dfn>scope_patterns</dfn></code> member
           </h4>
           <p>
-            The home tab scope_patterns member is a list of URLPatterns that
-            define the scope of the home tab.
+            The [=home_tab/scope_patterns=] member is a list of [=URLPattern=]s
+            that define the scope of the home tab.
           </p>
           <p>
-            If navigating from the home tab context to a URL url that is
-            outside of the home tab scope the following steps are run:
+            If navigating from the home tab context to a [=URL=] |URL:url| that
+            is outside of the [=home tab scope=], the following steps are run:
           </p>
           <ol>
-            <li>Create a new application context in the current window.
+            <li>Create a new [=application context=] in the current window.
             </li>
-            <li>Navigate it to url.
+            <li>Navigate it to |url|.
             </li>
           </ol>
           <p>
-            If navigating to a URL url within the home tab scope, the following
-            steps are run:
+            If navigating to a [=URL=] |URL:url| within the [=home tab scope=],
+            the following steps are run:
           </p>
           <ol>
-            <li>Focus the home tab context.
+            <li>Focus the [=home tab context=].
             </li>
-            <li>Navigate it to url.
+            <li>Navigate it to |url|.
             </li>
           </ol>
         </section>
       </section>
       <section>
         <h3>
-          new_tab_button member
+          <code><dfn>new_tab_button</dfn></code> member
         </h3>
         <p>
-          The tab_strip new_tab_button member is an ordered map that describes
-          the behaviour of a UI affordance (such as a button) which, when
-          clicked/activated, opens a new application context within the
-          application window. It has the following members:
+          The [=tab_strip/new_tab_button=] member is an ordered map that
+          describes the behaviour of a UI affordance (such as a button) which,
+          when clicked/activated, opens a new [=application context=] within
+          the application window. It has the following members:
         </p>
         <ul>
           <li>[=new_tab_button/url=]
           </li>
         </ul>
         <p>
-          If url is within the home tab scope, then the new tab button may be
-          hidden.
+          If [=new_tab_button/url=] is within the [=home tab scope=], then the
+          new tab button may be hidden.
         </p>
         <section>
           <h4>
-            url member
+            <code><dfn>url</dfn></code> member
           </h4>
           <p>
-            The new_tab_button’s url member is a string that represents a URL
-            relative to the manifest URL that is within scope of a processed
-            manifest. This URL will be navigated to when the new tab button is
-            activated.
+            The [=url=] member is a string that represents a URL relative to
+            the [=manifest URL=] that is [=within scope=] of a [=processed
+            manifest=]. This URL will be navigated to when the new tab button
+            is activated.
           </p>
         </section>
       </section>
