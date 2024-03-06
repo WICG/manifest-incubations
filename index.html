@@ -361,94 +361,102 @@
       </section>
       <section>
         <h2>
-          Processing tab_strip member
-        </h2>To process the tab_strip member, given ordered map json, ordered
-        map manifest, URL manifest_URL, run the following during the extension
-        point in processing a manifest:
+          Processing the `tab_strip` member
+        </h2>To <dfn>process the `tab_strip` member</dfn>, given [=ordered
+        map=] |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
+        [=URL=] |manifest URL:URL|, run the following during the <a data-cite=
+        "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
+        point</a> in [=processing a manifest=]:
         <ol>
-          <li>Set manifest["tab_strip"] to a new ordered map.
+          <li>Set |manifest|["tab_strip"] to a new [=ordered map=].
           </li>
-          <li>Set manifest["tab_strip"]["new_tab_button"]["url"] to start_url.
+          <li>Set |manifest|["tab_strip"]["new_tab_button"]["url"] to
+          |manifest|["start_url"].
           </li>
-          <li>If json["tab_strip"] does not exist, return.
+          <li>If |json|["tab_strip"] does not exist or |json|["tab_strip"] is
+          not an [=ordered map=], return.
           </li>
-          <li>If the type of json["tab_strip"] is not ordered map, return.
+          <li>[=Process the `home_tab` member=] passing |json|["tab_strip"],
+          |manifest|["tab_strip"], and |manifest URL|.
           </li>
-          <li>Process the home_tab member passing json["tab_strip"],
-          manifest["tab_strip"], and manifest_URL.
-          </li>
-          <li>Process the new_tab_button member passing json["tab_strip"],
-          manifest["tab_strip"], and manifest_URL.
+          <li>[=Process the `new_tab_button` member=] passing
+          |json|["tab_strip"], |manifest|["tab_strip"], |manifest URL|, and
+          |manifest|["start_url"].
           </li>
         </ol>
       </section>
       <section>
         <h2>
-          Processing home_tab member
-        </h2>To process the home_tab member, given ordered map json, ordered
-        map manifest_tab_strip, URL manifest_URL, run the following:
+          Processing the `home_tab` member
+        </h2>To <dfn>process the `home_tab` member</dfn>, given [=ordered map=]
+        |json:ordered map|, [=ordered map=] |manifest tab strip:ordered map|,
+        and [=URL=] |manifest URL:URL|, run the following:
         <ol>
-          <li>If json["home_tab"] does not exist, or is not an ordered map,
-          return.
+          <li>If |json|["home_tab"] does not exist or |json|["home_tab"] not an
+          [=ordered map=], return.
           </li>
-          <li>Let home_tab be a new ordered map.
+          <li>Let |home tab:ordered map| be a new [=ordered map=].
           </li>
-          <li>Process the scope_patterns member passing
-          json["home_tab"]["scope_patterns"], home_tab.
+          <li>[=Process the `scope_patterns` member=] passing
+          |json|["home_tab"]["scope_patterns"] and |home tab|.
           </li>
-          <li>Set manifest_tab_strip["home_tab"] to home_tab.
+          <li>Set |manifest tab strip|["home_tab"] to |home tab|.
           </li>
         </ol>
       </section>
       <section>
         <h2>
-          Processing the new_tab_button member
-        </h2>To process the new_tab_button member, given ordered map json,
-        ordered map manifest_tab_strip, URL manifest_URL, run the following:
+          Processing the `new_tab_button` member
+        </h2>To <dfn>process the `new_tab_button` member</dfn>, given [=ordered
+        map=] |json:ordered map|, [=ordered map=] |manifest tab strip:ordered
+        map|, [=URL=] |manifest URL:URL|, and [=URL=] |start URL:URL|, run the
+        following:
         <ol>
-          <li>Set manifest_tab_strip["new_tab_button"]["url"] to start_url.
+          <li>Set |manifest tab strip|["new_tab_button"]["url"] to |start URL|.
           </li>
-          <li>If json["new_tab_button"] does not exist, or is not an ordered
-          map, return.
+          <li>If |json|["new_tab_button"] does not exist or
+          |json|["new_tab_button"] is not an [=ordered map=], return.
           </li>
-          <li>Let url be the result of parsing json["new_tab_button"]["url"]
-          with manifest_URL as the base URL.
+          <li>Let |url:URL| be the result of [=URL Parser|parsing=]
+          |json|["new_tab_button"]["url"] with |manifest URL| as the base URL.
           </li>
-          <li>If url is failure, return.
+          <li>If |url| is failure, return.
           </li>
-          <li>If url is not within scope of manifest_URL, return.
+          <li>If |url| is not [=within scope=] of |manifest URL|, return.
           </li>
-          <li>Set manifest_tab_strip["new_tab_button"]["url"] to url.
+          <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
           </li>
         </ol>
       </section>
       <section>
         <h2>
-          Processing the scope_patterns member
-        </h2>To process the scope_patterns member, given ordered map json,
-        ordered map manifest_home_tab, run the following:
+          Processing the `scope_patterns` member
+        </h2>To <dfn>process the `scope_patterns` member</dfn>, given [=ordered
+        map=] |json:ordered map|, [=ordered map=] |manifest home tab:ordered
+        map|, run the following:
         <ol>
-          <li>Let processedScopePatterns be a new list.
+          <li>Let |processed scope patterns:list| be a new list.
           </li>
-          <li>Set manifest_home_tab["scope_patterns"] to
-          processedScopePatterns.
+          <li>Set |manifest home tab|["scope_patterns"] to |processed scope
+          patterns|.
           </li>
-          <li>If json["scope_patterns"] doesn't exist or json["scope_patterns"]
-          is not a list, return.
+          <li>If |json|["scope_patterns"] doesn't exist or
+          |json|["scope_patterns"] is not a list, return.
           </li>
-          <li>For each entry of json["scope_patterns"]:
+          <li>For each |entry:ordered map| of |json|["scope_patterns"]:
             <ol>
-              <li>If entry is not an ordered map, continue.
+              <li>If |entry| is not an [=ordered map=], continue.
               </li>
-              <li>If entry["pathname"] does not exist, or is not a string,
-              continue.
+              <li>If |entry|["pathname"] does not exist, or is not a
+              [=string=], continue.
               </li>
-              <li>Let pattern be a URLPattern.
+              <li>Let |pattern:URLPattern| be a [=URLPattern=].
               </li>
-              <li>Run the steps to initialize a URLPattern given pattern,
-              entry["pathname"], scope and default options.
+              <li>Run the steps to initialize a [=URLPattern=] given |pattern|,
+              |entry|["pathname"], <span style="background-color: red">scope
+              and default options</span>.
               </li>
-              <li>Append pattern to processedScopePatterns.
+              <li>Append |pattern| to |processed scope patterns|.
               </li>
             </ol>
           </li>
