@@ -24,6 +24,7 @@
             "file-system-access",
             "fs",
             "mimesniff",
+            "urlpattern",
             "web-app-launch",
             "window-controls-overlay"
           ],
@@ -304,8 +305,8 @@
             <code><dfn>scope_patterns</dfn></code> member
           </h4>
           <p>
-            The [=home_tab/scope_patterns=] member is a list of [=URLPattern=]s
-            that define the scope of the home tab.
+            The [=home_tab/scope_patterns=] member is a list of [=URL
+            pattern=]s that define the scope of the home tab.
           </p>
           <p>
             If navigating from the home tab context to a [=URL=] |URL:url| that
@@ -353,10 +354,14 @@
           </h4>
           <p>
             The [=url=] member is a string that represents a URL relative to
-            the [=manifest URL=] that is [=within scope=] of a [=processed
-            manifest=]. This URL will be navigated to when the new tab button
-            is activated.
+            the [=manifest URL=] that is [=manifest/within scope=] of a
+            [=Document/processed manifest=]. This URL will be navigated to when
+            the new tab button is activated.
           </p>
+          <aside class="warning">
+            "manifest URL" and "start URL" need to be exported from
+            APPMANIFEST.
+          </aside>
         </section>
       </section>
       <section>
@@ -422,7 +427,7 @@
           </li>
           <li>If |url| is failure, return.
           </li>
-          <li>If |url| is not [=within scope=] of |manifest URL|, return.
+          <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
           </li>
           <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
           </li>
@@ -450,17 +455,28 @@
               <li>If |entry|["pathname"] does not exist, or is not a
               [=string=], continue.
               </li>
-              <li>Let |pattern:URLPattern| be a [=URLPattern=].
-              </li>
-              <li>Run the steps to initialize a [=URLPattern=] given |pattern|,
-              |entry|["pathname"], <span style="background-color: red">scope
-              and default options</span>.
+              <li>Let |pattern:URL pattern| be the result of [=URL
+              pattern/create|creating=] a [=URL pattern=] given
+              |entry|["pathname"] and <span style=
+              "background-color: red">|scope:URL|</span>.
               </li>
               <li>Append |pattern| to |processed scope patterns|.
               </li>
             </ol>
           </li>
         </ol>
+        <aside class="warning">
+          Q for Louise: Why do we specifically pick out "pathname" from the
+          pattern dictionary and pass it as a string to the URL pattern
+          constructor? The constructor also takes a dictionary
+          ({{URLPatternInit}}) and will process all the members properly. Do we
+          intentionally ignore all the other members?
+        </aside>
+        <aside class="warning">
+          Q for Louise: Why is scope used as the base for parsing the URL
+          pattern? Shouldn't it be manifest URL? (Either way, we need to pass
+          it into this algorithm, which is why it's red above.)
+        </aside>
       </section>
       <aside class="warning">
         TODO: The above algorithms need to be properly formatted and concepts
