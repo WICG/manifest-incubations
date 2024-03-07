@@ -448,17 +448,16 @@
           <li>If |json|["scope_patterns"] doesn't exist or
           |json|["scope_patterns"] is not a list, return.
           </li>
-          <li>For each |entry:ordered map| of |json|["scope_patterns"]:
+          <li>For each |entry:URLPatternInit| of |json|["scope_patterns"]:
             <ol>
               <li>If |entry| is not an [=ordered map=], continue.
               </li>
-              <li>If |entry|["pathname"] does not exist, or is not a
-              [=string=], continue.
-              </li>
               <li>Let |pattern:URL pattern| be the result of [=URL
-              pattern/create|creating=] a [=URL pattern=] given
-              |entry|["pathname"] and <span style=
-              "background-color: red">|scope:URL|</span>.
+              pattern/create|creating=] a [=URL pattern=] given |entry| and
+              <span style="background-color: red">|scope:URL|</span>.
+              </li>
+              <li>Set |pattern|'s [=URL pattern/search component=] and [=URL
+              pattern/hash component=] to undefined.
               </li>
               <li>Append |pattern| to |processed scope patterns|.
               </li>
@@ -466,11 +465,12 @@
           </li>
         </ol>
         <aside class="warning">
-          Q for Louise: Why do we specifically pick out "pathname" from the
-          pattern dictionary and pass it as a string to the URL pattern
-          constructor? The constructor also takes a dictionary
-          ({{URLPatternInit}}) and will process all the members properly. Do we
-          intentionally ignore all the other members?
+          TODO: The "search component" and "hash component" of URL pattern are
+          not exported. It isn't clear to me how we would go about setting them
+          to undefined if they are private (you can't just set them to
+          undefined in the input dictionary, because the `baseURL` can be used
+          to set them). It's also not clear to me why we want to set them to
+          undefined.
         </aside>
         <aside class="warning">
           Q for Louise: Why is scope used as the base for parsing the URL
