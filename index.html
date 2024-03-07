@@ -251,11 +251,11 @@
         <li>[=tab_strip/new_tab_button=]
         </li>
       </ul>
-      <aside class="warning">
+      <p class="issue" title="Missing exports from APPMANIFEST">
         "manifest URL" and "start URL" need to be exported from APPMANIFEST.
         See <a href=
         "https://github.com/w3c/manifest/pull/1112">w3c/manifest#1112</a>.
-      </aside>
+      </p>
       <section>
         <h3>
           <code><dfn>home_tab</dfn></code> member
@@ -465,20 +465,15 @@
             </ol>
           </li>
         </ol>
-        <aside class="warning">
-          TODO: The "search component" and "hash component" of URL pattern are
-          not exported. It isn't clear to me how we would go about setting them
-          to undefined if they are private (you can't just set them to
-          undefined in the input dictionary, because the `baseURL` can be used
-          to set them). It's also not clear to me why we want to set them to
+        <p class="issue" title="TODO: Figure out how to clear search and hash">
+          The "search component" and "hash component" of URL pattern are not
+          exported. It isn't clear to me how we would go about setting them to
+          undefined if they are private (you can't just set them to undefined
+          in the input dictionary, because the `baseURL` can be used to set
+          them). It's also not clear to me why we want to set them to
           undefined.
-        </aside>
+        </p>
       </section>
-      <aside class="warning">
-        TODO: The above algorithms need to be properly formatted and concepts
-        linked. (I am working off a source document where links have been set
-        up already.)
-      </aside>
     </section>
     <section>
       <h2>
