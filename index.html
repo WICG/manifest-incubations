@@ -440,13 +440,13 @@
         map=] |json:ordered map|, [=ordered map=] |manifest home tab:ordered
         map| and [=URL=] |manifest URL:URL|, run the following:
         <ol>
-          <li>Let |processed scope patterns:list| be a new list.
+          <li>Let |processed scope patterns:list| be a new [=list=].
           </li>
           <li>Set |manifest home tab|["scope_patterns"] to |processed scope
           patterns|.
           </li>
           <li>If |json|["scope_patterns"] doesn't exist or
-          |json|["scope_patterns"] is not a list, return.
+          |json|["scope_patterns"] is not a [=list=], return.
           </li>
           <li>For each |entry:URLPatternInit| of |json|["scope_patterns"]:
             <ol>
