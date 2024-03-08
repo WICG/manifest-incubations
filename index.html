@@ -357,6 +357,10 @@
           <h4>
             <code><dfn>url</dfn></code> member
           </h4>
+          <p class="issue">
+            "url" is already defined as a member of another struct. This is
+            causing linking issues.
+          </p>
           <p>
             The [=url=] member is a string that represents a URL relative to
             the [=manifest URL=] that is [=manifest/within scope=] of a
