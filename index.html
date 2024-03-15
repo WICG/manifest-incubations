@@ -404,89 +404,102 @@
           |manifest|["start_url"].
           </li>
         </ol>
-      </section>
-      <section>
-        <h2>
-          Processing the `home_tab` member
-        </h2>To <dfn>process the `home_tab` member</dfn>, given [=ordered map=]
-        |json:ordered map|, [=ordered map=] |manifest tab strip:ordered map|,
-        and [=URL=] |manifest URL:URL|, run the following:
-        <ol>
-          <li>If |json|["home_tab"] does not exist or |json|["home_tab"] not an
-          [=ordered map=], return.
-          </li>
-          <li>Let |home tab:ordered map| be a new [=ordered map=].
-          </li>
-          <li>[=Process the `scope_patterns` member=] passing
-          |json|["home_tab"]["scope_patterns"], |home tab| and |manifest URL|.
-          </li>
-          <li>Set |manifest tab strip|["home_tab"] to |home tab|.
-          </li>
-        </ol>
-      </section>
-      <section>
-        <h2>
-          Processing the `new_tab_button` member
-        </h2>To <dfn>process the `new_tab_button` member</dfn>, given [=ordered
-        map=] |json:ordered map|, [=ordered map=] |manifest tab strip:ordered
-        map|, [=URL=] |manifest URL:URL|, and [=URL=] |start URL:URL|, run the
-        following:
-        <ol>
-          <li>Set |manifest tab strip|["new_tab_button"]["url"] to |start URL|.
-          </li>
-          <li>If |json|["new_tab_button"] does not exist or
-          |json|["new_tab_button"] is not an [=ordered map=], return.
-          </li>
-          <li>Let |url:URL| be the result of [=URL Parser|parsing=]
-          |json|["new_tab_button"]["url"] with |manifest URL| as the base URL.
-          </li>
-          <li>If |url| is failure, return.
-          </li>
-          <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
-          </li>
-          <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
-          </li>
-        </ol>
-      </section>
-      <section>
-        <h2>
-          Processing the `scope_patterns` member
-        </h2>To <dfn>process the `scope_patterns` member</dfn>, given [=ordered
-        map=] |json:ordered map|, [=ordered map=] |manifest home tab:ordered
-        map| and [=URL=] |manifest URL:URL|, run the following:
-        <ol>
-          <li>Let |processed scope patterns:list| be a new [=list=].
-          </li>
-          <li>Set |manifest home tab|["scope_patterns"] to |processed scope
-          patterns|.
-          </li>
-          <li>If |json|["scope_patterns"] doesn't exist or
-          |json|["scope_patterns"] is not a [=list=], return.
-          </li>
-          <li>For each |entry:URLPatternInit| of |json|["scope_patterns"]:
-            <ol>
-              <li>If |entry| is not an [=ordered map=], continue.
-              </li>
-              <li>Let |pattern:URL pattern| be the result of [=URL
-              pattern/create|creating=] a [=URL pattern=] given |entry| and
-              |manifest URL|.
-              </li>
-              <li>Set |pattern|'s [=URL pattern/search component=] and [=URL
-              pattern/hash component=] to undefined.
-              </li>
-              <li>Append |pattern| to |processed scope patterns|.
-              </li>
-            </ol>
-          </li>
-        </ol>
-        <p class="issue" title="TODO: Figure out how to clear search and hash">
-          The "search component" and "hash component" of URL pattern are not
-          exported. It isn't clear to me how we would go about setting them to
-          undefined if they are private (you can't just set them to undefined
-          in the input dictionary, because the `baseURL` can be used to set
-          them). It's also not clear to me why we want to set them to
-          undefined.
-        </p>
+        <section>
+          <h3>
+            Processing the `home_tab` member
+          </h3>
+          <p>
+            To <dfn>process the `home_tab` member</dfn>, given [=ordered map=]
+            |json:ordered map|, [=ordered map=] |manifest tab strip:ordered
+            map|, and [=URL=] |manifest URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>If |json|["home_tab"] does not exist or |json|["home_tab"] not
+            an [=ordered map=], return.
+            </li>
+            <li>Let |home tab:ordered map| be a new [=ordered map=].
+            </li>
+            <li>[=Process the `scope_patterns` member=] passing
+            |json|["home_tab"]["scope_patterns"], |home tab| and |manifest
+            URL|.
+            </li>
+            <li>Set |manifest tab strip|["home_tab"] to |home tab|.
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h3>
+            Processing the `new_tab_button` member
+          </h3>
+          <p>
+            To <dfn>process the `new_tab_button` member</dfn>, given [=ordered
+            map=] |json:ordered map|, [=ordered map=] |manifest tab
+            strip:ordered map|, [=URL=] |manifest URL:URL|, and [=URL=] |start
+            URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>Set |manifest tab strip|["new_tab_button"]["url"] to |start
+            URL|.
+            </li>
+            <li>If |json|["new_tab_button"] does not exist or
+            |json|["new_tab_button"] is not an [=ordered map=], return.
+            </li>
+            <li>Let |url:URL| be the result of [=URL Parser|parsing=]
+            |json|["new_tab_button"]["url"] with |manifest URL| as the base
+            URL.
+            </li>
+            <li>If |url| is failure, return.
+            </li>
+            <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
+            </li>
+            <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h3>
+            Processing the `scope_patterns` member
+          </h3>
+          <p>
+            To <dfn>process the `scope_patterns` member</dfn>, given [=ordered
+            map=] |json:ordered map|, [=ordered map=] |manifest home
+            tab:ordered map| and [=URL=] |manifest URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>Let |processed scope patterns:list| be a new [=list=].
+            </li>
+            <li>Set |manifest home tab|["scope_patterns"] to |processed scope
+            patterns|.
+            </li>
+            <li>If |json|["scope_patterns"] doesn't exist or
+            |json|["scope_patterns"] is not a [=list=], return.
+            </li>
+            <li>For each |entry:URLPatternInit| of |json|["scope_patterns"]:
+              <ol>
+                <li>If |entry| is not an [=ordered map=], continue.
+                </li>
+                <li>Let |pattern:URL pattern| be the result of [=URL
+                pattern/create|creating=] a [=URL pattern=] given |entry| and
+                |manifest URL|.
+                </li>
+                <li>Set |pattern|'s [=URL pattern/search component=] and [=URL
+                pattern/hash component=] to undefined.
+                </li>
+                <li>Append |pattern| to |processed scope patterns|.
+                </li>
+              </ol>
+            </li>
+          </ol>
+          <p class="issue" title=
+          "TODO: Figure out how to clear search and hash">
+            The "search component" and "hash component" of URL pattern are not
+            exported. It isn't clear to me how we would go about setting them
+            to undefined if they are private (you can't just set them to
+            undefined in the input dictionary, because the `baseURL` can be
+            used to set them). It's also not clear to me why we want to set
+            them to undefined.
+          </p>
+        </section>
       </section>
     </section>
     <section>
