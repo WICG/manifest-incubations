@@ -150,10 +150,10 @@
             <dfn data-export="" data-dfn-for="display mode">tabbed</dfn>
           </dt>
           <dd>
-            The web application can have multiple application contexts combined
-            in a single operating-system-level window. For example, this could
-            mean the user agent displays a tab strip UI to allow the user to
-            switch between the application contexts.
+            The web application can have multiple [=application contexts=]
+            combined in a single operating-system-level window. For example,
+            this could mean the user agent displays a tab strip UI to allow the
+            user to switch between the application contexts.
           </dd>
         </dl>
         <section class="informative">
@@ -264,7 +264,7 @@
           The `home_tab` member of the [=tab_strip=] object is an ordered map
           that contains information about a specially marked [=application
           context=] that, if it exists, is in every app window. This
-          application context has special properties compared to other
+          [=application context=] has special properties compared to other
           application contexts, such as restricted navigation and it SHOULD
           have a different appearance.
         </p>
@@ -277,8 +277,8 @@
         </aside>
         <p>
           If the [=tab_strip/home_tab=] member is not present, then the
-          application is not intended to have a home tab context, otherwise it
-          is an ordered map with the following members:
+          application is not intended to have a [=home tab context=], otherwise
+          it is an ordered map with the following members:
         </p>
         <ul>
           <li>[=home_tab/scope_patterns=]
@@ -291,8 +291,8 @@
         <p>
           The <dfn>home tab scope</dfn> is the set of URLs to which the home
           tab context can be navigated to. All navigations within the
-          application to a URL within the home tab scope will be done in the
-          [=home tab context=], and all other navigations will be done in a
+          application to a URL within the [=home tab scope=] will be done in
+          the [=home tab context=], and all other navigations will be done in a
           different [=application context=].
         </p>
         <p>
@@ -314,8 +314,9 @@
             pattern=]s that define the scope of the home tab.
           </p>
           <p>
-            If navigating from the home tab context to a [=URL=] |URL:url| that
-            is outside of the [=home tab scope=], the following steps are run:
+            If navigating from the [=home tab context=] to a [=URL=] |URL:url|
+            that is outside of the [=home tab scope=], the following steps are
+            run:
           </p>
           <ol>
             <li>Create a new [=application context=] in the current window.
@@ -351,7 +352,16 @@
         </ul>
         <p>
           If [=new_tab_button/url=] is within the [=home tab scope=], then the
-          new tab button may be hidden.
+          user agent MUST hide the new tab button.
+        </p>
+        <aside class="note">
+          It is not possible to have a new tab button within the [=home tab
+          scope=], because regular tabs are not expected to be within the home
+          tab scope.
+        </aside>
+        <p class="issue">
+          This should probably be stronger: check if it matches in the parser
+          and ignore it. Add a note here.
         </p>
         <section>
           <h4>
