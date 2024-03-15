@@ -262,71 +262,112 @@
         </h3>
         <p>
           The `home_tab` member of the [=tab_strip=] object is an ordered map
-          that contains information about a specially marked [=application
-          context=] that, if it exists, is in every app window. This
-          [=application context=] has special properties compared to other
-          application contexts, such as restricted navigation and it SHOULD
-          have a different appearance.
-        </p>
-        <p>
-          A <dfn>home tab context</dfn> is the [=application context=] in which
-          these special properties are applied.
-        </p>
-        <aside class="note">
-          The home tab is intended to serve as a top level menu for the app.
-        </aside>
-        <p>
-          If the [=tab_strip/home_tab=] member is not present, then the
-          application is not intended to have a [=home tab context=], otherwise
-          it is an ordered map with the following members:
+          that contains information about a special "home tab" that is intended
+          to serve as the top-level menu for the application. It contains the
+          following members:
         </p>
         <ul>
           <li>[=home_tab/scope_patterns=]
           </li>
         </ul>
         <p>
-          How the [=home tab context=] is presented is at the discretion of the
-          user agent.
-        </p>
-        <p>
-          The <dfn>home tab scope</dfn> is the set of URLs to which the home
-          tab context can be navigated to. All navigations within the
-          application to a URL within the [=home tab scope=] will be done in
-          the [=home tab context=], and all other navigations will be done in a
-          different [=application context=].
-        </p>
-        <p>
-          The [=home tab scope=] consists of the [=start URL=] and URLs that
-          match a pattern specified in the [=scope_patterns=] field.
+          The <code><dfn>scope_patterns</dfn></code> member is a list of
+          {{URLPatternInput}}s that define the [=home tab scope|scope of the
+          home tab=] relative to the [=manifest URL=].
         </p>
         <aside class="note">
-          Navigation to a URL within the [=home tab scope=] will open in the
-          home tab, leaving behind the tab that initiated the navigation.
-          Developers should ensure the tab left behind does not end up in an
-          unexpected state.
+          Each scope pattern is either a string which looks like a URL but has
+          "<code>*</code>" as a wildcard character, or a dictionary containing
+          separate URL components with "<code>*</code>" wildcards. See
+          [[urlpattern]] for more information.
         </aside>
+        <p>
+          If the [=home_tab=] member is validly specified, every application
+          window SHOULD feature an [=application context=] called the <dfn>home
+          tab context</dfn> that has special properties compared to other
+          application contexts. If [=home_tab=] is not present or not valid,
+          then the application windows SHOULD NOT have a [=home tab context=].
+        </p>
+        <p>
+          How the [=home tab context=] is presented is at the discretion of the
+          user agent, but it SHOULD have a different appearance to normal tabs.
+        </p>
+        <p>
+          The <dfn>home tab scope</dfn> is a set of [=URLs=] which comprises
+          the union of the [=start URL=] and all URLs |url:URL| to which
+          applying [=URL pattern/match=] given any element of the
+          [=scope_patterns=] field and |url| returns a {{URLPatternResult}}.
+        </p>
+        <p>
+          A URL is said to be <dfn>within home tab scope</dfn> if it is a
+          member of the [=home tab scope=]. It is <dfn>outside of home tab
+          scope</dfn> if it is not a member of [=home tab scope=].
+        </p>
+        <p class="issue">
+          Be more clear that [=home tab scope=] is not defined when `home_tab`
+          is not given (as opposed to the above, which implies that it defaults
+          to [=start URL=]).
+        </p>
+        <aside class="note">
+          The [=home tab scope=] is the set of URLs to which the [=home tab
+          context=] can be navigated. All navigations within the application to
+          a URL [=within home tab scope=] will be performed in the [=home tab
+          context=], and all navigations to a URL [=outside of home tab scope=]
+          will be performed in a different [=application context=], creating
+          one if necessary. The application's [=start URL=] is always part of
+          the [=home tab scope=].
+        </aside>
+        <p>
+          When a [=home tab scope=] is defined, the user agent SHOULD ensure
+          that at all times:
+        </p>
+        <ul>
+          <li>every application window has exactly one [=home tab context=],
+          and
+          </li>
+          <li>every [=home tab context=]'s [=browsing context/initial URL=] is
+          [=within home tab scope=], and
+          </li>
+          <li>every non-home-tab [=application context=]'s [=browsing
+          context/initial URL=] is [=outside of home tab scope=].
+          </li>
+        </ul>
+        <p class="issue" title="TODO: Verify understanding">
+          The rule about "[=initial URL=] is [=within home tab scope=]" is
+          based on the understanding that "initial URL" refers to the current
+          URL of the document (not simply the URL initially loaded into the
+          application context). The "initial" simply refers to not taking into
+          account changes made to the display URL via the History API. Verify
+          this and possibly add a note. Also, this is not linkable. Find a way
+          to reference this aspect of the context (possibly via document).
+        </p>
+        <p>
+          In order to ensure the above rule that "every application window has
+          exactly one [=home tab context=]", the user agent will need to create
+          a new [=home tab context=] whenever a new application window is
+          created, for example when launching the application, or when moving a
+          tab to a new window. A newly created [=home tab context=] SHOULD be
+          navigated to the [=start URL=], which by definition is [=within home
+          tab scope=].
+        </p>
         <section>
-          <h4>
-            <code><dfn>scope_patterns</dfn></code> member
-          </h4>
+          <h3>
+            Navigations concerning the home tab scope
+          </h3>
           <p>
-            The [=home_tab/scope_patterns=] member is a list of [=URL
-            pattern=]s that define the scope of the home tab.
-          </p>
-          <p>
-            If navigating from the [=home tab context=] to a [=URL=] |URL:url|
-            that is outside of the [=home tab scope=], the following steps are
-            run:
+            If navigating from the [=home tab context=] to a [=URL=] |url:URL|
+            that is [=outside of home tab scope=], the following steps are run:
           </p>
           <ol>
-            <li>Create a new [=application context=] in the current window.
+            <li>Create a new [=application context=] in the current window and
+            focus it.
             </li>
             <li>Navigate it to |url|.
             </li>
           </ol>
           <p>
-            If navigating to a [=URL=] |URL:url| within the [=home tab scope=],
-            the following steps are run:
+            If navigating to a [=URL=] |url:URL| [=within home tab scope=], the
+            following steps are run:
           </p>
           <ol>
             <li>Focus the [=home tab context=].
@@ -334,6 +375,15 @@
             <li>Navigate it to |url|.
             </li>
           </ol>
+          <aside class="note">
+            Navigation from the home tab to a URL [=outside of home tab scope=]
+            will open a new regular tab, leaving the existing document open in
+            the home tab. Similarly, navigation from a regular tab to a URL
+            [=within home tab scope=] will open in the home tab, leaving the
+            existing document open in the tab that initiated the navigation.
+            Developers should ensure that in both of these cases, the document
+            left behind does not end up in an unexpected state.
+          </aside>
         </section>
       </section>
       <section>
@@ -350,43 +400,52 @@
           <li>[=new_tab_button/url=]
           </li>
         </ul>
+        <p class="issue">
+          "url" is already defined as a member of another struct. This is
+          causing linking issues.
+        </p>
         <p>
-          If [=new_tab_button/url=] is within the [=home tab scope=], then the
-          user agent MUST hide the new tab button.
+          The [=url=] member is a string that represents a URL relative to the
+          [=manifest URL=] that is [=manifest/within scope=] of a
+          [=Document/processed manifest=].
+        </p>
+        <p>
+          When the new tab button is activated by the end user, the following
+          steps are run:
+        </p>
+        <ol>
+          <li>Create a new [=application context=] in the current window and
+          focus it.
+          </li>
+          <li>Navigate it to the value of the [=new_tab_button/url=] member of
+          [=new_tab_button=].
+          </li>
+        </ol>
+        <p>
+          If [=new_tab_button/url=] is [=within home tab scope=], then the user
+          agent MUST hide the new tab button.
         </p>
         <aside class="note">
-          It is not possible to have a new tab button within the [=home tab
-          scope=], because regular tabs are not expected to be within the home
-          tab scope.
+          It is not possible to have a new tab button URL [=within home tab
+          scope=], because it would violate the rule that regular tabs do not
+          navigate to URLs within home tab scope.
         </aside>
         <p class="issue">
           This should probably be stronger: check if it matches in the parser
           and ignore it. Add a note here.
         </p>
-        <section>
-          <h4>
-            <code><dfn>url</dfn></code> member
-          </h4>
-          <p class="issue">
-            "url" is already defined as a member of another struct. This is
-            causing linking issues.
-          </p>
-          <p>
-            The [=url=] member is a string that represents a URL relative to
-            the [=manifest URL=] that is [=manifest/within scope=] of a
-            [=Document/processed manifest=]. This URL will be navigated to when
-            the new tab button is activated.
-          </p>
-        </section>
       </section>
       <section>
         <h2>
           Processing the `tab_strip` member
-        </h2>To <dfn>process the `tab_strip` member</dfn>, given [=ordered
-        map=] |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
-        [=URL=] |manifest URL:URL|, run the following during the <a data-cite=
-        "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
-        point</a> in [=processing a manifest=]:
+        </h2>
+        <p>
+          To <dfn>process the `tab_strip` member</dfn>, given [=ordered map=]
+          |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
+          [=URL=] |manifest URL:URL|, run the following during the
+          <a data-cite="appmanifest#dfn-processing-extension-point-of-web-manifest">
+          extension point</a> in [=processing a manifest=]:
+        </p>
         <ol>
           <li>Set |manifest|["tab_strip"] to a new [=ordered map=].
           </li>
@@ -500,6 +559,12 @@
             them to undefined.
           </p>
         </section>
+      </section>
+      <section>
+        <h2>
+          Usage Example
+        </h2>
+        <p class="issue" title="TODO: Add a usage example for tab_strip"></p>
       </section>
     </section>
     <section>
