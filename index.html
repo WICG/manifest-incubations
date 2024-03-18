@@ -255,6 +255,7 @@
         "manifest URL" and "start URL" need to be exported from APPMANIFEST.
         See <a href=
         "https://github.com/w3c/manifest/pull/1112">w3c/manifest#1112</a>.
+        Also, "processed manifest".
       </p>
       <section>
         <h3>
@@ -282,24 +283,30 @@
           [[urlpattern]] for more information.
         </aside>
         <p>
+          An application <dfn>has a home tab</dfn> if the [=processed
+          manifest=] includes a non-null [=home_tab=] member of the
+          [=tab_strip=] member.
+        </p>
+        <p>
           The <dfn>home tab context</dfn> is an optional [=application
           context=] that has special properties compared to other application
-          contexts. If the [=home_tab=] member is validly specified, every
-          application window SHOULD feature a [=home tab context=]. If
-          [=home_tab=] is not present or not valid, then the application
-          windows SHOULD NOT have a [=home tab context=].
+          contexts. If the application [=has a home tab=], every application
+          window SHOULD feature a [=home tab context=]. If not, then the
+          application windows SHOULD NOT have a [=home tab context=].
         </p>
         <p>
           How the [=home tab context=] is presented is at the discretion of the
           user agent, but it SHOULD have a different appearance to normal tabs.
         </p>
         <p>
-          The <dfn>home tab scope</dfn> is a set of [=URLs=] which, if
-          [=home_tab=] is validly specified, comprises the union of the [=start
+          The <dfn>home tab scope</dfn> is a set of [=URLs=] which, if the
+          application [=has a home tab=], comprises the union of the [=start
           URL=] and all URLs |url:URL| to which applying [=URL pattern/match=]
-          given any element of the [=scope_patterns=] field and |url| returns a
-          {{URLPatternResult}}. If [=home_tab=] is not present or not valid,
-          then the [=home tab scope=] is the empty set.
+          given any element of the [=scope_patterns=] member of the
+          [=home_tab=] member of the [=tab_strip=] member of the [=processed
+          manifest=] and |url| returns a {{URLPatternResult}}. If the
+          application does not [=has a home tab|have a home tab=], then the
+          [=home tab scope=] is the empty set.
         </p>
         <p>
           A URL is said to be <dfn>within home tab scope</dfn> if it is a
