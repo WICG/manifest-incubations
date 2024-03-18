@@ -454,11 +454,15 @@
         <ol>
           <li>Set |manifest|["tab_strip"] to a new [=ordered map=].
           </li>
-          <li>Set |manifest|["tab_strip"]["new_tab_button"]["url"] to
-          |manifest|["start_url"].
-          </li>
           <li>If |json|["tab_strip"] does not exist or |json|["tab_strip"] is
-          not an [=ordered map=], return.
+          not an [=ordered map=]:
+            <ol>
+              <li>Set |manifest|["tab_strip"]["new_tab_button"]["url"] to
+              |manifest|["start_url"].
+              </li>
+              <li>Return.
+              </li>
+            </ol>
           </li>
           <li>[=Process the `home_tab` member=] passing |json|["tab_strip"],
           |manifest|["tab_strip"], and |manifest URL|.
