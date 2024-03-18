@@ -282,31 +282,29 @@
           [[urlpattern]] for more information.
         </aside>
         <p>
-          If the [=home_tab=] member is validly specified, every application
-          window SHOULD feature an [=application context=] called the <dfn>home
-          tab context</dfn> that has special properties compared to other
-          application contexts. If [=home_tab=] is not present or not valid,
-          then the application windows SHOULD NOT have a [=home tab context=].
+          The <dfn>home tab context</dfn> is an optional [=application
+          context=] that has special properties compared to other application
+          contexts. If the [=home_tab=] member is validly specified, every
+          application window SHOULD feature a [=home tab context=]. If
+          [=home_tab=] is not present or not valid, then the application
+          windows SHOULD NOT have a [=home tab context=].
         </p>
         <p>
           How the [=home tab context=] is presented is at the discretion of the
           user agent, but it SHOULD have a different appearance to normal tabs.
         </p>
         <p>
-          The <dfn>home tab scope</dfn> is a set of [=URLs=] which comprises
-          the union of the [=start URL=] and all URLs |url:URL| to which
-          applying [=URL pattern/match=] given any element of the
-          [=scope_patterns=] field and |url| returns a {{URLPatternResult}}.
+          The <dfn>home tab scope</dfn> is a set of [=URLs=] which, if
+          [=home_tab=] is validly specified, comprises the union of the [=start
+          URL=] and all URLs |url:URL| to which applying [=URL pattern/match=]
+          given any element of the [=scope_patterns=] field and |url| returns a
+          {{URLPatternResult}}. If [=home_tab=] is not present or not valid,
+          then the [=home tab scope=] is the empty set.
         </p>
         <p>
           A URL is said to be <dfn>within home tab scope</dfn> if it is a
           member of the [=home tab scope=]. It is <dfn>outside of home tab
           scope</dfn> if it is not a member of [=home tab scope=].
-        </p>
-        <p class="issue">
-          Be more clear that [=home tab scope=] is not defined when `home_tab`
-          is not given (as opposed to the above, which implies that it defaults
-          to [=start URL=]).
         </p>
         <aside class="note">
           The [=home tab scope=] is the set of URLs to which the [=home tab
