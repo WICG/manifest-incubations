@@ -414,6 +414,10 @@
           [=manifest URL=] that is [=manifest/within scope=] of a
           [=Document/processed manifest=].
         </p>
+        <aside class="note">
+          The [=new_tab_button=] member will be ignored if it is [=within home
+          tab scope=].
+        </aside>
         <p>
           When the new tab button is activated by the end user, the following
           steps are run:
@@ -426,19 +430,6 @@
           [=new_tab_button=].
           </li>
         </ol>
-        <p>
-          If [=new_tab_button/url=] is [=within home tab scope=], then the user
-          agent MUST hide the new tab button.
-        </p>
-        <aside class="note">
-          It is not possible to have a new tab button URL [=within home tab
-          scope=], because it would violate the rule that regular tabs do not
-          navigate to URLs within home tab scope.
-        </aside>
-        <p class="issue">
-          This should probably be stronger: check if it matches in the parser
-          and ignore it. Add a note here.
-        </p>
       </section>
       <section>
         <h2>
@@ -520,9 +511,16 @@
             </li>
             <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
             </li>
+            <li>If |url| is [=within home tab scope=], return.
+            </li>
             <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
             </li>
           </ol>
+          <aside class="note">
+            It is not possible to have a new tab button URL [=within home tab
+            scope=], because it would mean that activating the new tab button
+            would open the page in the home tab.
+          </aside>
         </section>
         <section>
           <h3>
