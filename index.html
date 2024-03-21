@@ -255,7 +255,6 @@
         "manifest URL" and "start URL" need to be exported from APPMANIFEST.
         See <a href=
         "https://github.com/w3c/manifest/pull/1112">w3c/manifest#1112</a>.
-        Also, "processed manifest".
       </p>
       <section>
         <h3>
@@ -283,7 +282,7 @@
           [[urlpattern]] for more information.
         </aside>
         <p>
-          An application <dfn>has a home tab</dfn> if the [=processed
+          An application <dfn>has a home tab</dfn> if the [=Document/processed
           manifest=] includes a non-null [=home_tab=] member of the
           [=tab_strip=] member.
         </p>
@@ -303,10 +302,10 @@
           application [=has a home tab=], comprises the union of the [=start
           URL=] and all URLs |url:URL| to which applying [=URL pattern/match=]
           given any element of the [=scope_patterns=] member of the
-          [=home_tab=] member of the [=tab_strip=] member of the [=processed
-          manifest=] and |url| returns a {{URLPatternResult}}. If the
-          application does not [=has a home tab|have a home tab=], then the
-          [=home tab scope=] is the empty set.
+          [=home_tab=] member of the [=tab_strip=] member of the
+          [=Document/processed manifest=] and |url| returns a
+          {{URLPatternResult}}. If the application does not [=has a home
+          tab|have a home tab=], then the [=home tab scope=] is the empty set.
         </p>
         <p>
           A URL is said to be <dfn>within home tab scope</dfn> if it is a
