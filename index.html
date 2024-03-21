@@ -567,11 +567,39 @@
           </ol>
         </section>
       </section>
-      <section>
+      <section class="informative">
         <h2>
           Usage Example
         </h2>
-        <p class="issue" title="TODO: Add a usage example for tab_strip"></p>
+        <pre class="example json" title="Tabbed application manifest">
+        {
+          "name": "Tabbed App Example",
+          "start_url": "/",
+          "display": "standalone",
+          "display_override": ["tabbed"],
+          "tab_strip": {
+            "home_tab": {
+              "scope_patterns": [
+                "/",
+                "/index.html"
+              ]
+            },
+            "new_tab_button": {
+              "url": "/create"
+            }
+          }
+        }
+        </pre>
+        <p>
+          This example is a tabbed web app that falls back to a single-document
+          standalone window if tabbed mode is not supported. Any navigation to
+          the main index page (either <code>/</code> or
+          <code>/index.html</code>) is opened in the [=home tab context=]. Note
+          that query parameters are ignored by default (so a navigation to
+          <code>/index.html?utm_source=foo</code> will match the home tab
+          scope). The new tab button will open a new tab at
+          <code>/create</code>.
+        </p>
       </section>
     </section>
     <section>
