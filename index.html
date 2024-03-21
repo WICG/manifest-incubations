@@ -337,6 +337,14 @@
           context/initial URL=] is [=outside of home tab scope=].
           </li>
         </ul>
+        <aside class="note">
+          User agents will not dynamically move documents between home-tab and
+          non-home-tab contexts if they use the {{History}} API to modify their
+          display URL into or out of the home tab scope, because no navigation
+          is taking place. A well-designed application will detect when it is
+          in tabbed application mode and change its behaviour to perform actual
+          navigations rather than modifying its URL.
+        </aside>
         <p class="issue" title="TODO: Verify understanding">
           The rule about "[=initial URL=] is [=within home tab scope=]" is
           based on the understanding that "initial URL" refers to the current
