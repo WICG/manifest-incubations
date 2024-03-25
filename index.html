@@ -433,18 +433,18 @@
               <li>If |protocol_handler|["protocol"] or
               |protocol_handler|["url"] is undefined, [=iteration/continue=].
               </li>
-              <li>Let (<dfn>normalizedProtocol</dfn>, <dfn>normalizedUrl</dfn>)
-              be the result of running [=normalize protocol handler
-              parameters=] with |protocol_handler|["protocol"], |
-              protocol_handler|["url"] using |manifest URL| as the base URL,
-              and [=this=]'s relevant [=environment settings object=]. If the
-              result is failure, [=iteration/continue=].
+              <li>Let (|normalizedProtocol:string|, |normalizedUrl:URL|) be the
+              result of running [=normalize protocol handler parameters=] with
+              |protocol_handler|["protocol"], | protocol_handler|["url"] using
+              |manifest URL| as the base URL, and [=this=]'s relevant
+              [=environment settings object=]. If the result is failure,
+              [=iteration/continue=].
               </li>
-              <li>If [=normalizedUrl=] is not [=manifest/within scope=] of
+              <li>If |normalizedUrl| is not [=manifest/within scope=] of
               |manifest|, [=iteration/continue=].
               </li>
               <li>If |processedProtocolHandlers| [=list/contains=] the
-              [=normalizedUrl=], [=iteration/continue=].
+              |normalizedUrl|, [=iteration/continue=].
               </li>
               <li>[=List/Append=] |protocol_handler| to
               |processedProtocolHandlers|.
