@@ -415,14 +415,11 @@
           <li>[=new_tab_button/url=]
           </li>
         </ul>
-        <p class="issue">
-          "url" is already defined as a member of another struct. This is
-          causing linking issues.
-        </p>
         <p>
-          The [=url=] member is a string that represents a URL relative to the
-          [=manifest URL=] that is [=manifest/within scope=] of a
-          [=Document/processed manifest=].
+          The <code><dfn data-dfn-for="new_tab_button">url</dfn></code> member
+          is a string that represents a URL relative to the [=manifest URL=]
+          that is [=manifest/within scope=] of a [=Document/processed
+          manifest=].
         </p>
         <aside class="note">
           The [=new_tab_button=] member will be ignored if it is [=within home
