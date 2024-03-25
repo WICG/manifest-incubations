@@ -195,6 +195,31 @@
     </section>
     <section>
       <h2>
+        Extensions to processing the manifest
+      </h2>
+      <p>
+        To facilitate all of the new extension and incubation features added by
+        this specification, the user agent SHOULD run the following during the
+        <a data-cite=
+        "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
+        point</a> in [=processing a manifest=] (having access to [=URL=]
+        |document URL:URL|, [=URL=] |manifest URL:URL|, [=ordered map=]
+        |json:ordered map|, and [=ordered map=] |manifest:ordered map|):
+      </p>
+      <ol>
+        <li>[=Process the `note_taking` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+        <li>[=Process the `protocol_handlers` member=], passing |json| and
+        |manifest|.
+        </li>
+        <li>[=Process the `file_handlers` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>
         `share_target` member
       </h2>
       <p>
@@ -598,9 +623,9 @@
         applications is at the discretion of the operating system.
       </p>
       <p>
-        To <dfn class="lint-ignore">process the `file_handlers` member</dfn>,
-        given [=ordered map=] |json:ordered map|, [=ordered map=]
-        |manifest:ordered map|, [=URL=] |manifest_url:URL|:
+        To <dfn>process the `file_handlers` member</dfn>, given [=ordered map=]
+        |json:ordered map|, [=ordered map=] |manifest:ordered map|, [=URL=]
+        |manifest_url:URL|:
       </p>
       <ol class="algorithm">
         <li>Let |processedFileHandlers:list| be a new [=list=].
