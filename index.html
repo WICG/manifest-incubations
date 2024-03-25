@@ -479,7 +479,7 @@
       </section>
       <section>
         <h2>
-          ProtocolHandler items
+          Protocol handler items
         </h2>
         <p>
           Each <dfn>protocol handler description</dfn> is an [=object=] that
@@ -487,9 +487,9 @@
           has the following members:
         </p>
         <ul>
-          <li>[=`protocol`=]
+          <li>[=protocol handler description/protocol=]
           </li>
-          <li>[=`url`=]
+          <li>[=protocol handler description/url=]
           </li>
         </ul>
         <p>
@@ -501,10 +501,11 @@
         <p class="note">
           [[HTML]]'s {{NavigatorContentUtils/registerProtocolHandler()}} allows
           web sites to register themselves as possible handlers for particular
-          protocols. What constitutes valid <code>protocol</code> and
-          <code>url</code> values for <a>protocol handler description</a>s is
-          defined in that API. Also note that the [[HTML]] API uses
-          [=url/scheme=] where we use <code>protocol</code> but the same
+          protocols. What constitutes valid [=protocol handler
+          description/protocol=] and [=protocol handler description/url=]
+          values for <a>protocol handler description</a>s is defined in that
+          API. Also note that the [[HTML]] API uses <code>scheme</code> where
+          we use [=protocol handler description/protocol=] but the same
           restrictions apply.
         </p>
         <section>
@@ -512,15 +513,17 @@
             `protocol` member
           </h3>
           <p>
-            The <dfn>protocol</dfn> member of a <a>protocol handler
-            description</a> is a <a>string</a> that represents the protocol to
-            be handled, such as `mailto` or `web+auth`.
+            The <code><dfn data-dfn-for=
+            "protocol handler description">protocol</dfn></code> member of a
+            <a>protocol handler description</a> is a <a>string</a> that
+            represents the protocol to be handled, such as `mailto` or
+            `web+auth`.
           </p>
           <p>
-            The <a>protocol</a> member of a <a>protocol handler description</a>
-            is equivalent to
-            {{NavigatorContentUtils/registerProtocolHandler()}}'s |scheme|
-            argument defined in [[HTML]].
+            The [=protocol handler description/protocol=] member of a
+            <a>protocol handler description</a> is equivalent to
+            {{NavigatorContentUtils/registerProtocolHandler()}}'s
+            <code>scheme</code> argument defined in [[HTML]].
           </p>
         </section>
         <section>
@@ -528,13 +531,16 @@
             `url` member
           </h3>
           <p>
-            The <dfn>url</dfn> member of a <a>protocol handler description</a>
-            is the <a>URL</a> [=manifest/within scope=] of the application that
-            opens when the associated protocol is activated.
+            The <code><dfn data-dfn-for=
+            "protocol handler description">url</dfn></code> member of a
+            <a>protocol handler description</a> is the <a>URL</a>
+            [=manifest/within scope=] of the application that opens when the
+            associated protocol is activated.
           </p>
           <p>
-            The <a>url</a> member of a <a>protocol handler description</a> is
-            equivalent to {{NavigatorContentUtils/registerProtocolHandler()}}'s
+            The [=protocol handler description/url=] member of a <a>protocol
+            handler description</a> is equivalent to
+            {{NavigatorContentUtils/registerProtocolHandler()}}'s
             <code>url</code> argument defined in [[HTML]].
           </p>
         </section>
