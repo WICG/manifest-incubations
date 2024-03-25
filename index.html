@@ -549,15 +549,10 @@
             </li>
             <li>For each |entry:URLPatternInit| of |json|["scope_patterns"]:
               <ol>
-                <li>If |entry| is not a {{URLPatternInput}}, continue.
-                </li>
-                <li>If |entry| is a {{URLPatternInit}}, set |entry|["baseURL"]
-                to |manifest URL|, and let |base URL| be null. Otherwise, let
-                |base URL| be |manifest URL|.
-                </li>
-                <li>Let |pattern:URL pattern| be the result of [=URL
-                pattern/create|creating=] a [=URL pattern=] given |entry| and
-                |base URL|. If this process throws, continue.
+                <li>Let |pattern:URL pattern| be the result of [=build a URL
+                pattern from an infra value|building a URL pattern from an
+                infra value=] |entry| given |manifest URL|. If this process
+                throws or returns null, continue.
                 </li>
                 <li>Append |pattern| to |processed scope patterns|.
                 </li>
