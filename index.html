@@ -22,7 +22,9 @@
             "appmanifest",
             "dom",
             "file-system-access",
+            "fs",
             "mimesniff",
+            "web-app-launch",
             "window-controls-overlay"
           ],
           profile: "web-platform",
@@ -111,17 +113,6 @@
             to control the application. Common actions in the [=window
             controls=] include minimize, maximize/restore, and close buttons.
           </li>
-          <li>
-            <dfn>Additional Window Controls</dfn>: feature to replace [=window
-            controls=] by calling the minimize/maximize/close etc APIs directly
-            without the need to use browser's native window controls.
-          </li>
-          <li>
-            <dfn data-lt="IWA">Isolated Web App</dfn>: feature for installed
-            and signed web applications which are packaged as Web Bundles and
-            can be used offline instead of being fetched over HTTPS. See
-            <a href="https://github.com/WICG/isolated-web-apps">explainer</a>.
-          </li>
         </ul>
       </section>
       <section>
@@ -201,6 +192,31 @@
           </li>
         </ul>
       </section>
+    </section>
+    <section>
+      <h2>
+        Extensions to processing the manifest
+      </h2>
+      <p>
+        To facilitate all of the new extension and incubation features added by
+        this specification, the user agent SHOULD run the following during the
+        <a data-cite=
+        "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
+        point</a> in [=processing a manifest=] (having access to [=URL=]
+        |document URL:URL|, [=URL=] |manifest URL:URL|, [=ordered map=]
+        |json:ordered map|, and [=ordered map=] |manifest:ordered map|):
+      </p>
+      <ol>
+        <li>[=Process the `note_taking` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+        <li>[=Process the `protocol_handlers` member=], passing |json| and
+        |manifest|.
+        </li>
+        <li>[=Process the `file_handlers` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+      </ol>
     </section>
     <section>
       <h2>
@@ -358,6 +374,11 @@
           |manifest|["note_taking"]["new_note_url"].
           </li>
         </ol>
+        <p>
+          The user agent MAY [=launch the `new_note_url`=] for a given
+          [=installed web application=] at any time, typically in response to a
+          user affordance.
+        </p>
       </section>
     </section>
     <section>
@@ -412,18 +433,18 @@
               <li>If |protocol_handler|["protocol"] or
               |protocol_handler|["url"] is undefined, [=iteration/continue=].
               </li>
-              <li>Let (<dfn>normalizedProtocol</dfn>, <dfn>normalizedUrl</dfn>)
-              be the result of running [=normalize protocol handler
-              parameters=] with |protocol_handler|["protocol"], |
-              protocol_handler|["url"] using |manifest URL| as the base URL,
-              and [=this=]'s relevant [=environment settings object=]. If the
-              result is failure, [=iteration/continue=].
+              <li>Let (|normalizedProtocol:string|, |normalizedUrl:URL|) be the
+              result of running [=normalize protocol handler parameters=] with
+              |protocol_handler|["protocol"], | protocol_handler|["url"] using
+              |manifest URL| as the base URL, and [=this=]'s relevant
+              [=environment settings object=]. If the result is failure,
+              [=iteration/continue=].
               </li>
-              <li>If [=normalizedUrl=] is not [=manifest/within scope=] of
+              <li>If |normalizedUrl| is not [=manifest/within scope=] of
               |manifest|, [=iteration/continue=].
               </li>
               <li>If |processedProtocolHandlers| [=list/contains=] the
-              [=normalizedUrl=], [=iteration/continue=].
+              |normalizedUrl|, [=iteration/continue=].
               </li>
               <li>[=List/Append=] |protocol_handler| to
               |processedProtocolHandlers|.
@@ -479,17 +500,18 @@
       </section>
       <section>
         <h2>
-          ProtocolHandler items
+          Protocol handler items
         </h2>
         <p>
           Each <dfn>protocol handler description</dfn> is an [=object=] that
-          represents a protocol that the web application wants to handle. It
-          has the following members:
+          represents a protocol that the web application wants to handle,
+          corresponding to the [=manifest/protocol_handlers=] member. It has
+          the following members:
         </p>
         <ul>
-          <li>[=`protocol`=]
+          <li>[=protocol handler description/protocol=]
           </li>
-          <li>[=`url`=]
+          <li>[=protocol handler description/url=]
           </li>
         </ul>
         <p>
@@ -501,10 +523,11 @@
         <p class="note">
           [[HTML]]'s {{NavigatorContentUtils/registerProtocolHandler()}} allows
           web sites to register themselves as possible handlers for particular
-          protocols. What constitutes valid <code>protocol</code> and
-          <code>url</code> values for <a>protocol handler description</a>s is
-          defined in that API. Also note that the [[HTML]] API uses
-          [=url/scheme=] where we use <code>protocol</code> but the same
+          protocols. What constitutes valid [=protocol handler
+          description/protocol=] and [=protocol handler description/url=]
+          values for <a>protocol handler description</a>s is defined in that
+          API. Also note that the [[HTML]] API uses <code>scheme</code> where
+          we use [=protocol handler description/protocol=] but the same
           restrictions apply.
         </p>
         <section>
@@ -512,15 +535,17 @@
             `protocol` member
           </h3>
           <p>
-            The <dfn>protocol</dfn> member of a <a>protocol handler
-            description</a> is a <a>string</a> that represents the protocol to
-            be handled, such as `mailto` or `web+auth`.
+            The <code><dfn data-dfn-for=
+            "protocol handler description">protocol</dfn></code> member of a
+            <a>protocol handler description</a> is a <a>string</a> that
+            represents the protocol to be handled, such as `mailto` or
+            `web+auth`.
           </p>
           <p>
-            The <a>protocol</a> member of a <a>protocol handler description</a>
-            is equivalent to
-            {{NavigatorContentUtils/registerProtocolHandler()}}'s |scheme|
-            argument defined in [[HTML]].
+            The [=protocol handler description/protocol=] member of a
+            <a>protocol handler description</a> is equivalent to
+            {{NavigatorContentUtils/registerProtocolHandler()}}'s
+            <code>scheme</code> argument defined in [[HTML]].
           </p>
         </section>
         <section>
@@ -528,13 +553,16 @@
             `url` member
           </h3>
           <p>
-            The <dfn>url</dfn> member of a <a>protocol handler description</a>
-            is the <a>URL</a> [=manifest/within scope=] of the application that
-            opens when the associated protocol is activated.
+            The <code><dfn data-dfn-for=
+            "protocol handler description">url</dfn></code> member of a
+            <a>protocol handler description</a> is the <a>URL</a>
+            [=manifest/within scope=] of the application that opens when the
+            associated protocol is activated.
           </p>
           <p>
-            The <a>url</a> member of a <a>protocol handler description</a> is
-            equivalent to {{NavigatorContentUtils/registerProtocolHandler()}}'s
+            The [=protocol handler description/url=] member of a <a>protocol
+            handler description</a> is equivalent to
+            {{NavigatorContentUtils/registerProtocolHandler()}}'s
             <code>url</code> argument defined in [[HTML]].
           </p>
         </section>
@@ -601,9 +629,9 @@
         applications is at the discretion of the operating system.
       </p>
       <p>
-        To <dfn class="lint-ignore">process the `file_handlers` member</dfn>,
-        given [=ordered map=] |json:ordered map|, [=ordered map=]
-        |manifest:ordered map|, [=URL=] |manifest_url:URL|:
+        To <dfn>process the `file_handlers` member</dfn>, given [=ordered map=]
+        |json:ordered map|, [=ordered map=] |manifest:ordered map|, [=URL=]
+        |manifest_url:URL|:
       </p>
       <ol class="algorithm">
         <li>Let |processedFileHandlers:list| be a new [=list=].
@@ -930,19 +958,13 @@
                 <ol>
                   <li>[=list/for each=] |file| of |files|
                     <ol>
-                      <li>Let |params:LaunchParams| be a new <a href=
-                      "https://wicg.github.io/web-app-launch/#dom-launchparams">
-                        LaunchParams</a> with <a href=
-                        "https://wicg.github.io/web-app-launch/#dom-launchparams-files">
-                        files</a> set to a {{FrozenArray}} with a single
-                        element that is a {{FileSystemHandle}} corresponding to
-                        |file|.
+                      <li>Let |params:LaunchParams| be a new {{LaunchParams}}
+                      with {{LaunchParams/files}} set to a {{FrozenArray}} with
+                      a single element that is a {{FileSystemHandle}}
+                      corresponding to |file|.
                       </li>
-                      <li>
-                        <a href=
-                        "https://wicg.github.io/web-app-launch/#dfn-launching-a-web-application-with-handling">
-                        Launch a web application with handling</a> passing
-                        |manifest| and |params|.
+                      <li>[=Launch a web application with handling=], passing
+                      |manifest| and |params|.
                       </li>
                     </ol>
                   </li>
@@ -950,18 +972,13 @@
               </li>
               <li>Else,
                 <ol>
-                  <li>Let |params:LaunchParams| be a new <a href=
-                  "https://wicg.github.io/web-app-launch/#dom-launchparams">LaunchParams</a>
-                  with <a href=
-                  "https://wicg.github.io/web-app-launch/#dom-launchparams-files">
-                    files</a> set to a {{FrozenArray}} of {{FileSystemHandle}}s
-                    that correspond to the file paths named by |files|.
+                  <li>Let |params:LaunchParams| be a new {{LaunchParams}} with
+                  {{LaunchParams/files}} set to a {{FrozenArray}} of
+                  {{FileSystemHandle}}s that correspond to the file paths named
+                  by |files|.
                   </li>
-                  <li>
-                    <a href=
-                    "https://wicg.github.io/web-app-launch/#dfn-launching-a-web-application-with-handling">
-                    Launch a web application with handling</a> passing
-                    |manifest| and |params|.
+                  <li>[=Launch a web application with handling=], passing
+                  |manifest| and |params|.
                   </li>
                 </ol>
               </li>
@@ -1288,7 +1305,8 @@
         <p>
           The <dfn>PromptResponseObject</dfn> contains the result of calling
           {{BeforeInstallPromptEvent/prompt()}}. It contains one member,
-          <dfn>userChoice</dfn>, which states the user's chosen outcome.
+          <dfn data-dfn-for="PromptResponseObject">userChoice</dfn>, which
+          states the user's chosen outcome.
         </p>
         <p>
           An instance of a {{BeforeInstallPromptEvent}} has the following
@@ -1439,7 +1457,7 @@
             handles "<dfn class="event">appinstalled</dfn>" events.
           </p>
         </section>
-        <section>
+        <section data-dfn-for="Window">
           <h4>
             <code>onbeforeinstallprompt</code> attribute
           </h4>
