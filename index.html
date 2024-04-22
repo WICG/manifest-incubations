@@ -297,17 +297,24 @@
         </p>
         <p>
           A [=URL=] |url:URL| is said to be <dfn>within home tab scope</dfn> if
-          and only if the application [=has a home tab=] and at least one of
-          the following conditions are met:
+          and only if:
         </p>
         <ul>
-          <li>|url| [=URL/equals=] the [=start URL=], with [=URL/equals/exclude
-          fragments=] set to true.
+          <li>the application [=has a home tab=], and
           </li>
-          <li>Applying [=URL pattern/match=] given any element of the
-          [=scope_patterns=] member of the [=home_tab=] member of the
-          [=tab_strip=] member of the [=Document/processed manifest=] and |url|
-          returns a {{URLPatternResult}}.
+          <li>|url| is [=manifest/within scope=] of the manifest, and
+          </li>
+          <li>at least one of the following:
+            <ul>
+              <li>|url| [=URL/equals=] the [=start URL=], with
+              [=URL/equals/exclude fragments=] set to true, or
+              </li>
+              <li>Applying [=URL pattern/match=] given any element of the
+              [=scope_patterns=] member of the [=home_tab=] member of the
+              [=tab_strip=] member of the [=Document/processed manifest=] and
+              |url| returns a {{URLPatternResult}}.
+              </li>
+            </ul>
           </li>
         </ul>
         <p>
