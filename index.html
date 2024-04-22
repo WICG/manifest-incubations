@@ -270,8 +270,8 @@
         </ul>
         <p>
           The <code><dfn>scope_patterns</dfn></code> member is a list of
-          {{URLPatternInput}}s that define the [=home tab scope|scope of the
-          home tab=] relative to the [=manifest URL=].
+          {{URLPatternInput}}s that define the [=within home tab scope|scope of
+          the home tab=] relative to the [=manifest URL=].
         </p>
         <aside class="note">
           Each scope pattern is either a string which looks like a URL but has
@@ -318,23 +318,28 @@
           </li>
         </ul>
         <p>
-          The <dfn>home tab scope</dfn> is the set of [=URLs=] which are
-          [=within home tab scope=]. A URL is is <dfn>outside of home tab
-          scope</dfn> if it is not [=within home tab scope=].
+          A URL is is <dfn>outside of home tab scope</dfn> if it is not
+          [=within home tab scope=].
         </p>
         <aside class="note">
           <p>
-            The [=home tab scope=] is the set of URLs to which the [=home tab
-            context=] can be navigated. All navigations within the application
+            The "home tab scope" (i.e., the set of [=URLs=] which are [=within
+            home tab scope=]) is the set of URLs to which the [=home tab
+            context=] can be navigated . All navigations within the application
             to a URL [=within home tab scope=] will be performed in the [=home
             tab context=], and all navigations to a URL [=outside of home tab
-            scope=] will be performed in a different [=application context=],
-            creating one if necessary. The application's [=start URL=] is
-            always part of the [=home tab scope=].
+            scope=] will be performed in a different [=application context=]
+            (i.e., another tab), creating one if necessary. The application's
+            [=start URL=] is always part of the home tab scope.
+          </p>
+          <p>
+            For the purpose of matching against the [=start URL=], the
+            [=URL/fragment=] is ignored, but the [=URL/query=] must match
+            exactly.
           </p>
           <p>
             If the application does not [=has a home tab|have a home tab=],
-            then the [=home tab scope=] is the empty set.
+            then the home tab scope is the empty set.
           </p>
         </aside>
         <p>
