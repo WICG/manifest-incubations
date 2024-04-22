@@ -593,8 +593,8 @@
           "tab_strip": {
             "home_tab": {
               "scope_patterns": [
-                "/",
-                "/index.html"
+                {"pathname": "/"},
+                {"pathname": "/index.html"}
               ]
             },
             "new_tab_button": {
@@ -607,11 +607,17 @@
           This example is a tabbed web app that falls back to a single-document
           standalone window if tabbed mode is not supported. Any navigation to
           the main index page (either <code>/</code> or
-          <code>/index.html</code>) is opened in the [=home tab context=]. Note
-          that query parameters are ignored by default (so a navigation to
-          <code>/index.html?utm_source=foo</code> will match the home tab
-          scope). The new tab button will open a new tab at
-          <code>/create</code>.
+          <code>/index.html</code>) is opened in the [=home tab context=]. The
+          new tab button will open a new tab at <code>/create</code>.
+        </p>
+        <p>
+          Note that the [=URL/query=] part of the URL is ignored by default
+          when matching against [=tab_strip/home_tab/scope_patterns=] (so a
+          navigation to <code>/index.html?utm_source=foo</code> will open in
+          the home tab). However, when matching against [=start URL=], the
+          [=URL/query=] must match exactly, so sites that want to ignore the
+          query are advised to explicitly include the [=start URL=]'s
+          [=URL/path=] as a scope pattern.
         </p>
       </section>
     </section>
