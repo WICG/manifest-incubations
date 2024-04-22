@@ -342,47 +342,19 @@
             then the home tab scope is the empty set.
           </p>
         </aside>
-        <p>
-          When an application [=has a home tab=], the user agent SHOULD ensure
-          that at all times:
-        </p>
-        <ul>
-          <li>every application window has exactly one [=home tab context=],
-          and
-          </li>
-          <li>every [=home tab context=]'s [=browsing context/initial URL=] is
-          [=within home tab scope=], and
-          </li>
-          <li>every non-home-tab [=application context=]'s [=browsing
-          context/initial URL=] is [=outside of home tab scope=].
-          </li>
-        </ul>
-        <aside class="note">
-          User agents will not dynamically move documents between home-tab and
-          non-home-tab contexts if they use the {{History}} API to modify their
-          display URL into or out of the home tab scope, because no navigation
-          is taking place. A well-designed application will detect when it is
-          in tabbed application mode and change its behaviour to perform actual
-          navigations rather than modifying its URL.
-        </aside>
-        <p class="issue" title="TODO: Verify understanding">
-          The rule about "[=initial URL=] is [=within home tab scope=]" is
-          based on the understanding that "initial URL" refers to the current
-          URL of the document (not simply the URL initially loaded into the
-          application context). The "initial" simply refers to not taking into
-          account changes made to the display URL via the History API. Verify
-          this and possibly add a note. Also, this is not linkable. Find a way
-          to reference this aspect of the context (possibly via document).
-        </p>
-        <p>
-          In order to ensure the above rule that "every application window has
-          exactly one [=home tab context=]", the user agent will need to create
-          a new [=home tab context=] whenever a new application window is
-          created, for example when launching the application, or when moving a
-          tab to a new window. A newly created [=home tab context=] SHOULD be
-          navigated to the [=start URL=], which by definition is [=within home
-          tab scope=].
-        </p>
+        <section>
+          <h3>
+            Every window has a home tab
+          </h3>
+          <p>
+            If the application [=has a home tab=], whenever a new application
+            window is created (for example when launching the application, or
+            when moving a tab to a new window), the user agent MUST create a
+            new [=home tab context=] in that window. A newly created [=home tab
+            context=] SHOULD be navigated to the [=start URL=], which by
+            definition is [=within home tab scope=].
+          </p>
+        </section>
         <section>
           <h3>
             Navigations concerning the home tab scope
@@ -417,6 +389,44 @@
             Developers should ensure that in both of these cases, the document
             left behind does not end up in an unexpected state.
           </aside>
+        </section>
+        <section class="informative">
+          <h3>
+            Home tab invariants
+          </h3>
+          <p>
+            The above rules are intended to ensure that the following
+            invariants are always true, for applications that [=has a home
+            tab|have a home tab=]:
+          </p>
+          <ul>
+            <li>every application window has exactly one [=home tab context=],
+            and
+            </li>
+            <li>every [=home tab context=]'s active document's [=Document/URL=]
+            is [=within home tab scope=] (unless the document's URL has changed
+            since it was created), and
+            </li>
+            <li>every non-home-tab [=application context=]'s active document's
+            [=Document/URL=] is [=outside of home tab scope=] (unless the
+            document's URL has changed since it was created).
+            </li>
+          </ul>
+          <p>
+            User agents will not dynamically move documents between home-tab
+            and non-home-tab contexts if they change their [=URL/fragment=], or
+            use the {{History}} API to modify their display URL into or out of
+            the home tab scope, because no navigation is taking place. For this
+            reason, the above invariants only care about the [=Document/URLs=]
+            that documents had at the time of their creation.
+          </p>
+          <p>
+            Applications that "pretend" to navigate by modifing their URLs can
+            detect when they are in tabbed application mode and change their
+            behaviour to perform actual navigations into and out of the home
+            tab scope, rather than modifying the URL, to ensure the user agent
+            correctly opens documents in or out of the [=home tab context=].
+          </p>
         </section>
       </section>
       <section>
