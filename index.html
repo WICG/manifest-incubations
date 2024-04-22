@@ -296,28 +296,39 @@
           user agent, but it SHOULD have a different appearance to normal tabs.
         </p>
         <p>
-          The <dfn>home tab scope</dfn> is a set of [=URLs=] which, if the
-          application [=has a home tab=], comprises the union of the [=start
-          URL=] and all URLs |url:URL| to which applying [=URL pattern/match=]
-          given any element of the [=scope_patterns=] member of the
-          [=home_tab=] member of the [=tab_strip=] member of the
-          [=Document/processed manifest=] and |url| returns a
-          {{URLPatternResult}}. If the application does not [=has a home
-          tab|have a home tab=], then the [=home tab scope=] is the empty set.
+          A [=URL=] |url:URL| is said to be <dfn>within home tab scope</dfn> if
+          and only if the application [=has a home tab=] and at least one of
+          the following conditions are met:
         </p>
+        <ul>
+          <li>|url| [=URL/equals=] the [=start URL=], with [=URL/equals/exclude
+          fragments=] set to true.
+          </li>
+          <li>Applying [=URL pattern/match=] given any element of the
+          [=scope_patterns=] member of the [=home_tab=] member of the
+          [=tab_strip=] member of the [=Document/processed manifest=] and |url|
+          returns a {{URLPatternResult}}.
+          </li>
+        </ul>
         <p>
-          A URL is said to be <dfn>within home tab scope</dfn> if it is a
-          member of the [=home tab scope=]. It is <dfn>outside of home tab
-          scope</dfn> if it is not a member of [=home tab scope=].
+          The <dfn>home tab scope</dfn> is the set of [=URLs=] which are
+          [=within home tab scope=]. A URL is is <dfn>outside of home tab
+          scope</dfn> if it is not [=within home tab scope=].
         </p>
         <aside class="note">
-          The [=home tab scope=] is the set of URLs to which the [=home tab
-          context=] can be navigated. All navigations within the application to
-          a URL [=within home tab scope=] will be performed in the [=home tab
-          context=], and all navigations to a URL [=outside of home tab scope=]
-          will be performed in a different [=application context=], creating
-          one if necessary. The application's [=start URL=] is always part of
-          the [=home tab scope=].
+          <p>
+            The [=home tab scope=] is the set of URLs to which the [=home tab
+            context=] can be navigated. All navigations within the application
+            to a URL [=within home tab scope=] will be performed in the [=home
+            tab context=], and all navigations to a URL [=outside of home tab
+            scope=] will be performed in a different [=application context=],
+            creating one if necessary. The application's [=start URL=] is
+            always part of the [=home tab scope=].
+          </p>
+          <p>
+            If the application does not [=has a home tab|have a home tab=],
+            then the [=home tab scope=] is the empty set.
+          </p>
         </aside>
         <p>
           When an application [=has a home tab=], the user agent SHOULD ensure
