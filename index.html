@@ -280,9 +280,10 @@
           [[urlpattern]] for more information.
         </aside>
         <p>
-          An application <dfn>has a home tab</dfn> if the [=Document/processed
-          manifest=] includes a non-null [=home_tab=] member of the
-          [=tab_strip=] member.
+          An application <dfn>has a home tab</dfn> if the applied [=display
+          mode=] of the application is [=display mode/tabbed=], and the
+          [=Document/processed manifest=] includes a non-null [=home_tab=]
+          member of the [=tab_strip=] member.
         </p>
         <p>
           The <dfn>home tab context</dfn> is an optional [=application
@@ -293,7 +294,8 @@
         </p>
         <p>
           How the [=home tab context=] is presented is at the discretion of the
-          user agent, but it SHOULD have a different appearance to normal tabs.
+          user agent, but it SHOULD have a different appearance to normal
+          application contexts.
         </p>
         <p>
           A [=URL=] |url:URL| is said to be <dfn>within home tab scope</dfn> if
@@ -330,7 +332,8 @@
             tab context=], and all navigations to a URL [=outside of home tab
             scope=] will be performed in a different [=application context=]
             (i.e., another tab), creating one if necessary. The application's
-            [=start URL=] is always part of the home tab scope.
+            [=start URL=] is always part of the home tab scope (if the
+            application [=has a home tab=]).
           </p>
           <p>
             For the purpose of matching against the [=start URL=], the
