@@ -339,7 +339,8 @@
           </p>
           <p>
             If the application does not [=has a home tab|have a home tab=],
-            then the home tab scope is the empty set.
+            then the home tab scope is the empty set, and all URLs are
+            [=outside of home tab scope=].
           </p>
         </aside>
         <section>
@@ -449,9 +450,28 @@
           that is [=manifest/within scope=] of a [=Document/processed
           manifest=].
         </p>
+        <p>
+          An application <dfn>has a new tab button</dfn> if the
+          [=Document/processed manifest=]'s [=new_tab_button=]'s
+          [=new_tab_button/url=] member is [=outside of home tab scope=]. If
+          the application does not [=has a new tab button|have a new tab
+          button=], the user agent SHOULD NOT make the "new tab" affordance
+          available to the end user.
+        </p>
         <aside class="note">
-          The [=new_tab_button=] member will be ignored if it is [=within home
-          tab scope=].
+          <p>
+            The new tab button will be unavailable if its URL is [=within home
+            tab scope=]. This rule is necessary, since otherwise, it would
+            either imply that a) the new tab button would open a non-home tab
+            [=within home tab scope=], violating the third home tab invariant
+            above, or b) the new tab button would simply focus the home tab,
+            which would be redundant and confusing UI.
+          </p>
+          <p>
+            The default value for [=new_tab_button/url=] is the [=start URL=].
+            This means the button will be unavailable by default if the
+            application [=has a home tab=].
+          </p>
         </aside>
         <p>
           When the new tab button is activated by the end user, the following
@@ -546,16 +566,9 @@
             </li>
             <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
             </li>
-            <li>If |url| is [=within home tab scope=], return.
-            </li>
             <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
             </li>
           </ol>
-          <aside class="note">
-            It is not possible to have a new tab button URL [=within home tab
-            scope=], because it would mean that activating the new tab button
-            would open the page in the home tab.
-          </aside>
         </section>
         <section>
           <h3>
