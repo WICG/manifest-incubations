@@ -551,17 +551,18 @@
           </h3>
           <p>
             To <dfn>process the `home_tab` member</dfn>, given [=ordered map=]
-            |json:ordered map|, [=ordered map=] |manifest tab strip:ordered
-            map|, and [=URL=] |manifest URL:URL|, run the following:
+            |json tab strip:ordered map|, [=ordered map=] |manifest tab
+            strip:ordered map|, and [=URL=] |manifest URL:URL|, run the
+            following:
           </p>
           <ol>
-            <li>If |json|["home_tab"] does not exist or |json|["home_tab"] not
-            an [=ordered map=], return.
+            <li>If |json tab strip|["home_tab"] does not exist or |json tab
+            strip|["home_tab"] not an [=ordered map=], return.
             </li>
             <li>Let |home tab:ordered map| be a new [=ordered map=].
             </li>
-            <li>[=Process the `scope_patterns` member=] passing
-            |json|["home_tab"]["scope_patterns"], |home tab| and |manifest
+            <li>[=Process the `scope_patterns` member=] passing |json tab
+            strip|["home_tab"]["scope_patterns"], |home tab| and |manifest
             URL|.
             </li>
             <li>Set |manifest tab strip|["home_tab"] to |home tab|.
@@ -574,7 +575,7 @@
           </h3>
           <p>
             To <dfn>process the `new_tab_button` member</dfn>, given [=ordered
-            map=] |json:ordered map|, [=ordered map=] |manifest tab
+            map=] |json tab strip:ordered map|, [=ordered map=] |manifest tab
             strip:ordered map|, [=URL=] |manifest URL:URL|, and [=URL=] |start
             URL:URL|, run the following:
           </p>
@@ -582,11 +583,11 @@
             <li>Set |manifest tab strip|["new_tab_button"]["url"] to |start
             URL|.
             </li>
-            <li>If |json|["new_tab_button"] does not exist or
-            |json|["new_tab_button"] is not an [=ordered map=], return.
+            <li>If |json tab strip|["new_tab_button"] does not exist or |json
+            tab strip|["new_tab_button"] is not an [=ordered map=], return.
             </li>
-            <li>Let |url:URL| be the result of [=URL Parser|parsing=]
-            |json|["new_tab_button"]["url"] with |manifest URL| as the base
+            <li>Let |url:URL| be the result of [=URL Parser|parsing=] |json tab
+            strip|["new_tab_button"]["url"] with |manifest URL| as the base
             URL.
             </li>
             <li>If |url| is failure, return.
@@ -603,7 +604,7 @@
           </h3>
           <p>
             To <dfn>process the `scope_patterns` member</dfn>, given [=ordered
-            map=] |json:ordered map|, [=ordered map=] |manifest home
+            map=] |json home tab:ordered map|, [=ordered map=] |manifest home
             tab:ordered map| and [=URL=] |manifest URL:URL|, run the following:
           </p>
           <ol>
@@ -612,10 +613,11 @@
             <li>Set |manifest home tab|["scope_patterns"] to |processed scope
             patterns|.
             </li>
-            <li>If |json|["scope_patterns"] doesn't exist or
-            |json|["scope_patterns"] is not a [=list=], return.
+            <li>If |json home tab|["scope_patterns"] doesn't exist or |json
+            home tab|["scope_patterns"] is not a [=list=], return.
             </li>
-            <li>For each |entry:URLPatternInit| of |json|["scope_patterns"]:
+            <li>For each |entry:URLPatternInit| of |json home
+            tab|["scope_patterns"]:
               <ol>
                 <li>Let |pattern:URL pattern| be the result of [=build a URL
                 pattern from an infra value|building a URL pattern from an
