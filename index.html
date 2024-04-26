@@ -426,11 +426,15 @@
             that documents had at the time of their creation.
           </p>
           <p>
-            Applications that "pretend" to navigate by modifing their URLs can
-            detect when they are in tabbed application mode and change their
-            behaviour to perform actual navigations into and out of the home
-            tab scope, rather than modifying the URL, to ensure the user agent
-            correctly opens documents in or out of the [=home tab context=].
+            For single-page applications that "pretend" to navigate by
+            modifying their URLs, this may result in undesirable behaviour that
+            breaks the above invariants (e.g. if the user clicks a link from
+            the home tab to dynamically change the URL to a non-home page, they
+            will stay inside the home tab because it is not actually
+            navigating). To avoid this situation, the application can detect
+            when it is in tabbed application mode and change its behavior to
+            perform actual navigations into and out of the home tab scope,
+            rather than modifying the URL.
           </p>
         </section>
       </section>
