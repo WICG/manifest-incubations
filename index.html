@@ -364,25 +364,51 @@
             Navigations concerning the home tab scope
           </h3>
           <p>
-            If [=navigate|navigating=] from the [=home tab context=] to a
-            [=URL=] |url:URL| that is [=outside of home tab scope=], the
-            following steps are run:
+            When [=navigate|navigating=] the [=top-level traversable=]
+            associated with a [=home tab context=] to a [=URL=] |url:URL| that
+            is [=outside of home tab scope=], the following steps are run:
           </p>
           <ol>
-            <li>[=Create a new application context=] in the current window and
-            focus it.
+            <li>Let [=top-level traversable=] |tab:toplevel traversable| be the
+            result of choosing a navigable with a target of
+            <code>"_blank"</code> and noopener true.
             </li>
-            <li>Navigate it to |url|.
+            <li>Instead of [=navigating=] the home-tab traversable,
+            [=navigate=] |tab| with the same parameters.
+            </li>
+            <li>[=applied|Apply=] the current [=application manifest=] to
+            |tab|'s [=top-level browsing context=].
+            </li>
+            <li>The user agent SHOULD place |tab| in the same window as the
+            home-tab navigable.
+            </li>
+            <li>Focus |tab|.
             </li>
           </ol>
+          <p class="issue" title=
+          "Cannot link to &quot;rules for choosing a navigable&quot;">
+            The [[HTML]] spec defines <a href=
+            "https://html.spec.whatwg.org/multipage/document-sequences.html#the-rules-for-choosing-a-navigable">
+            rules for choosing a navigable</a>, mentioned above. However, it is
+            not exported, so it is unable to be properly linked, and may be
+            considered a layering violation.
+          </p>
           <p>
-            If [=navigate|navigating=] to a [=URL=] |url:URL| [=within home tab
-            scope=], the following steps are run:
+            When [=navigate|navigating=] a [=top-level traversable=] with a
+            [=display mode=] of [=display mode/tabbed=] that is not associated
+            with a [=home tab context=] (i.e. a non-home tab) to a [=URL=]
+            |url:URL| that is [=within home tab scope=], the following steps
+            are run:
           </p>
           <ol>
-            <li>Focus the [=home tab context=].
+            <li>Let |hometab:toplevel traversable| be the [=top-level
+            traversable=] of the [=home tab context=] associated with the
+            current window.
             </li>
-            <li>Navigate it to |url|.
+            <li>Instead of [=navigating=] the top-level traversable,
+            [=navigate=] |hometab| with the same parameters.
+            </li>
+            <li>Focus |hometab|.
             </li>
           </ol>
           <aside class="note">
