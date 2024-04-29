@@ -24,6 +24,7 @@
             "file-system-access",
             "fs",
             "mimesniff",
+            "urlpattern",
             "web-app-launch",
             "window-controls-overlay"
           ],
@@ -92,14 +93,20 @@
             mode/window-controls-overlay=] and the user agent supports this,
             then return that |candidate_display_mode:DisplayModeType|.
             </li>
+            <li>If |candidate_display_mode:DisplayModeType| is [=display
+            mode/tabbed=] and the user agent supports this, then return that
+            |candidate_display_mode:DisplayModeType|.
+            </li>
           </ol>
         </li>
       </ol>
       <p class="note">
         This member is intended to be only used for advanced cases, where the
         developer wants explicit control over the fallback order of their
-        display modes. Otherwise, the [=manifest/display=] member is sufficient
-        for most use cases.
+        display modes, or for modes that are not available in the basic
+        <a data-cite="appmanifest/#dfn-display-modes-list">display modes
+        list</a>. Otherwise, the [=manifest/display=] member is sufficient for
+        most use cases.
       </p>
       <section>
         <h3>
@@ -139,6 +146,15 @@
           <dt>
             [=display mode/window-controls-overlay=]
           </dt>
+          <dt>
+            <dfn data-export="" data-dfn-for="display mode">tabbed</dfn>
+          </dt>
+          <dd>
+            The web application can have multiple [=application contexts=]
+            combined in a single operating-system-level window. For example,
+            this could mean the user agent displays a tab strip UI to allow the
+            user to switch between the application contexts.
+          </dd>
         </dl>
         <section class="informative">
           <h4>
@@ -207,6 +223,9 @@
         |json:ordered map|, and [=ordered map=] |manifest:ordered map|):
       </p>
       <ol>
+        <li>[=Process the `tab_strip` member=], passing |json|, |manifest| and
+        |manifest URL|.
+        </li>
         <li>[=Process the `note_taking` member=], passing |json|, |manifest|
         and |manifest URL|.
         </li>
@@ -217,6 +236,442 @@
         and |manifest URL|.
         </li>
       </ol>
+    </section>
+    <section>
+      <h2>
+        <code><dfn>tab_strip</dfn></code> member
+      </h2>
+      <p>
+        The `tab_strip` member of the <a data-cite=
+        "appmanifest#web-application-manifest">Web Application Manifest</a> is
+        an <a data-cite="appmanifest#dfn-object">object</a> that contains
+        information about how the application is intended to behave in the
+        [=display mode/tabbed=] display mode. It has the following members:
+      </p>
+      <ul>
+        <li>[=tab_strip/home_tab=]
+        </li>
+        <li>[=tab_strip/new_tab_button=]
+        </li>
+      </ul>
+      <section>
+        <h3>
+          <code><dfn>home_tab</dfn></code> member
+        </h3>
+        <p>
+          The `home_tab` member of the [=tab_strip=] object is an ordered map
+          that contains information about a special "home tab" that is intended
+          to serve as the top-level menu for the application. It contains the
+          following members:
+        </p>
+        <ul>
+          <li>[=home_tab/scope_patterns=]
+          </li>
+        </ul>
+        <p>
+          The <code><dfn>scope_patterns</dfn></code> member is a list of
+          {{URLPatternInput}}s that define the [=within home tab scope|scope of
+          the home tab=] relative to the [=manifest URL=].
+        </p>
+        <aside class="note">
+          Each scope pattern is either a string which looks like a URL but has
+          "<code>*</code>" as a wildcard character, or a dictionary containing
+          separate URL components with "<code>*</code>" wildcards. See
+          [[urlpattern]] for more information.
+        </aside>
+        <p>
+          An application <dfn>has a home tab</dfn> if the applied [=display
+          mode=] of the application is [=display mode/tabbed=], and the
+          [=Document/processed manifest=] includes a non-null [=home_tab=]
+          member of the [=tab_strip=] member.
+        </p>
+        <p>
+          The <dfn>home tab context</dfn> is an optional [=application
+          context=] that has special properties compared to other application
+          contexts. If the application [=has a home tab=], every application
+          window SHOULD feature a [=home tab context=]. If not, then the
+          application windows SHOULD NOT have a [=home tab context=].
+        </p>
+        <p>
+          How the [=home tab context=] is presented is at the discretion of the
+          user agent, but it SHOULD have a different appearance to normal
+          application contexts.
+        </p>
+        <p>
+          A [=URL=] |url:URL| is said to be <dfn>within home tab scope</dfn> if
+          and only if:
+        </p>
+        <ul>
+          <li>the application [=has a home tab=], and
+          </li>
+          <li>|url| is [=manifest/within scope=] of the manifest, and
+          </li>
+          <li>at least one of the following:
+            <ul>
+              <li>|url| [=URL/equals=] the [=start URL=], with
+              [=URL/equals/exclude fragments=] set to true, or
+              </li>
+              <li>Applying [=URL pattern/match=] given any element of the
+              [=scope_patterns=] member of the [=home_tab=] member of the
+              [=tab_strip=] member of the [=Document/processed manifest=] and
+              |url| returns a {{URLPatternResult}}.
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <p>
+          A URL is is <dfn>outside of home tab scope</dfn> if it is not
+          [=within home tab scope=].
+        </p>
+        <aside class="note">
+          <p>
+            The "home tab scope" (i.e., the set of [=URLs=] which are [=within
+            home tab scope=]) is the set of URLs to which the [=home tab
+            context=] can be navigated . All navigations within the application
+            to a URL [=within home tab scope=] will be performed in the [=home
+            tab context=], and all navigations to a URL [=outside of home tab
+            scope=] will be performed in a different [=application context=]
+            (i.e., another tab), creating one if necessary. The application's
+            [=start URL=] is always part of the home tab scope (if the
+            application [=has a home tab=]).
+          </p>
+          <p>
+            For the purpose of matching against the [=start URL=], the
+            [=URL/fragment=] is ignored, but the [=URL/query=] must match
+            exactly.
+          </p>
+          <p>
+            If the application does not [=has a home tab|have a home tab=],
+            then the home tab scope is the empty set, and all URLs are
+            [=outside of home tab scope=].
+          </p>
+        </aside>
+        <section>
+          <h3>
+            Every window has a home tab
+          </h3>
+          <p>
+            If the application [=has a home tab=], whenever a new application
+            window is created (for example when launching the application, or
+            when moving a tab to a new window), the user agent MUST create a
+            new [=home tab context=] in that window. A newly created [=home tab
+            context=] SHOULD be navigated to the [=start URL=], which by
+            definition is [=within home tab scope=].
+          </p>
+        </section>
+        <section>
+          <h3>
+            Navigations concerning the home tab scope
+          </h3>
+          <p>
+            When [=navigate|navigating=] the [=top-level traversable=]
+            associated with a [=home tab context=] to a [=URL=] |url:URL| that
+            is [=outside of home tab scope=], the following steps are run:
+          </p>
+          <ol>
+            <li>Let [=top-level traversable=] |tab:toplevel traversable| be the
+            result of choosing a navigable with a target of
+            <code>"_blank"</code> and noopener true.
+            </li>
+            <li>Instead of [=navigating=] the home-tab traversable,
+            [=navigate=] |tab| with the same parameters.
+            </li>
+            <li>[=applied|Apply=] the current [=application manifest=] to
+            |tab|'s [=top-level browsing context=].
+            </li>
+            <li>The user agent SHOULD place |tab| in the same window as the
+            home-tab navigable.
+            </li>
+            <li>Focus |tab|.
+            </li>
+          </ol>
+          <p class="issue" data-number="98"></p>
+          <p>
+            When [=navigate|navigating=] a [=top-level traversable=] with a
+            [=display mode=] of [=display mode/tabbed=] that is not associated
+            with a [=home tab context=] (i.e. a non-home tab) to a [=URL=]
+            |url:URL| that is [=within home tab scope=], the following steps
+            are run:
+          </p>
+          <ol>
+            <li>Let |hometab:toplevel traversable| be the [=top-level
+            traversable=] of the [=home tab context=] associated with the
+            current window.
+            </li>
+            <li>Instead of [=navigating=] the top-level traversable,
+            [=navigate=] |hometab| with the same parameters.
+            </li>
+            <li>Focus |hometab|.
+            </li>
+          </ol>
+          <aside class="note">
+            Navigation from the home tab to a URL [=outside of home tab scope=]
+            will open a new regular tab, leaving the existing document open in
+            the home tab. Similarly, navigation from a regular tab to a URL
+            [=within home tab scope=] will open in the home tab, leaving the
+            existing document open in the tab that initiated the navigation.
+            Developers should ensure that in both of these cases, the document
+            left behind does not end up in an unexpected state.
+          </aside>
+        </section>
+        <section class="informative">
+          <h3>
+            Home tab invariants
+          </h3>
+          <p>
+            The above rules are intended to ensure that the following
+            invariants are always true, for applications that [=has a home
+            tab|have a home tab=]:
+          </p>
+          <ul>
+            <li>every application window has exactly one [=home tab context=],
+            and
+            </li>
+            <li>every [=home tab context=]'s active document's [=Document/URL=]
+            is [=within home tab scope=] (unless the document's URL has changed
+            since it was created), and
+            </li>
+            <li>every non-home-tab [=application context=]'s active document's
+            [=Document/URL=] is [=outside of home tab scope=] (unless the
+            document's URL has changed since it was created).
+            </li>
+          </ul>
+          <p>
+            User agents will not dynamically move documents between home-tab
+            and non-home-tab contexts if they change their [=URL/fragment=], or
+            use the {{History}} API to modify their display URL into or out of
+            the home tab scope, because no navigation is taking place. For this
+            reason, the above invariants only care about the [=Document/URLs=]
+            that documents had at the time of their creation.
+          </p>
+          <p>
+            For single-page applications that "pretend" to navigate by
+            modifying their URLs, this may result in undesirable behaviour that
+            breaks the above invariants (e.g. if the user clicks a link from
+            the home tab to dynamically change the URL to a non-home page, they
+            will stay inside the home tab because it is not actually
+            navigating). To avoid this situation, the application can detect
+            when it is in tabbed application mode and change its behavior to
+            perform actual navigations into and out of the home tab scope,
+            rather than modifying the URL.
+          </p>
+        </section>
+      </section>
+      <section>
+        <h3>
+          <code><dfn>new_tab_button</dfn></code> member
+        </h3>
+        <p>
+          The [=tab_strip/new_tab_button=] member is an ordered map that
+          describes the behaviour of a UI affordance (such as a button) which,
+          when clicked/activated, opens a new [=application context=] within
+          the application window. It has the following members:
+        </p>
+        <ul>
+          <li>[=new_tab_button/url=]
+          </li>
+        </ul>
+        <p>
+          The <code><dfn data-dfn-for="new_tab_button">url</dfn></code> member
+          is a string that represents a URL relative to the [=manifest URL=]
+          that is [=manifest/within scope=] of a [=Document/processed
+          manifest=].
+        </p>
+        <p>
+          An application <dfn>has a new tab button</dfn> if the
+          [=Document/processed manifest=]'s [=new_tab_button=]'s
+          [=new_tab_button/url=] member is [=outside of home tab scope=]. If
+          the application does not [=has a new tab button|have a new tab
+          button=], the user agent SHOULD NOT make the "new tab" affordance
+          available to the end user.
+        </p>
+        <aside class="note">
+          <p>
+            The new tab button will be unavailable if its URL is [=within home
+            tab scope=]. This rule is necessary, since otherwise, it would
+            either imply that a) the new tab button would open a non-home tab
+            [=within home tab scope=], violating the third home tab invariant
+            above, or b) the new tab button would simply focus the home tab,
+            which would be redundant and confusing UI.
+          </p>
+          <p>
+            The default value for [=new_tab_button/url=] is the [=start URL=].
+            This means the button will be unavailable by default if the
+            application [=has a home tab=].
+          </p>
+        </aside>
+        <p>
+          When the new tab button is activated by the end user, the following
+          steps are run:
+        </p>
+        <ol>
+          <li>[=Create a new application context=] in the current window and
+          focus it.
+          </li>
+          <li>Navigate it to the value of the [=new_tab_button/url=] member of
+          [=new_tab_button=].
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>
+          Processing the `tab_strip` member
+        </h2>
+        <p>
+          To <dfn>process the `tab_strip` member</dfn>, given [=ordered map=]
+          |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
+          [=URL=] |manifest URL:URL|, run the following during the
+          <a data-cite="appmanifest#dfn-processing-extension-point-of-web-manifest">
+          extension point</a> in [=processing a manifest=]:
+        </p>
+        <ol>
+          <li>Set |manifest|["tab_strip"] to a new [=ordered map=].
+          </li>
+          <li>If |json|["tab_strip"] does not exist or |json|["tab_strip"] is
+          not an [=ordered map=]:
+            <ol>
+              <li>Set |manifest|["tab_strip"]["new_tab_button"]["url"] to
+              |manifest|["start_url"].
+              </li>
+              <li>Return.
+              </li>
+            </ol>
+          </li>
+          <li>[=Process the `home_tab` member=] passing |json|["tab_strip"],
+          |manifest|["tab_strip"], and |manifest URL|.
+          </li>
+          <li>[=Process the `new_tab_button` member=] passing
+          |json|["tab_strip"], |manifest|["tab_strip"], |manifest URL|, and
+          |manifest|["start_url"].
+          </li>
+        </ol>
+        <section>
+          <h3>
+            Processing the `home_tab` member
+          </h3>
+          <p>
+            To <dfn>process the `home_tab` member</dfn>, given [=ordered map=]
+            |json tab strip:ordered map|, [=ordered map=] |manifest tab
+            strip:ordered map|, and [=URL=] |manifest URL:URL|, run the
+            following:
+          </p>
+          <ol>
+            <li>If |json tab strip|["home_tab"] does not exist or |json tab
+            strip|["home_tab"] not an [=ordered map=], return.
+            </li>
+            <li>Let |home tab:ordered map| be a new [=ordered map=].
+            </li>
+            <li>[=Process the `scope_patterns` member=] passing |json tab
+            strip|["home_tab"]["scope_patterns"], |home tab| and |manifest
+            URL|.
+            </li>
+            <li>Set |manifest tab strip|["home_tab"] to |home tab|.
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h3>
+            Processing the `new_tab_button` member
+          </h3>
+          <p>
+            To <dfn>process the `new_tab_button` member</dfn>, given [=ordered
+            map=] |json tab strip:ordered map|, [=ordered map=] |manifest tab
+            strip:ordered map|, [=URL=] |manifest URL:URL|, and [=URL=] |start
+            URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>Set |manifest tab strip|["new_tab_button"]["url"] to |start
+            URL|.
+            </li>
+            <li>If |json tab strip|["new_tab_button"] does not exist or |json
+            tab strip|["new_tab_button"] is not an [=ordered map=], return.
+            </li>
+            <li>Let |url:URL| be the result of [=URL Parser|parsing=] |json tab
+            strip|["new_tab_button"]["url"] with |manifest URL| as the base
+            URL.
+            </li>
+            <li>If |url| is failure, return.
+            </li>
+            <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
+            </li>
+            <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h3>
+            Processing the `scope_patterns` member
+          </h3>
+          <p>
+            To <dfn>process the `scope_patterns` member</dfn>, given [=ordered
+            map=] |json home tab:ordered map|, [=ordered map=] |manifest home
+            tab:ordered map| and [=URL=] |manifest URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>Let |processed scope patterns:list| be a new [=list=].
+            </li>
+            <li>Set |manifest home tab|["scope_patterns"] to |processed scope
+            patterns|.
+            </li>
+            <li>If |json home tab|["scope_patterns"] doesn't exist or |json
+            home tab|["scope_patterns"] is not a [=list=], return.
+            </li>
+            <li>For each |entry:URLPatternInit| of |json home
+            tab|["scope_patterns"]:
+              <ol>
+                <li>Let |pattern:URL pattern| be the result of [=build a URL
+                pattern from an infra value|building a URL pattern from an
+                infra value=] |entry| given |manifest URL|. If this process
+                throws or returns null, continue.
+                </li>
+                <li>Append |pattern| to |processed scope patterns|.
+                </li>
+              </ol>
+            </li>
+          </ol>
+          <p class="issue" data-number="97"></p>
+        </section>
+      </section>
+      <section class="informative">
+        <h2>
+          Usage Example
+        </h2>
+        <pre class="example json" title="Tabbed application manifest">
+        {
+          "name": "Tabbed App Example",
+          "start_url": "/",
+          "display": "standalone",
+          "display_override": ["tabbed"],
+          "tab_strip": {
+            "home_tab": {
+              "scope_patterns": [
+                {"pathname": "/"},
+                {"pathname": "/index.html"}
+              ]
+            },
+            "new_tab_button": {
+              "url": "/create"
+            }
+          }
+        }
+        </pre>
+        <p>
+          This example is a tabbed web app that falls back to a single-document
+          standalone window if tabbed mode is not supported. Any navigation to
+          the main index page (either <code>/</code> or
+          <code>/index.html</code>) is opened in the [=home tab context=]. The
+          new tab button will open a new tab at <code>/create</code>.
+        </p>
+        <p>
+          Note that the [=URL/query=] part of the URL is ignored by default
+          when matching against [=tab_strip/home_tab/scope_patterns=] (so a
+          navigation to <code>/index.html?utm_source=foo</code> will open in
+          the home tab). However, when matching against [=start URL=], the
+          [=URL/query=] must match exactly, so sites that want to ignore the
+          query are advised to explicitly include the [=start URL=]'s
+          [=URL/path=] as a scope pattern.
+        </p>
+      </section>
     </section>
     <section>
       <h2>
