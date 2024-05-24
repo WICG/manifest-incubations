@@ -7,6 +7,13 @@ web apps to extend their
 [scope](https://www.w3.org/TR/appmanifest/#understanding-scope) to other
 origins.
 
+## Introduction
+
+A web application's content might originate from different scopes. Currently, if an installed web application navigates to a url that is out of the scope defined in the manifest file, a security UX will appear in the form of a bar to indicate to the user that they are outside of the defined scope of the application. See figure below. 
+
+![alt text](image.png)
+
+The app in he image (`PWinter`) has navigated to a url out of its scope (`airhorner.com`). The white bar on top of the web app is providing information to the user about this change of scope. While this is a security feature, it can be the case that an application would want to extend its scope. For example, an application might host content that is located in one specific origin, and rely on a login page that is out of the scope of the application itself to access that content. In other cases, the same application might be associated to multiple Top Level Domains, that might respond to different geographies (`app.com`, `app.co.uk`, `app.co.cr`, etc).
 
 ## Use Cases / Goals
 
@@ -89,6 +96,15 @@ level navigation. Without scope_extensions, this URL must be from the same
 origin as the app scope. With scope_extensions, this exposed URL can be from a
 different origin within extended scope.
 
+### Extended Scope Permissions
+
+When an application uses `scope_extensions` to expand its scope, each additional scope's permissions remain the same. Expanding scopes does not imply any change in permissions. The only thing that changes after being included in a scope is that the security UX will not appear when an app navigates to content served from those scopes.
+
+### Additional security UX
+
+For added security when in the installed web application, the app might display UX that always displays the current scope that is being served, along with privacy and permission settings of that specific scope.
+
+![alt text](image-1.png)
 
 ## Future extensions
 
