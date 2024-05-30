@@ -1862,7 +1862,7 @@
                   installButton.disabled = true;
 
                   // Show the prompt.
-                  const { userChoice } = await event.prompt();
+                  const userChoice = await event.prompt();
                   console.info(`user choice was: ${userChoice}`);
                 });
               });
