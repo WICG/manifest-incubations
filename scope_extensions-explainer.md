@@ -89,7 +89,7 @@ level navigation. Without scope_extensions, this URL must be from the same
 origin as the app scope. With scope_extensions, this exposed URL can be from a
 different origin within extended scope.
 
-### Link capturing
+### Link capturing from another origin
 User agents may perform link capturing for user navigations within a web app's
 extended scope and launch the web app instead of performing the navigation.
 
@@ -103,7 +103,7 @@ the following attack vector:
 1. TestApp sets its `launch_handler` to
    ```
    {
-     "route_to": "existing-client-retain"
+     "client_mode": "focus-existing"
    }
    ```
 1. User clicks on a link to site.com.
