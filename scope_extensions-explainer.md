@@ -76,7 +76,7 @@ associated origins.
     - Has an origin with a valid
       `<origin>/.well-known/web-app-origin-association` association file
       with an association entry matching the web app's
-      [identity](https://w3c.github.io/manifest/#dfn-identity).
+      [identity](manifest-identity).
 
 ## Security Considerations
 
@@ -148,9 +148,9 @@ The Scope Extensions proposal is intended to be a replacement for the
  - Move the association file from "<origin>/web-app-origin-association.json" to
    "<origin>/.well-known/web-app-origin-association". This better conforms
    with [RFC 8615](https://datatracker.ietf.org/doc/html/rfc8615).
- - Change the association file entries to be keyed on the web app identifier
-   rather than the web app's manifest URL. This aligns with the recent
-   [PWA Unique ID][unique-id] proposal.
+ - Change the association file entries to be keyed on the [web app
+   identifier](manifest-identity) rather than the web app's manifest URL (the
+   former having been added to the Manifest spec in the interim).
  - Rename `"paths"` to `"include_paths"` in the association file entries.
  - Add an "authorize" field to the association file entries for the associated
    origin to provide explicit opt-in signals for security sensitive
@@ -159,5 +159,4 @@ The Scope Extensions proposal is intended to be a replacement for the
 
 [launch-handler]: https://github.com/WICG/sw-launch/blob/main/launch_handler.md
 [url-handlers]: https://github.com/WICG/pwa-url-handler/blob/main/explainer.md
-[dlc]: https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md
-[unique-id]: https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md
+[manifest-identity]: https://w3c.github.io/manifest/#dfn-identity
