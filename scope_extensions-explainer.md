@@ -80,16 +80,8 @@ associated origins.
 
 ## Security Considerations
 
-### [Launch handling params](https://github.com/WICG/web-app-launch/blob/main/launch_handler.md)
-
-If an URL in extended scope is captured by an app that has 
-launch_handler: { client_mode: "focus-existing" } set in its manifest, the URL 
-is made visible to the app through Window.launchQueue instead of causing a top 
-level navigation. Without scope_extensions, this URL must be from the same 
-origin as the app scope. With scope_extensions, this exposed URL can be from a
-different origin within extended scope.
-
 ### Link capturing from another origin
+
 User agents may perform link capturing for user navigations within a web app's
 extended scope and launch the web app instead of performing the navigation.
 
