@@ -18,13 +18,22 @@
         github: "WICG/manifest-incubations",
         shortName: "manifest-incubations",
         xref: {
-          specs: ["appmanifest", "dom", "mimesniff", "file-system-access"],
+          specs: [
+            "appmanifest",
+            "dom",
+            "file-system-access",
+            "fs",
+            "mimesniff",
+            "urlpattern",
+            "web-app-launch",
+            "window-controls-overlay"
+          ],
           profile: "web-platform",
         },
       };
     </script>
   </head>
-  <body>
+  <body data-cite="MEDIAQUERIES-5">
     <section id="abstract">
       <p>
         Feature specifications for <a href=
@@ -41,27 +50,30 @@
       </p>
     </section>
     <section>
-      <h2 data-dfn-for="">
-        <code>display_override</code> member
+      <h2>
+        <code><dfn data-export="" data-dfn-for=
+        "manifest">display_override</dfn></code> member
       </h2>
       <p>
-        For advanced usages, the display_override member can be used to specify
-        a custom fallback order of <a data-cite=
-        "appmanifest#dfn-display-modes-values">display mode values</a> for
+        For advanced usages, the [=manifest/display_override=] member can be
+        used to specify a custom fallback order of <a data-cite=
+        "appmanifest#dfn-display-modes-list">display mode list values</a> for
         developers to choose their preferred <a data-cite=
-        "appmanifest#dfn-display-mode">display mode</a>.
+        "appmanifest#dfn-display">display mode</a> for the web application. Its
+        value is a [=display mode=].
       </p>
       <p>
-        The <dfn>display_override</dfn> member of the [=application manifest=]
-        is a <a>sequence</a> of <a data-cite=
-        "appmanifest#dfn-display-modes-values">display mode values</a>. This
-        item represents the developer's preferred fallback chain for
-        <a data-cite="appmanifest#dfn-display-mode">display modes</a>. This
-        field overrides the [=manifest/display=] member. If the user agent does
-        not support any of the display modes specified here, then it falls back
-        to considering the [=manifest/display=] member. See <a data-cite=
-        "appmanifest#dfn-display-mode">display modes</a> for the algorithm
-        steps.
+        The [=manifest/display_override=] member of the [=application
+        manifest=] is a <a>sequence</a> of <a data-cite=
+        "appmanifest#dfn-display-modes-list">display mode list values</a>
+        including extensions like [=display mode/window-controls-overlay=] and
+        [=display mode/borderless=]. This member represents the developer's
+        preferred fallback chain for [=display mode=]s. This field overrides
+        the [=manifest/display=] member. If the user agent does not support any
+        of the [=display mode=]s specified here, then it falls back to
+        considering the [=manifest/display=] member. See <a data-cite=
+        "appmanifest#dfn-process-the-display-member">processing the display
+        members</a> for the algorithm steps.
       </p>
       <p>
         The following steps are added to the [=application manifest/processing
@@ -71,10 +83,19 @@
       </p>
       <ol>
         <li>[=list/For each=] |candidate_display_mode:DisplayModeType| of
-        |manifest|.{{display_override}}:
-          <ol>
-            <li>If the user agent supports the |candidate_display_mode|, then
-            return |candidate_display_mode|.
+        |manifest:ordered map|.[=manifest/display_override=] member:
+          <ol class="algorithm">
+            <li>If <a data-cite="appmanifest/#dfn-display-modes-list">display
+            modes list</a> contains |candidate_display_mode:DisplayModeType|,
+            return that |candidate_display_mode:DisplayModeType|
+            </li>
+            <li>If |candidate_display_mode:DisplayModeType| is [=display
+            mode/window-controls-overlay=] and the user agent supports this,
+            then return that |candidate_display_mode:DisplayModeType|.
+            </li>
+            <li>If |candidate_display_mode:DisplayModeType| is [=display
+            mode/tabbed=] and the user agent supports this, then return that
+            |candidate_display_mode:DisplayModeType|.
             </li>
           </ol>
         </li>
@@ -82,36 +103,574 @@
       <p class="note">
         This member is intended to be only used for advanced cases, where the
         developer wants explicit control over the fallback order of their
-        display modes. Otherwise, the [=manifest/display=] member is sufficient
-        for most use cases.
+        display modes, or for modes that are not available in the basic
+        <a data-cite="appmanifest/#dfn-display-modes-list">display modes
+        list</a>. Otherwise, the [=manifest/display=] member is sufficient for
+        most use cases.
       </p>
-      <section class="informative">
+      <section>
         <h3>
-          Usage Example
+          Concepts
+        </h3>
+        <ul>
+          <li>
+            <dfn data-lt="controls of the window">Window controls</dfn>:
+            interface elements that the operating system uses consistently
+            across applications to enable the user to perform certain actions
+            to control the application. Common actions in the [=window
+            controls=] include minimize, maximize/restore, and close buttons.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h3>
+          Display mode extensions
         </h3>
         <p>
-          The following shows a [=manifest=] that prefers the
-          <code>minimal-ui</code> <a data-cite=
-          "appmanifest#dfn-display-mode">display mode</a> over
-          <code>standalone</code>, but if <code>minimal-ui</code> isn't
-          supported, falls back to <code>standalone</code> as opposed to
-          <code>browser</code>.
+          Additionally to the normal <a data-cite=
+          "appmanifest#dfn-display-modes-list">display modes</a>,
+          [=manifest/display_override=] also supports certain extensions to it.
         </p>
-        <pre class="example json" title="Advanced display usage manifest">
-          {
-            "name": "Recipe Zone",
-            "description": "All of the recipes!",
-            "icons": [{
-              "src": "icon/hd_hi",
-              "sizes": "128x128"
-            }],
-            "start_url": "/index.html",
-            "display_override": ["minimal-ui"],
-            "display": "standalone",
-            "theme_color": "yellow",
-            "background_color": "red"
+        <dl>
+          <dt>
+            <dfn data-export="" data-dfn-for="display mode">borderless</dfn>
+          </dt>
+          <dd>
+            The web application does not have any host-native title bar or
+            [=window controls=] visible and with the web contents extended to
+            the whole title bar area. The app can specify [=draggable region=]s
+            in the web contents to create a customized title bar. The user
+            agent may change the title bar state depending on various security
+            considerations, like an out-of-scope navigation.
+          </dd>
+          <dt>
+            [=display mode/window-controls-overlay=]
+          </dt>
+          <dt>
+            <dfn data-export="" data-dfn-for="display mode">tabbed</dfn>
+          </dt>
+          <dd>
+            The web application can have multiple [=application contexts=]
+            combined in a single operating-system-level window. For example,
+            this could mean the user agent displays a tab strip UI to allow the
+            user to switch between the application contexts.
+          </dd>
+        </dl>
+        <section class="informative">
+          <h4>
+            [=manifest/display_override=] usage example
+          </h4>
+          <p>
+            The following shows a [=manifest=] that prefers the
+            <code>minimal-ui</code> <a data-cite=
+            "appmanifest#dfn-display-mode">display mode</a> over
+            <code>standalone</code>, but if <code>minimal-ui</code> isn't
+            supported, falls back to <code>standalone</code> as opposed to
+            <code>browser</code>.
+          </p>
+          <pre class="example json" title="display_override usage manifest">
+            {
+              "name": "Recipe Zone",
+              "description": "All of the recipes!",
+              "icons": [{
+                "src": "icon/hd_hi",
+                "sizes": "128x128"
+              }],
+              "start_url": "/index.html",
+              "display_override": ["minimal-ui"],
+              "display": "standalone",
+              "theme_color": "yellow",
+              "background_color": "red"
+            }
+          </pre>
+        </section>
+      </section>
+      <section>
+        <h3>
+          Defining <dfn data-export="" data-lt="draggable region">draggable
+          regions</dfn>
+        </h3>
+        <p class="issue" title="At risk feature">
+          [=app-region=] CSS property has not been implemented in any user
+          agent, so it is at risk. Note that some user agents use the
+          non-standard CSS property <dfn data-export="" data-lt=
+          "-webkit-app-region">`-webkit-app-region`</dfn> for the same purpose.
+        </p>
+        <p>
+          The <dfn data-export="" data-lt="app-region">`app-region`</dfn>
+          property can be used to define with CSS which regions or elements in
+          for example a title bar are draggable.
+        </p>
+        <ul>
+          <li>To enable dragging an element, shall be set to `drag`.
+          </li>
+          <li>To disable dragging an element, shall be set to `no-drag`.
+          </li>
+        </ul>
+      </section>
+    </section>
+    <section>
+      <h2>
+        Extensions to processing the manifest
+      </h2>
+      <p>
+        To facilitate all of the new extension and incubation features added by
+        this specification, the user agent SHOULD run the following during the
+        <a data-cite=
+        "appmanifest#dfn-processing-extension-point-of-web-manifest">extension
+        point</a> in [=processing a manifest=] (having access to [=URL=]
+        |document URL:URL|, [=URL=] |manifest URL:URL|, [=ordered map=]
+        |json:ordered map|, and [=ordered map=] |manifest:ordered map|):
+      </p>
+      <ol>
+        <li>[=Process the `tab_strip` member=], passing |json|, |manifest| and
+        |manifest URL|.
+        </li>
+        <li>[=Process the `note_taking` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+        <li>[=Process the `protocol_handlers` member=], passing |json| and
+        |manifest|.
+        </li>
+        <li>[=Process the `file_handlers` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>
+        <code><dfn>tab_strip</dfn></code> member
+      </h2>
+      <p>
+        The `tab_strip` member of the <a data-cite=
+        "appmanifest#web-application-manifest">Web Application Manifest</a> is
+        an <a data-cite="appmanifest#dfn-object">object</a> that contains
+        information about how the application is intended to behave in the
+        [=display mode/tabbed=] display mode. It has the following members:
+      </p>
+      <ul>
+        <li>[=tab_strip/home_tab=]
+        </li>
+        <li>[=tab_strip/new_tab_button=]
+        </li>
+      </ul>
+      <section>
+        <h3>
+          <code><dfn>home_tab</dfn></code> member
+        </h3>
+        <p>
+          The `home_tab` member of the [=tab_strip=] object is an ordered map
+          that contains information about a special "home tab" that is intended
+          to serve as the top-level menu for the application. It contains the
+          following members:
+        </p>
+        <ul>
+          <li>[=home_tab/scope_patterns=]
+          </li>
+        </ul>
+        <p>
+          The <code><dfn>scope_patterns</dfn></code> member is a list of
+          {{URLPatternInput}}s that define the [=within home tab scope|scope of
+          the home tab=] relative to the [=manifest URL=].
+        </p>
+        <aside class="note">
+          Each scope pattern is either a string which looks like a URL but has
+          "<code>*</code>" as a wildcard character, or a dictionary containing
+          separate URL components with "<code>*</code>" wildcards. See
+          [[urlpattern]] for more information.
+        </aside>
+        <p>
+          An application <dfn>has a home tab</dfn> if the applied [=display
+          mode=] of the application is [=display mode/tabbed=], and the
+          [=Document/processed manifest=] includes a non-null [=home_tab=]
+          member of the [=tab_strip=] member.
+        </p>
+        <p>
+          The <dfn>home tab context</dfn> is an optional [=application
+          context=] that has special properties compared to other application
+          contexts. If the application [=has a home tab=], every application
+          window SHOULD feature a [=home tab context=]. If not, then the
+          application windows SHOULD NOT have a [=home tab context=].
+        </p>
+        <p>
+          How the [=home tab context=] is presented is at the discretion of the
+          user agent, but it SHOULD have a different appearance to normal
+          application contexts.
+        </p>
+        <p>
+          A [=URL=] |url:URL| is said to be <dfn>within home tab scope</dfn> if
+          and only if:
+        </p>
+        <ul>
+          <li>the application [=has a home tab=], and
+          </li>
+          <li>|url| is [=manifest/within scope=] of the manifest, and
+          </li>
+          <li>at least one of the following:
+            <ul>
+              <li>|url| [=URL/equals=] the [=start URL=], with
+              [=URL/equals/exclude fragments=] set to true, or
+              </li>
+              <li>Applying [=URL pattern/match=] given any element of the
+              [=scope_patterns=] member of the [=home_tab=] member of the
+              [=tab_strip=] member of the [=Document/processed manifest=] and
+              |url| returns a {{URLPatternResult}}.
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <p>
+          A URL is is <dfn>outside of home tab scope</dfn> if it is not
+          [=within home tab scope=].
+        </p>
+        <aside class="note">
+          <p>
+            The "home tab scope" (i.e., the set of [=URLs=] which are [=within
+            home tab scope=]) is the set of URLs to which the [=home tab
+            context=] can be navigated . All navigations within the application
+            to a URL [=within home tab scope=] will be performed in the [=home
+            tab context=], and all navigations to a URL [=outside of home tab
+            scope=] will be performed in a different [=application context=]
+            (i.e., another tab), creating one if necessary. The application's
+            [=start URL=] is always part of the home tab scope (if the
+            application [=has a home tab=]).
+          </p>
+          <p>
+            For the purpose of matching against the [=start URL=], the
+            [=URL/fragment=] is ignored, but the [=URL/query=] must match
+            exactly.
+          </p>
+          <p>
+            If the application does not [=has a home tab|have a home tab=],
+            then the home tab scope is the empty set, and all URLs are
+            [=outside of home tab scope=].
+          </p>
+        </aside>
+        <section>
+          <h3>
+            Every window has a home tab
+          </h3>
+          <p>
+            If the application [=has a home tab=], whenever a new application
+            window is created (for example when launching the application, or
+            when moving a tab to a new window), the user agent MUST create a
+            new [=home tab context=] in that window. A newly created [=home tab
+            context=] SHOULD be navigated to the [=start URL=], which by
+            definition is [=within home tab scope=].
+          </p>
+        </section>
+        <section>
+          <h3>
+            Navigations concerning the home tab scope
+          </h3>
+          <p>
+            When [=navigate|navigating=] the [=top-level traversable=]
+            associated with a [=home tab context=] to a [=URL=] |url:URL| that
+            is [=outside of home tab scope=], the following steps are run:
+          </p>
+          <ol>
+            <li>Let [=top-level traversable=] |tab:toplevel traversable| be the
+            result of choosing a navigable with a target of
+            <code>"_blank"</code> and noopener true.
+            </li>
+            <li>Instead of [=navigating=] the home-tab traversable,
+            [=navigate=] |tab| with the same parameters.
+            </li>
+            <li>[=applied|Apply=] the current [=application manifest=] to
+            |tab|'s [=top-level browsing context=].
+            </li>
+            <li>The user agent SHOULD place |tab| in the same window as the
+            home-tab navigable.
+            </li>
+            <li>Focus |tab|.
+            </li>
+          </ol>
+          <p class="issue" data-number="98"></p>
+          <p>
+            When [=navigate|navigating=] a [=top-level traversable=] with a
+            [=display mode=] of [=display mode/tabbed=] that is not associated
+            with a [=home tab context=] (i.e. a non-home tab) to a [=URL=]
+            |url:URL| that is [=within home tab scope=], the following steps
+            are run:
+          </p>
+          <ol>
+            <li>Let |hometab:toplevel traversable| be the [=top-level
+            traversable=] of the [=home tab context=] associated with the
+            current window.
+            </li>
+            <li>Instead of [=navigating=] the top-level traversable,
+            [=navigate=] |hometab| with the same parameters.
+            </li>
+            <li>Focus |hometab|.
+            </li>
+          </ol>
+          <aside class="note">
+            Navigation from the home tab to a URL [=outside of home tab scope=]
+            will open a new regular tab, leaving the existing document open in
+            the home tab. Similarly, navigation from a regular tab to a URL
+            [=within home tab scope=] will open in the home tab, leaving the
+            existing document open in the tab that initiated the navigation.
+            Developers should ensure that in both of these cases, the document
+            left behind does not end up in an unexpected state.
+          </aside>
+        </section>
+        <section class="informative">
+          <h3>
+            Home tab invariants
+          </h3>
+          <p>
+            The above rules are intended to ensure that the following
+            invariants are always true, for applications that [=has a home
+            tab|have a home tab=]:
+          </p>
+          <ul>
+            <li>every application window has exactly one [=home tab context=],
+            and
+            </li>
+            <li>every [=home tab context=]'s active document's [=Document/URL=]
+            is [=within home tab scope=] (unless the document's URL has changed
+            since it was created), and
+            </li>
+            <li>every non-home-tab [=application context=]'s active document's
+            [=Document/URL=] is [=outside of home tab scope=] (unless the
+            document's URL has changed since it was created).
+            </li>
+          </ul>
+          <p>
+            User agents will not dynamically move documents between home-tab
+            and non-home-tab contexts if they change their [=URL/fragment=], or
+            use the {{History}} API to modify their display URL into or out of
+            the home tab scope, because no navigation is taking place. For this
+            reason, the above invariants only care about the [=Document/URLs=]
+            that documents had at the time of their creation.
+          </p>
+          <p>
+            For single-page applications that "pretend" to navigate by
+            modifying their URLs, this may result in undesirable behaviour that
+            breaks the above invariants (e.g. if the user clicks a link from
+            the home tab to dynamically change the URL to a non-home page, they
+            will stay inside the home tab because it is not actually
+            navigating). To avoid this situation, the application can detect
+            when it is in tabbed application mode and change its behavior to
+            perform actual navigations into and out of the home tab scope,
+            rather than modifying the URL.
+          </p>
+        </section>
+      </section>
+      <section>
+        <h3>
+          <code><dfn>new_tab_button</dfn></code> member
+        </h3>
+        <p>
+          The [=tab_strip/new_tab_button=] member is an ordered map that
+          describes the behaviour of a UI affordance (such as a button) which,
+          when clicked/activated, opens a new [=application context=] within
+          the application window. It has the following members:
+        </p>
+        <ul>
+          <li>[=new_tab_button/url=]
+          </li>
+        </ul>
+        <p>
+          The <code><dfn data-dfn-for="new_tab_button">url</dfn></code> member
+          is a string that represents a URL relative to the [=manifest URL=]
+          that is [=manifest/within scope=] of a [=Document/processed
+          manifest=].
+        </p>
+        <p>
+          An application <dfn>has a new tab button</dfn> if the
+          [=Document/processed manifest=]'s [=new_tab_button=]'s
+          [=new_tab_button/url=] member is [=outside of home tab scope=]. If
+          the application does not [=has a new tab button|have a new tab
+          button=], the user agent SHOULD NOT make the "new tab" affordance
+          available to the end user.
+        </p>
+        <aside class="note">
+          <p>
+            The new tab button will be unavailable if its URL is [=within home
+            tab scope=]. This rule is necessary, since otherwise, it would
+            either imply that a) the new tab button would open a non-home tab
+            [=within home tab scope=], violating the third home tab invariant
+            above, or b) the new tab button would simply focus the home tab,
+            which would be redundant and confusing UI.
+          </p>
+          <p>
+            The default value for [=new_tab_button/url=] is the [=start URL=].
+            This means the button will be unavailable by default if the
+            application [=has a home tab=].
+          </p>
+        </aside>
+        <p>
+          When the new tab button is activated by the end user, the following
+          steps are run:
+        </p>
+        <ol>
+          <li>[=Create a new application context=] in the current window and
+          focus it.
+          </li>
+          <li>Navigate it to the value of the [=new_tab_button/url=] member of
+          [=new_tab_button=].
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>
+          Processing the `tab_strip` member
+        </h2>
+        <p>
+          To <dfn>process the `tab_strip` member</dfn>, given [=ordered map=]
+          |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
+          [=URL=] |manifest URL:URL|, run the following during the
+          <a data-cite="appmanifest#dfn-processing-extension-point-of-web-manifest">
+          extension point</a> in [=processing a manifest=]:
+        </p>
+        <ol>
+          <li>Set |manifest|["tab_strip"] to a new [=ordered map=].
+          </li>
+          <li>If |json|["tab_strip"] does not exist or |json|["tab_strip"] is
+          not an [=ordered map=]:
+            <ol>
+              <li>Set |manifest|["tab_strip"]["new_tab_button"]["url"] to
+              |manifest|["start_url"].
+              </li>
+              <li>Return.
+              </li>
+            </ol>
+          </li>
+          <li>[=Process the `home_tab` member=] passing |json|["tab_strip"],
+          |manifest|["tab_strip"], and |manifest URL|.
+          </li>
+          <li>[=Process the `new_tab_button` member=] passing
+          |json|["tab_strip"], |manifest|["tab_strip"], |manifest URL|, and
+          |manifest|["start_url"].
+          </li>
+        </ol>
+        <section>
+          <h3>
+            Processing the `home_tab` member
+          </h3>
+          <p>
+            To <dfn>process the `home_tab` member</dfn>, given [=ordered map=]
+            |json tab strip:ordered map|, [=ordered map=] |manifest tab
+            strip:ordered map|, and [=URL=] |manifest URL:URL|, run the
+            following:
+          </p>
+          <ol>
+            <li>If |json tab strip|["home_tab"] does not exist or |json tab
+            strip|["home_tab"] not an [=ordered map=], return.
+            </li>
+            <li>Let |home tab:ordered map| be a new [=ordered map=].
+            </li>
+            <li>[=Process the `scope_patterns` member=] passing |json tab
+            strip|["home_tab"]["scope_patterns"], |home tab| and |manifest
+            URL|.
+            </li>
+            <li>Set |manifest tab strip|["home_tab"] to |home tab|.
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h3>
+            Processing the `new_tab_button` member
+          </h3>
+          <p>
+            To <dfn>process the `new_tab_button` member</dfn>, given [=ordered
+            map=] |json tab strip:ordered map|, [=ordered map=] |manifest tab
+            strip:ordered map|, [=URL=] |manifest URL:URL|, and [=URL=] |start
+            URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>Set |manifest tab strip|["new_tab_button"]["url"] to |start
+            URL|.
+            </li>
+            <li>If |json tab strip|["new_tab_button"] does not exist or |json
+            tab strip|["new_tab_button"] is not an [=ordered map=], return.
+            </li>
+            <li>Let |url:URL| be the result of [=URL Parser|parsing=] |json tab
+            strip|["new_tab_button"]["url"] with |manifest URL| as the base
+            URL.
+            </li>
+            <li>If |url| is failure, return.
+            </li>
+            <li>If |url| is not [=URL/within scope=] of |manifest URL|, return.
+            </li>
+            <li>Set |manifest tab strip|["new_tab_button"]["url"] to |url|.
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h3>
+            Processing the `scope_patterns` member
+          </h3>
+          <p>
+            To <dfn>process the `scope_patterns` member</dfn>, given [=ordered
+            map=] |json home tab:ordered map|, [=ordered map=] |manifest home
+            tab:ordered map| and [=URL=] |manifest URL:URL|, run the following:
+          </p>
+          <ol>
+            <li>Let |processed scope patterns:list| be a new [=list=].
+            </li>
+            <li>Set |manifest home tab|["scope_patterns"] to |processed scope
+            patterns|.
+            </li>
+            <li>If |json home tab|["scope_patterns"] doesn't exist or |json
+            home tab|["scope_patterns"] is not a [=list=], return.
+            </li>
+            <li>For each |entry:URLPatternInit| of |json home
+            tab|["scope_patterns"]:
+              <ol>
+                <li>Let |pattern:URL pattern| be the result of [=build a URL
+                pattern from an infra value|building a URL pattern from an
+                infra value=] |entry| given |manifest URL|. If this process
+                throws or returns null, continue.
+                </li>
+                <li>Append |pattern| to |processed scope patterns|.
+                </li>
+              </ol>
+            </li>
+          </ol>
+          <p class="issue" data-number="97"></p>
+        </section>
+      </section>
+      <section class="informative">
+        <h2>
+          Usage Example
+        </h2>
+        <pre class="example json" title="Tabbed application manifest">
+        {
+          "name": "Tabbed App Example",
+          "start_url": "/",
+          "display": "standalone",
+          "display_override": ["tabbed"],
+          "tab_strip": {
+            "home_tab": {
+              "scope_patterns": [
+                {"pathname": "/"},
+                {"pathname": "/index.html"}
+              ]
+            },
+            "new_tab_button": {
+              "url": "/create"
+            }
           }
+        }
         </pre>
+        <p>
+          This example is a tabbed web app that falls back to a single-document
+          standalone window if tabbed mode is not supported. Any navigation to
+          the main index page (either <code>/</code> or
+          <code>/index.html</code>) is opened in the [=home tab context=]. The
+          new tab button will open a new tab at <code>/create</code>.
+        </p>
+        <p>
+          Note that the [=URL/query=] part of the URL is ignored by default
+          when matching against [=tab_strip/home_tab/scope_patterns=] (so a
+          navigation to <code>/index.html?utm_source=foo</code> will open in
+          the home tab). However, when matching against [=start URL=], the
+          [=URL/query=] must match exactly, so sites that want to ignore the
+          query are advised to explicitly include the [=start URL=]'s
+          [=URL/path=] as a scope pattern.
+        </p>
       </section>
     </section>
     <section>
@@ -265,13 +824,16 @@
           <li>If the type of |manifest|["note_taking"]["new_note_url"] is not
           [=URL=], return.
           </li>
-          <li>Let |browsing context:Browsing Context| be the result of creating
-          a new [=top-level browsing context=].
-          </li>
-          <li>[=Navigate=] |browsing context| to resource
+          <li>Run the steps to [=launch a web application=] setting |manifest|
+          to |manifest| and |target URL| to
           |manifest|["note_taking"]["new_note_url"].
           </li>
         </ol>
+        <p>
+          The user agent MAY [=launch the `new_note_url`=] for a given
+          [=installed web application=] at any time, typically in response to a
+          user affordance.
+        </p>
       </section>
     </section>
     <section>
@@ -326,18 +888,18 @@
               <li>If |protocol_handler|["protocol"] or
               |protocol_handler|["url"] is undefined, [=iteration/continue=].
               </li>
-              <li>Let (<dfn>normalizedProtocol</dfn>, <dfn>normalizedUrl</dfn>)
-              be the result of running [=normalize protocol handler
-              parameters=] with |protocol_handler|["protocol"], |
-              protocol_handler|["url"] using |manifest URL| as the base URL,
-              and [=this=]'s relevant [=environment settings object=]. If the
-              result is failure, [=iteration/continue=].
+              <li>Let (|normalizedProtocol:string|, |normalizedUrl:URL|) be the
+              result of running [=normalize protocol handler parameters=] with
+              |protocol_handler|["protocol"], | protocol_handler|["url"] using
+              |manifest URL| as the base URL, and [=this=]'s relevant
+              [=environment settings object=]. If the result is failure,
+              [=iteration/continue=].
               </li>
-              <li>If [=normalizedUrl=] is not [=manifest/within scope=] of
+              <li>If |normalizedUrl| is not [=manifest/within scope=] of
               |manifest|, [=iteration/continue=].
               </li>
               <li>If |processedProtocolHandlers| [=list/contains=] the
-              [=normalizedUrl=], [=iteration/continue=].
+              |normalizedUrl|, [=iteration/continue=].
               </li>
               <li>[=List/Append=] |protocol_handler| to
               |processedProtocolHandlers|.
@@ -393,17 +955,18 @@
       </section>
       <section>
         <h2>
-          ProtocolHandler items
+          Protocol handler items
         </h2>
         <p>
           Each <dfn>protocol handler description</dfn> is an [=object=] that
-          represents a protocol that the web application wants to handle. It
-          has the following members:
+          represents a protocol that the web application wants to handle,
+          corresponding to the [=manifest/protocol_handlers=] member. It has
+          the following members:
         </p>
         <ul>
-          <li>[=`protocol`=]
+          <li>[=protocol handler description/protocol=]
           </li>
-          <li>[=`url`=]
+          <li>[=protocol handler description/url=]
           </li>
         </ul>
         <p>
@@ -415,10 +978,11 @@
         <p class="note">
           [[HTML]]'s {{NavigatorContentUtils/registerProtocolHandler()}} allows
           web sites to register themselves as possible handlers for particular
-          protocols. What constitutes valid <code>protocol</code> and
-          <code>url</code> values for <a>protocol handler description</a>s is
-          defined in that API. Also note that the [[HTML]] API uses
-          [=url/scheme=] where we use <code>protocol</code> but the same
+          protocols. What constitutes valid [=protocol handler
+          description/protocol=] and [=protocol handler description/url=]
+          values for <a>protocol handler description</a>s is defined in that
+          API. Also note that the [[HTML]] API uses <code>scheme</code> where
+          we use [=protocol handler description/protocol=] but the same
           restrictions apply.
         </p>
         <section>
@@ -426,15 +990,17 @@
             `protocol` member
           </h3>
           <p>
-            The <dfn>protocol</dfn> member of a <a>protocol handler
-            description</a> is a <a>string</a> that represents the protocol to
-            be handled, such as `mailto` or `web+auth`.
+            The <code><dfn data-dfn-for=
+            "protocol handler description">protocol</dfn></code> member of a
+            <a>protocol handler description</a> is a <a>string</a> that
+            represents the protocol to be handled, such as `mailto` or
+            `web+auth`.
           </p>
           <p>
-            The <a>protocol</a> member of a <a>protocol handler description</a>
-            is equivalent to
-            {{NavigatorContentUtils/registerProtocolHandler()}}'s |scheme|
-            argument defined in [[HTML]].
+            The [=protocol handler description/protocol=] member of a
+            <a>protocol handler description</a> is equivalent to
+            {{NavigatorContentUtils/registerProtocolHandler()}}'s
+            <code>scheme</code> argument defined in [[HTML]].
           </p>
         </section>
         <section>
@@ -442,13 +1008,16 @@
             `url` member
           </h3>
           <p>
-            The <dfn>url</dfn> member of a <a>protocol handler description</a>
-            is the <a>URL</a> [=manifest/within scope=] of the application that
-            opens when the associated protocol is activated.
+            The <code><dfn data-dfn-for=
+            "protocol handler description">url</dfn></code> member of a
+            <a>protocol handler description</a> is the <a>URL</a>
+            [=manifest/within scope=] of the application that opens when the
+            associated protocol is activated.
           </p>
           <p>
-            The <a>url</a> member of a <a>protocol handler description</a> is
-            equivalent to {{NavigatorContentUtils/registerProtocolHandler()}}'s
+            The [=protocol handler description/url=] member of a <a>protocol
+            handler description</a> is equivalent to
+            {{NavigatorContentUtils/registerProtocolHandler()}}'s
             <code>url</code> argument defined in [[HTML]].
           </p>
         </section>
@@ -460,9 +1029,14 @@
             When a <a>protocol handler description</a>
             <var>protocol_handler</var> having [=manifest=] <var>manifest</var>
             is invoked, it goes through the same steps used to [=invoke a
-            protocol handler=] defined in [=HTML=], where the user agent SHOULD
-            navigate to [=url=] and the appropriate browsing context is set to
-            a new top level browsing context.
+            protocol handler=] where the user agent, instead of [=navigating=]
+            to <var>resultURL</var>, SHOULD [=launch a web application=]
+            passing <var>manifest</var> and <var>resultURL</var>.
+          </p>
+          <p class="issue">
+            This should not invoke and alter [=invoke a protocol handler=] in
+            this way. The computation of <var>resultURL</var> should be
+            extracted out into a separate algorithm for general use.
           </p>
         </section>
       </section>
@@ -510,9 +1084,9 @@
         applications is at the discretion of the operating system.
       </p>
       <p>
-        To <dfn class="lint-ignore">process the `file_handlers` member</dfn>,
-        given [=ordered map=] |json:ordered map|, [=ordered map=]
-        |manifest:ordered map|, [=URL=] |manifest_url:URL|:
+        To <dfn>process the `file_handlers` member</dfn>, given [=ordered map=]
+        |json:ordered map|, [=ordered map=] |manifest:ordered map|, [=URL=]
+        |manifest_url:URL|:
       </p>
       <ol class="algorithm">
         <li>Let |processedFileHandlers:list| be a new [=list=].
@@ -615,15 +1189,19 @@
           <p>
             The <a>file handler</a>'s <code><dfn data-dfn-for=
             "file handler">icons</dfn></code> member lists icons that serve as
-            graphical representations of a [=file type=] on a platform. User
-            agents MAY pass this information to the operating system during
-            file handler registration.
+            graphical representations of a [=file type=]. User agents MAY pass
+            this information to the operating system during file handler
+            registration.
           </p>
           <aside class="note">
-            Semantically, the [=file handler/icons=] are used to convey the
-            file type itself and also the app. As with [=file handler/name=],
-            this is typically only displayed when the app has become the
-            default handler for a file type.
+            The [=file handler/icons=] member is expected to be an image (or
+            collection of images at different sizes) that represents all files
+            that are associated with the handler. This will typically appear
+            like a document (e.g. a piece of paper) as opposed to an
+            application logo, but might include elements (such as logos) that
+            suggest which application the file is associated with. As with
+            [=file handler/name=], this is typically only displayed when the
+            app has become the default handler for a file type.
           </aside>
         </section>
         <section>
@@ -840,7 +1418,8 @@
                       a single element that is a {{FileSystemHandle}}
                       corresponding to |file|.
                       </li>
-                      <li>[=launch a web app=] with |params|.
+                      <li>[=Launch a web application with handling=], passing
+                      |manifest| and |params|.
                       </li>
                     </ol>
                   </li>
@@ -853,7 +1432,8 @@
                   {{FileSystemHandle}}s that correspond to the file paths named
                   by |files|.
                   </li>
-                  <li>[=launch a web app=] with |params|.
+                  <li>[=Launch a web application with handling=], passing
+                  |manifest| and |params|.
                   </li>
                 </ol>
               </li>
@@ -1091,8 +1671,9 @@
           user agent that a web application can be installed. These signals
           will vary per user agent, as each user agent will have its own
           heuristics to determine whether a web site is elegible of an install
-          prompt. Implementers generally will provide documentation that describe their particular installabilty signals
-          or other relevant criteria a web application needs to meet to be deemed installable.
+          prompt. Implementers generally will provide documentation that
+          describe their particular installabilty signals or other relevant
+          criteria a web application needs to meet to be deemed installable.
         </p>
         <p>
           Examples of possible <a>installability signals</a> for a web
@@ -1179,7 +1760,8 @@
         <p>
           The <dfn>PromptResponseObject</dfn> contains the result of calling
           {{BeforeInstallPromptEvent/prompt()}}. It contains one member,
-          <dfn>userChoice</dfn>, which states the user's chosen outcome.
+          <dfn data-dfn-for="PromptResponseObject">userChoice</dfn>, which
+          states the user's chosen outcome.
         </p>
         <p>
           An instance of a {{BeforeInstallPromptEvent}} has the following
@@ -1280,7 +1862,7 @@
                   installButton.disabled = true;
 
                   // Show the prompt.
-                  const { userChoice } = await event.prompt();
+                  const userChoice = await event.prompt();
                   console.info(`user choice was: ${userChoice}`);
                 });
               });
@@ -1330,7 +1912,7 @@
             handles "<dfn class="event">appinstalled</dfn>" events.
           </p>
         </section>
-        <section>
+        <section data-dfn-for="Window">
           <h4>
             <code>onbeforeinstallprompt</code> attribute
           </h4>
@@ -1340,118 +1922,6 @@
             "event">beforeinstallprompt</dfn>" events.
           </p>
         </section>
-      </section>
-    </section>
-    <section data-cite="file-system-access permissions">
-      <h2>
-        Launch queue and launch params
-      </h2>
-      <section data-dfn-for="LaunchParams">
-        <h3>
-          <dfn>LaunchParams</dfn> interface
-        </h3>
-        <pre class="idl">
-          [Exposed=Window] interface LaunchParams {
-            readonly attribute DOMString? targetURL;
-            readonly attribute FrozenArray&lt;FileSystemHandle&gt; files;
-          };
-        </pre>
-        <p>
-          {{LaunchParams/targetURL}} represents the [=URL=] of the launch which
-          MUST be [=manifest/within scope=] of the application.
-        </p>
-        <p>
-          For every |file handle:FileSystemHandle| in {{LaunchParams/files}},
-          querying the file system permission with
-          {{FileSystemPermissionDescriptor/mode}} set to
-          {{FileSystemPermissionMode/"readwrite"}} MUST return
-          {{PermissionState/"granted"}}.
-        </p>
-      </section>
-      <section data-dfn-for="LaunchConsumer">
-        <h3>
-          <dfn>LaunchConsumer</dfn> function
-        </h3>
-        <pre class="idl">
-          callback LaunchConsumer = any (LaunchParams params);
-        </pre>
-      </section>
-      <section data-dfn-for="LaunchQueue">
-        <h3>
-          <dfn>LaunchQueue</dfn> interface
-        </h3>
-        <pre class="idl">
-          partial interface Window {
-            readonly attribute LaunchQueue launchQueue;
-          };
-
-          [Exposed=Window] interface LaunchQueue {
-            undefined setConsumer(LaunchConsumer consumer);
-          };
-        </pre>
-        <p>
-          {{LaunchQueue}} has an <dfn>unconsumed launch params</dfn> which is a
-          [=list=] of {{LaunchParams}} that is initially empty.
-        </p>
-        <p>
-          {{LaunchQueue}} has an <dfn>assigned launch consumer</dfn> which is
-          initially null.
-        </p>
-        <section>
-          <h2>
-            <dfn>setConsumer</dfn> method
-          </h2>
-          <p>
-            The {{LaunchQueue/setConsumer(consumer)}} method steps are:
-          </p>
-          <ol class="algorithm">
-            <li>Set the [=assigned launch consumer=] to |consumer|.
-            </li>
-            <li>[=list/For each=] |launch_params:LaunchParams| of [=unconsumed
-            launch params=]:
-              <ol>
-                <li>Invoke |consumer| with |launch_params|.
-                </li>
-              </ol>
-            </li>
-            <li>Set [=unconsumed launch params=] to the empty [=list=].
-            </li>
-          </ol>
-        </section>
-      </section>
-      <section>
-        <h3>
-          Handling Web App Launches
-        </h3>
-        <p>
-          The steps to <dfn>launch a web app</dfn> are given by the following
-          algorithm. The algorithm takes {{LaunchParams}}
-          |params:LaunchParams|.
-        </p>
-        <ol class="algorithm">
-          <li>If |params| is null, set |params| to a new {{LaunchParams}} with
-          {{LaunchParams/targetURL}} set to [=manifest/start_url=].
-          </li>
-          <li>Create a new top level browsing context and navigate it to
-          |params.targetUrl|.
-          </li>
-          <li>Append |params| to the [=unconsumed launch params=] of the
-          launched document's {{Window.LaunchQueue}}.
-          </li>
-          <li>If the [=assigned launch consumer=] |consumer| is set:
-            <ol>
-              <li>[=list/For each=] |launch_params:LaunchParams| of
-              [=unconsumed launch params=]:
-                <ol>
-                  <li>Invoke |consumer| with |launch_params|.
-                  </li>
-                </ol>
-              </li>
-              <li>Set [=unconsumed launch params=] to the empty list.
-              </li>
-            </ol>
-          </li>
-        </ol>
       </section>
     </section>
     <section id="conformance"></section>

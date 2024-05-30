@@ -2,6 +2,8 @@
 
 Authors: [Aaron Gustafson](https://github.com/aarongustafson), Louise Brett (loubrett@google.com), Glen Robertson (glenrob@chromium.org)
 
+TODO: This explainer needs to be updated to match the [Web Manifest Overrides](https://github.com/w3c/manifest/issues/1045) proposal.
+
 ## Overview
 
 This document proposes a new `translations` manifest member that enables web apps to provide alternate values for manifest members in specific languages. 
@@ -86,21 +88,21 @@ For array members (e.g., `icons`, `screenshots`, `shortcuts`), only a subset of 
 "shortcuts": [
   {
     "name": "Pet Me",
-    "url": "/pet-me"
-  },
+    "url": "/pet-me"
+  },
   {
-     "name": "Feed Me",
-     "url": "/feed-me"
+    "name": "Feed Me",
+    "url": "/feed-me"
   }
 ],
 "translations": {
   "fr": {
     "shortcuts": [
       {
-        "name": "Caressez-moi"
-      },
+        "name": "Caressez-moi"
+      },
       {
-        "name": "Nourrissez-moi"
+        "name": "Nourrissez-moi"
       }
     ]
   }
@@ -118,8 +120,9 @@ To ensure translations for these complex constructs do not get out of sync with 
 
 In addition to the language string mapping to an object containing the translations as proposed, it could map to a string that defines the location of a separate JSON file containing the translations.
 
+
+manifest.json:
 ```json
-// manifest.json
 {
   "name": "Good dog",
   "description": "An app for dogs",
@@ -130,9 +133,10 @@ In addition to the language string mapping to an object containing the translati
     "fr": "manifest.fr.json"
   }
 }
+```
 
-
-// manifest.fr.json:
+manifest.fr.json:
+```json
 {
   "name": "Bon chien",
   "description": "Une application pour chiens",
@@ -140,6 +144,7 @@ In addition to the language string mapping to an object containing the translati
   "screenshots": []
 }
 ```
+
 
 Since the translations field could become quite large and difficult to manage in the single file, this option reduces the size of the manifest and allows user agents to only download the languages they need. It is not proposed as the initial implementation due to the complexity and overhead of downloading a separate file for every language.
 
@@ -154,7 +159,7 @@ Some alternatives were considered on the [original issue thread](https://github.
 1. Have the translations field point to a single separate file which contains all of the translations. This has the advantage of keeping the manifest file small. However this adds the complexity of having another file to download without the benefit of only downloading the necessary languages (which is possible with the extension option above).
 2. Have the translations field keyed by manifest member rather than by language:
 
-```
+```json
 {
   "name": "Good dog",
   "description": "An app for dogs",
@@ -166,7 +171,7 @@ Some alternatives were considered on the [original issue thread](https://github.
     "description": {
       "fr": "Une application pour chiens"
     },
-  "icons": ...
+  "icons": []
 }
 ```
 
