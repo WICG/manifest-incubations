@@ -82,6 +82,11 @@ associated origins.
 
 ### Link capturing from another origin
 
+If an origin A adds a web app B to its `web-app-origin-association` file, A is
+implicitly authorizing app B to intercept navigations to URLs in A. This
+implies that app B can potentially spoof origin A and therefore it is advised
+that origin A and web app B should be owned by the same entity.
+
 User agents may perform link capturing for user navigations within a web app's
 extended scope and launch the web app instead of performing the navigation.
 
