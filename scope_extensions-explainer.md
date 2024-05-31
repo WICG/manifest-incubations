@@ -76,19 +76,39 @@ associated origins.
     - Has an origin with a valid
       `<origin>/.well-known/web-app-origin-association` association file
       with an association entry matching the web app's
-      [identity](https://w3c.github.io/manifest/#dfn-identity).
+      [identity](manifest-identity).
 
 ## Security Considerations
 
-### [Launch handling params](https://github.com/WICG/web-app-launch/blob/main/launch_handler.md)
+### Link capturing from another origin
 
-If an URL in extended scope is captured by an app that has 
-launch_handler: { client_mode: "focus-existing" } set in its manifest, the URL 
-is made visible to the app through Window.launchQueue instead of causing a top 
-level navigation. Without scope_extensions, this URL must be from the same 
-origin as the app scope. With scope_extensions, this exposed URL can be from a
-different origin within extended scope.
+If an origin A adds a web app B to its `web-app-origin-association` file, A is
+implicitly authorizing app B to intercept navigations to URLs in A. This
+implies that app B can potentially spoof origin A and therefore it is advised
+that origin A and web app B should be owned by the same entity.
 
+User agents may perform link capturing for user navigations within a web app's
+extended scope and launch the web app instead of performing the navigation.
+
+The [launch handler][launch-handler] proposal enables sites to reroute app
+launches into existing web app contexts.
+
+The combination of link capturing, launch handler and scope extensions leads to
+the following attack vector:
+1. User installs the TestApp web app from app.com.
+1. TestApp's scope includes site.com with valid origin associations.
+1. TestApp sets its `launch_handler` to
+   ```
+   {
+     "client_mode": "focus-existing"
+   }
+   ```
+1. User clicks on a link to site.com.
+1. Navigation is captured by an existing TestApp window that is brought into
+   focus and has a LaunchParam is enqueued.
+1. *TestApp is now aware that the user is navigating to site.com and could
+   perform a fake navigation with the intention of duping the user into thinking
+   they're on site.com.*
 
 ## Future extensions
 
@@ -103,38 +123,45 @@ different origin within extended scope.
   associated origins is not required for these URLs to be part of a valid
   manifest. Prior to validation the URLs must be treated as if they were not
   specified.
+- Add an `"authorize"` field to `web-app-origin-association` e.g.:
+  ```json
+  {
+    "web_apps": [{
+      "web_app_identity": "https://example.org",
+      "authorize": ["intercept-links"]
+    }]
+  }
+  ```
+  This opt-in serves as a signal of trust from the associated origin to allow
+  the web app to [capture navigations][link-capturing-from-another-origin] into
+  the associated origin.
+
 
 ## Related Proposals
 
-### [URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
+### [URL Handlers][url-handlers]
 
 The Scope Extensions proposal is intended to be a replacement for the
-[URL Handlers](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
-proposal with the following changes:
+[URL Handlers][url-handlers] proposal with the following changes:
  - Re-orient the goal to be focused just on expanding the set of origins/URLs in
    the web app's scope. Remove the goal of registering web apps as URL handlers
-   in the user's operating system. That behaviour will be covered by the
-   [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-   proposal instead.
+   in the user's operating system. That behaviour will be covered by individual
+   browsers optionally offering users the choice to capture link navigations as
+   web app launches.
  - Rename the new manifest field from `url_handlers` to `scope_extensions` to
    reflect the change in goals.
  - Move the association file from "<origin>/web-app-origin-association.json" to
    "<origin>/.well-known/web-app-origin-association". This better conforms
    with [RFC 8615](https://datatracker.ietf.org/doc/html/rfc8615).
- - Change the association file entries to be keyed on the web app identifier
-   rather than the web app's manifest URL. This aligns with the recent
-   [PWA Unique ID](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md)
-   proposal.
+ - Change the association file entries to be keyed on the [web app
+   identifier](manifest-identity) rather than the web app's manifest URL (the
+   former having been added to the Manifest spec in the interim).
  - Rename `"paths"` to `"include_paths"` in the association file entries.
  - Add an "authorize" field to the association file entries for the associated
    origin to provide explicit opt-in signals for security sensitive
    capabilities.
 
-### [Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
 
-Scope extensions can be considered the first stage in the link capturing
-pipeline. This proposal allows developers to control the set of user navigation
-URLs that the web app is intended to capture. The
-[Declarative Link Capturing](https://github.com/WICG/sw-launch/blob/main/declarative_link_capturing.md)
-proposal allows developers to control the action that is taken once a user
-navigation is captured e.g. open a new app context or navigate an existing one.
+[launch-handler]: https://github.com/WICG/sw-launch/blob/main/launch_handler.md
+[url-handlers]: https://github.com/WICG/pwa-url-handler/blob/main/explainer.md
+[manifest-identity]: https://w3c.github.io/manifest/#dfn-identity
