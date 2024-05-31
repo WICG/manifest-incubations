@@ -105,11 +105,6 @@ the following attack vector:
    perform a fake navigation with the intention of duping the user into thinking
    they're on site.com.*
 
-To mitigate this risk origins must explicitly grant web apps this ability via an
-`"authorize"` field in the corresponding web-app-origin-association.json entry
-set to a list including the value `"intercept-links"`. This opt-in is used as a
-signal of trust between the associated origin and the web app.
-
 ## Future extensions
 
 - More specific scoping e.g. scope suffix or include/exclude lists or
@@ -123,6 +118,19 @@ signal of trust between the associated origin and the web app.
   associated origins is not required for these URLs to be part of a valid
   manifest. Prior to validation the URLs must be treated as if they were not
   specified.
+- Add an `"authorize"` field to `web-app-origin-association` e.g.:
+  ```json
+  {
+    "web_apps": [{
+      "web_app_identity": "https://example.org",
+      "authorize": ["intercept-links"]
+    }]
+  }
+  ```
+  This opt-in serves as a signal of trust from the associated origin to allow
+  the web app to [capture navigations][link-capturing-from-another-origin] into
+  the associated origin.
+
 
 ## Related Proposals
 
