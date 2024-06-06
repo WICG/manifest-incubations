@@ -98,13 +98,15 @@ different origin within extended scope.
 
 ### Extended Scope Permissions
 
-When an application uses `scope_extensions` to expand its scope, each additional scope's permissions remain the same. Expanding scopes does not imply any change in permissions. The only thing that changes after being included in a scope is that the security UX will not appear when an app navigates to content served from those scopes.
+When an application uses `scope_extensions` to expand its scope, **each additional scope's permissions remain the same**. Expanding scopes does not imply any change in permissions. The only thing that changes after being included in a scope is that the security UX will not appear when an app navigates to content served from those scopes.
 
 ### Additional security UX
 
 For added security when in the installed web application, the app might display UX that always displays the current scope that is being served, along with privacy and permission settings of that specific scope.
 
 ![alt text](image-1.png)
+
+In the previous image, a user can always see which domain is serving content under the privacy menu. 
 
 ## Future extensions
 
