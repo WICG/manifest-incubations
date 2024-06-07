@@ -23,7 +23,8 @@ origins.
 Web app scope (defined by the `scope` field) is currently used for:
 1. Determining whether an app window's root document has left the app's scope
    (possibly invoking window UI informing the user of this).
-1. Constraining URLs appearing in manifest members like `start_url`, `file_handlers`, or `share_target`.
+1. Constraining URLs appearing in manifest members like `start_url`,
+   `file_handlers`, or `share_target`.
 
 The `scope_extensions` mechanism can expand all these behaviours to include
 other origins given agreement between the web app's primary origin and the
@@ -31,32 +32,52 @@ associated origins.
 
 
 ## Proposal
+To extend the app scope, a developer must modify the web app manifest and host
+one or more association files.
 
-1. Add a `scope_extensions` member to the web app manifest specifying a list of
-   origin patterns to associate with.
+### Web app manifest
+Add a `scope_extensions` member to the web app manifest specifying a list of
+origins to include in the extended app scope. 
 
-   Example manifest located at `https://example.com/manifest.webmanifest`:
+Example manifest located at `https://example.com/manifest.webmanifest`:
    ```json
    {
      "id": "/",
-     "name": "Example",
+     "name": "Example App",
      "display": "standalone",
-     "start_url": "/index.html",
+     "start_url": "/app/index.html",
+     "scope": "/app",
      "scope_extensions": [
-       {"origin": "*.example.com"},
-       {"origin": "example.co.uk"},
-       {"origin": "*.example.co.uk"},
-       {"origin": "*.example.co.uk"}
+       { "type": "registrable_domain", "value": "https://example.com" },
+       { "type": "registrable_domain", "value": "https://example.co.uk" },
+       { "type": "origin", "value": "https://helpcenter.example-help-center.com" }
      ]
    }
    ```
-   In this example the "Example" app is extending its app scope to all its
-   subdomains along with its `.co.uk` site and its subdomains.
+In this example the "Example" app has a regular scope of
+`http://example.com/app` and is extending its app scope to the registrable
+domains of `https://example.com` and `https://example.co.uk`, as well as the
+single origin `https://helpcenter.example-help-center.com`. 
 
-1. Specify a `web-app-origin-association` file format that must be located
-   at `https://<associated origin>/.well-known/web-app-origin-association`
-   on the associated origin's domain. This specifies a list of web apps that
-   may include it as a scope extension.
+Each object in `scope_extension` must contain both `type` and `value` string
+fields. The value of `type` must be one of `["origin" | "registrable_domain"]`.
+The `value` field must contain a valid URL. 
+
+| type   | Behavior |
+|--------|----------|
+| `origin` | The URL in `value` is converted to an [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). The `/` path of that origin is added to the extended scope.|
+| `registrable_domain` | The URL in `value` is converted to a [registrable domain](https://url.spec.whatwg.org/#host-registrable-domain). The `/` paths of all sub-domain origins within the registrable domain are added to the extended scope.|
+
+This format allows for both backward and forward compatibility. For example, a
+new type of entry could filter the paths of an origin added to the extended
+scope. Entries with types are that not recognized by a user agent should be
+ignored.
+
+### Association file
+ Specify a `web-app-origin-association` file that must be located at
+ `https://<associated origin>/.well-known/web-app-origin-association` on the
+ associated origin's domain. This specifies a list of web apps that may include
+ it as a scope extension.
 
    Example association file located at
    `https://example.co.uk/.well-known/web-app-origin-association`:
@@ -70,13 +91,16 @@ associated origins.
    }
    ```
 
-1. Let the extended scope of a web app be the set of URLs that:
-    - Has an origin that matches one of the origin patterns in the manifest's
-      `scope_extensions` list.
-    - Has an origin with a valid
-      `<origin>/.well-known/web-app-origin-association` association file
-      with an association entry matching the web app's
-      [identity](manifest-identity).
+The `web_app_identity` field must contain a valid [web application
+id](https://w3c.github.io/manifest/#id-member).
+
+### Resulting extended scope
+A URL is in the extended scope of a web app if both:
+  - It matches an entry in the `scope_extensions` list.
+  - That entry has been validated by fetching the
+    `<origin>/.well-known/web-app-origin-association` association file with an
+    entry matching the app's
+    [identity](https://w3c.github.io/manifest/#id-member).
 
 ## Security Considerations
 
