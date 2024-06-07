@@ -66,7 +66,7 @@ The `value` field must contain a valid URL.
 | type   | Behavior |
 |--------|----------|
 | `origin` | The URL in `value` is converted to an [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). The `/` path of that origin is added to the extended scope.|
-| `registrable_domain` | The URL in `value` is converted to a [registrable domain](https://url.spec.whatwg.org/#host-registrable-domain). The `/` paths of all sub-domain origins (not including the main domain origin) within the registrable domain are added to the extended scope.|
+| `registrable_domain` | The URL in `value` is converted to a [registrable domain](https://url.spec.whatwg.org/#host-registrable-domain). The `/` paths of all sub-domain origins within the registrable domain are added to the extended scope.|
 
 This format allows for both backward and forward compatibility. For example, a
 new type of entry could filter the paths of an origin added to the extended
