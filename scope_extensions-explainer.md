@@ -100,7 +100,7 @@ A URL is in the extended scope of a web app if both:
   - That entry has been validated by fetching the
     `<origin>/.well-known/web-app-origin-association` association file with an
     entry matching the app's
-    [identity](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md).
+    [identity](https://w3c.github.io/manifest/#id-member).
 
 ## Security Considerations
 
