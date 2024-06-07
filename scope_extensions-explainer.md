@@ -43,26 +43,27 @@ Example manifest located at `https://example.com/manifest.webmanifest`:
    ```json
    {
      "id": "/",
-     "name": "Example",
+     "name": "Example App",
      "display": "standalone",
-     "start_url": "/index.html",
+     "start_url": "/app/index.html",
      "scope": "/app",
      "scope_extensions": [
-       {"type": "registrable_domain", "value": "https://example.com"},
-       {"type": "origin", "value": "https://example.co.uk"},
-       {"type": "registrable_domain", "value": "https://example.co.uk"}
+       { "type": "registrable_domain", "value": "https://example.com" },
+       { "type": "registrable_domain", "value": "https://example.co.uk" },
+       { "type": "origin", "value": "https://helpcenter.example-help-center.com" }
      ]
    }
    ```
 In this example the "Example" app has a regular scope of
-`http://example.com/app` and is extending its app scope to all sub-domains of
-`https://example.com` as well as `https://example.co.uk` and its subdomains. 
+`http://example.com/app` and is extending its app scope to the registrable
+domains of `https://example.com` and `https://example.co.uk`, as well as the
+single origin `https://helpcenter.example-help-center.com`. 
 
 Each object in `scope_extension` must contain both `type` and `value` string
 fields. The value of `type` must be one of `["origin" | "registrable_domain"]`.
 The `value` field must contain a valid URL. 
 
-| type | Behavior |
+| type   | Behavior |
 |--------|----------|
 | `origin` | The URL in `value` is converted to an [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). The `/` path of that origin is added to the extended scope.|
 | `registrable_domain` | The URL in `value` is converted to a [registrable domain](https://url.spec.whatwg.org/#host-registrable-domain). The `/` paths of all sub-domain origins (not including the main domain origin) within the registrable domain are added to the extended scope.|
@@ -94,12 +95,12 @@ The `web_app_identity` field must contain a valid [web application
 id](https://w3c.github.io/manifest/#id-member).
 
 ### Resulting extended scope
-Let the extended scope of a web app be the set of URLs that:
-  - Have an origin which matches one of the `origin` or `registrable_domain`
-    values in the manifest's `scope_extensions` list.
-  - Have an origin with a valid
+A URL is in the extended scope of a web app if both:
+  - It matches an entry in the `scope_extensions` list.
+  - That entry has been validated by fetching the
     `<origin>/.well-known/web-app-origin-association` association file with an
-    entry matching the app's [identity](manifest-identity).
+    entry matching the app's
+    [identity](https://github.com/philloooo/pwa-unique-id/blob/main/explainer.md).
 
 ## Security Considerations
 
