@@ -70,7 +70,7 @@ The `value` field must contain a valid URL.
 
 This format allows for both backward and forward compatibility. For example, a
 new type of entry could filter the paths of an origin added to the extended
-scope. Entries with types are that not recognized by a user agent can be
+scope. Entries with types are that not recognized by a user agent should be
 ignored.
 
 ### Association file
