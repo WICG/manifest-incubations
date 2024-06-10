@@ -194,7 +194,7 @@ For added security when in the installed web application, the app might display
 UX that always displays the current scope that is being served, along with
 privacy and permission settings of that specific scope.
 
-![Current scope being displayed on the privacy menu of installe web
+![Current scope being displayed on the privacy menu of installed web
 app](images/scope-privacy-info.png)
 
 In the previous image, a user can always see which domain is serving content
