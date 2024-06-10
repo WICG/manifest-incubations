@@ -24,7 +24,7 @@ be the case that an application wants to extend its scope. For example, an
 application might host content that is located in one specific origin, and rely
 on a login page that is out of the scope of the application itself to access
 that content. In other cases, the same application might be associated to
-multiple Top Level Domains, that might respond to different geographies
+multiple Top Level Domains, that might respond to different locales
 (`app.com`, `app.co.uk`, `app.co.cr`, etc).
 
 
