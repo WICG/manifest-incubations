@@ -17,7 +17,7 @@ figure below.
 
 ![Installed web app showing out-of-scope UX](images/out-of-scope-ux.png)
 
-The app in he image (`PWinter`) has navigated to a url out of its scope
+The app in the image (`PWinter`) has navigated to a url out of its scope
 (`airhorner.com`). The white bar on top of the web app is providing information
 to the user about this change of scope. While this is a security feature, it can
 be the case that an application would want to extend its scope. For example, an
