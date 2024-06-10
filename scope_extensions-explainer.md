@@ -20,7 +20,7 @@ figure below.
 The app in the image (`PWinter`) has navigated to a url out of its scope
 (`airhorner.com`). The white bar on top of the web app is providing information
 to the user about this change of scope. While this is a security feature, it can
-be the case that an application would want to extend its scope. For example, an
+be the case that an application wants to extend its scope. For example, an
 application might host content that is located in one specific origin, and rely
 on a login page that is out of the scope of the application itself to access
 that content. In other cases, the same application might be associated to
