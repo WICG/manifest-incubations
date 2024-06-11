@@ -1,5 +1,9 @@
 # Web App Translations
 
+**This document is obsolete. The manifest editors have chosen to implement this using a different approach. You can track the progress in [w3c/manifest#1101](https://github.com/WICG/manifest-incubations/pull/103).**
+
+---
+
 Authors: [Aaron Gustafson](https://github.com/aarongustafson), Louise Brett (loubrett@google.com), Glen Robertson (glenrob@chromium.org)
 
 TODO: This explainer needs to be updated to match the [Web Manifest Overrides](https://github.com/w3c/manifest/issues/1045) proposal.
