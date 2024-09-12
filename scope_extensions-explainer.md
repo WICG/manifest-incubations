@@ -12,10 +12,14 @@ origins.
 A web application's content might originate from different scopes. Currently, if
 an installed web application navigates to a url that is out of the scope defined
 in the manifest file, a security UX will appear in the form of a bar to indicate
-to the user that they are outside of the defined scope of the application. See
-figure below. 
+to the user that they are outside of the defined scope of the application. 
 
-![Installed web app showing out-of-scope UX](images/out-of-scope-ux.png)
+<!-- TODO link to spec language around out-of-scope UI -->
+
+<figure>
+    <img src="images/out-of-scope-ux.png" width="600" alt="">
+    <figcaption>Installed web app window with out-of-scope UI</figcaption>
+</figure>
 
 The app in the image (`PWinter`) has navigated to a url out of its scope
 (`airhorner.com`). The white bar on top of the web app is providing information
@@ -52,8 +56,19 @@ associated origins.
 
 
 ## Proposal
-To extend the app scope, a developer must modify the web app manifest and host
-one or more association files.
+To extend the app scope, a developer will need to modify the web app manifest, host
+one or more association files, and may also have to add a new response header with
+returned documents.
+
+A new field `scope_extensions` in the manifest declares which origins or sites should
+join the app scope. 
+
+A two-way handshake between the app and the extension origin/site is established
+when the origin/site hosts a `.well-known/web-app-origin-association` file. This file
+declares which apps are allowed to incorporate itself and which resources can
+participate.
+
+<!-- TODO: Add graphic illustrating the 3 components. -->
 
 ### Web app manifest
 Add a `scope_extensions` member to the web app manifest specifying a list of
@@ -84,35 +99,39 @@ fields. The value of `type` must be one of `["origin" | "site"]`. The `value`
 field must contain a valid URL. 
 
 An `"origin"` extension adds that specific web origin to the app scope, while a
-`"site"` extension adds all origins that passes the same-site test with the
-specified host. Origins and sites have the option of filtering what resources
-are allowed to join the app scope by configuring filters in their 
-`.well-known/web-app-origin-association` file.
+`"site"` extension adds all origins that passes the
+[same-site](https://html.spec.whatwg.org/multipage/browsers.html#same-site) test with the
+specified host. 
 
-<!-- TODO -->
 | Type   | Behavior |
 |--------|----------|
 | `origin` | The URL in `value` is converted to an [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). All allowed paths of that origin is added to the extended scope.|
 | `site` | The URL in `value` is converted to a [host](https://url.spec.whatwg.org/#hosts-(domains-and-ip-addresses)). All allowed paths of all origins that pass the [same-site test](https://html.spec.whatwg.org/multipage/browsers.html#obtain-a-site) as the host are added to the extended scope.|
 
-This format allows for both backward and forward compatibility. For example, a
-new type of entry could filter the paths of an origin added to the extended
-scope. Entries with types not recognized by a user agent should be ignored.
+This format is both backward and forward compatibility. Entries with types not recognized
+by a user agent should be ignored.
 
 ### Association file
- Specify a `web-app-origin-association` file that must be located at
- `https://<associated origin>/.well-known/web-app-origin-association` on the
- associated origin's domain. This specifies a list of web apps that may include
- it as a scope extension.
 
-   Example association file located at
+Create a `web-app-origin-association` file that must be downloadable at
+`https://<associated origin/site>/.well-known/web-app-origin-association`. 
+This specifies a list of web apps that may include it as a scope extension.
+
+Origins/sites have the option of filtering what resources are allowed to join 
+the app scope by configuring filters in their 
+`.well-known/web-app-origin-association` file. A `scope` filter will allow paths
+to be included, working the same way as the manifest `scope` field. Other filtering
+formats can be added in the future.
+
+Example association file located at
    `https://example.co.uk/.well-known/web-app-origin-association`:
    ```json
    {
      "web_apps": [{
-       "web_app_identity": "https://example.com/"
+       "web_app_identity": "https://example.com/", 
+       "scope": "/app"
      }, {
-       "web_app_identity": "https://associated.site.com/"
+       "web_app_identity": "https://associated.site.com/",
      }]
    }
    ```
@@ -127,6 +146,22 @@ A URL is in the extended scope of a web app if both:
     `<origin>/.well-known/web-app-origin-association` association file with an
     entry matching the app's
     [identity](https://w3c.github.io/manifest/#id-member).
+
+### Response header
+For `origin` extensions, a `web-app-origin-association` file from the extended
+origin is sufficient to complete the two-way handshake. 
+
+For `site` extensions, a `web-app-origin-association` is necessary but insufficient
+as it cannot represent every origin that passes the same-site test with the site.
+For this reason, documents from the site will need to be accompanied by a 
+`App-Scope-Extension-Allow-Id` response header. 
+
+Example header: 
+`App-Scope-Extension-Allow-Id: https://myapp.com/index.html, https://otherapp.com/index.html`
+
+This response header represents the specific origin and validates that it
+agrees to be incorporated into apps that match a list of manifest IDs.
+ 
 
 ## Security Considerations
 
