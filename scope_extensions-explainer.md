@@ -1,38 +1,60 @@
 # Scope Extensions for Web Apps
 
-## Overview
+## Abstract
 
-This document describes a new `scope_extensions` manifest member that enables
-web apps to extend their
-[scope](https://www.w3.org/TR/appmanifest/#understanding-scope) to other
-origins.
+This document proposes a new `scope_extensions` [Web Application
+Manifest](https://www.w3.org/TR/appmanifest/) member that extends the concept of
+[app scope](https://www.w3.org/TR/appmanifest/#understanding-scope). User agents
+apply the manifest to documents that are [within
+scope](https://www.w3.org/TR/appmanifest/#dfn-within-scope) and often apply
+different UX treatments when visiting documents outside of scope. According to
+existing specification, the scope of an app can be made no broader than a single
+[web origin](https://datatracker.ietf.org/doc/rfc6454/). Apps that wish to
+define a scope spanning multiple origins could do so using the proposed
+`scope_extensions` member.
 
 ## Introduction
 
-A web application's content might originate from different scopes. Currently, if
-an installed web application navigates to a url that is out of the scope defined
-in the manifest file, a security UX will appear in the form of a bar to indicate
-to the user that they are outside of the defined scope of the application. 
-
-<!-- TODO link to spec language around out-of-scope UI -->
+In Chromium browsers, top-level app window navigation to an out-of-scope URL
+creates a notification bar - this notification bar informs the user that they
+have navigated outside of app scope or to a different origin altogether, and
+provides a control to return to the `start_url`. Other browser implementations
+may display similar behavior.
 
 <figure>
     <img src="images/out-of-scope-ux.png" width="600" alt="">
-    <figcaption>Installed web app window with out-of-scope UI</figcaption>
+    <figcaption>Example: installed web app window with out-of-scope bar UI</figcaption>
 </figure>
 
-The app in the image (`PWinter`) has navigated to a url out of its scope
-(`airhorner.com`). The white bar on top of the web app is providing information
-to the user about this change of scope. While this is a security feature, it can
-be the case that an application wants to extend its scope. For example, an
-application might host content that is located in one specific origin, and rely
-on a login page that is out of the scope of the application itself to access
-that content. In other cases, the same application might be associated to
-multiple Top Level Domains, that might respond to different locales
-(`app.com`, `app.co.uk`, `app.co.cr`, etc).
+The app window above has navigated to a url (`https://airhorner.com`) outside of
+its scope (`https://diek.us/pwinter/`). The white bar above the web contents
+informs the user of this difference. This feature aims to keep the user aware of
+the content's security context.
+
+A developer may intentionally want to include documents from different origins
+in app scope. In this case, the out-of-scope bar is not necessary and could
+confuse users. Furthermore, as app scope is used as the boundary for the
+application of manifest features such as `theme_color`, documents intended to be
+part of the app but are excluded from app scope are not presented in a
+consistent manner. 
+
+## Motivating use cases 
+
+* Multiple TLDs
+
+* Multiple subdomains (slack, zoom, etc)
+
+* Link capturing
+<!-- TODO -->
+
+For example, an application might host content that is located
+in one specific origin, and rely on a login page that is out of the scope of the
+application itself to access that content. In other cases, the same application
+might be associated to multiple Top Level Domains, that might respond to
+different locales (`app.com`, `app.co.uk`, `app.co.cr`, etc).
 
 
-## Use Cases / Goals
+## Goals
 
 - Allow sites that control multiple subdomains and top level domains to behave
   as one contiguous web app.\
@@ -41,27 +63,21 @@ multiple Top Level Domains, that might respond to different locales
 - Allow web apps to capture user navigations to sites they are affiliated with.\
   E.g. "News Aggregator App" capturing links navigations to examplenewssite.com.
 
+## Non-goals
 
-## Background
-
-Web app scope (defined by the `scope` field) is currently used for:
-1. Determining whether an app window's root document has left the app's scope
-   (possibly invoking window UI informing the user of this).
-1. Constraining URLs appearing in manifest members like `start_url`,
-   `file_handlers`, or `share_target`.
-
-The `scope_extensions` mechanism can expand all these behaviours to include
-other origins given agreement between the web app's primary origin and the
-associated origins.
-
+<!-- TODO -->
 
 ## Proposal
-To extend the app scope, a developer will need to modify the web app manifest, host
-one or more association files, and may also have to add a new response header with
-returned documents.
+
+`scope_extensions` works by ...
+<!-- TODO -->
 
 A new field `scope_extensions` in the manifest declares which origins or sites should
 join the app scope. 
+
+To extend the app scope, a developer will need to modify the web app manifest, host
+one or more association files, and may also have to add a new response header with
+returned documents.
 
 A two-way handshake between the app and the extension origin/site is established
 when the origin/site hosts a `.well-known/web-app-origin-association` file. This file
@@ -70,9 +86,11 @@ participate.
 
 <!-- TODO: Add graphic illustrating the 3 components. -->
 
-### Web app manifest
-Add a `scope_extensions` member to the web app manifest specifying a list of
-origins to include in the extended app scope. 
+### Manifest
+Use `scope_extensions` member in the web app manifest to declare origins in the
+the extended app scope. 
+
+<!-- TODO each origin has `scope` parameter as well. -->
 
 Example manifest located at `https://example.com/manifest.webmanifest`:
    ```json
@@ -241,6 +259,9 @@ app](images/scope-privacy-info.png)
 In the previous image, a user can always see which domain is serving content
 under the privacy menu. 
 
+## Alternatives considered
+
+<!-- TODO -->
 
 ## Related Proposals
 
