@@ -246,10 +246,11 @@ the following attack vector:
 
 ## Future work under consideration 
 
-1. More fine-grained scoping mechanisms such as include/exclude lists or [URL
-  patterns](https://wicg.github.io/urlpattern/). These mechanisms could be
-  reused in 3 difference places: in the association file, in `scope_extensions`
-  in the manifest, at the top level in the manifest.
+1. More [fine-grained scoping
+  mechanisms](https://github.com/w3c/manifest/issues/996) such as
+  include/exclude lists or [URL patterns](https://wicg.github.io/urlpattern/).
+  These mechanisms could be reused in 3 difference places: in the association
+  file, in `scope_extensions` in the manifest, at the top level in the manifest.
 
 1. Change the constraint on manifest URLs that are bound by scope (except for
   `start_url`) to instead be bound by the extended scope. Validation of the
