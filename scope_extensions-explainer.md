@@ -1,185 +1,216 @@
-# Scope Extensions for Web Apps
+# Scope Extensions for Web App Manifest
 
-## Abstract
+## Participate
 
-This document proposes a new `scope_extensions` [Web Application
-Manifest](https://www.w3.org/TR/appmanifest/) member that extends the concept of
-[app scope](https://www.w3.org/TR/appmanifest/#understanding-scope). User agents
-apply the manifest to documents that are [within
-scope](https://www.w3.org/TR/appmanifest/#dfn-within-scope) and often apply
-different UX treatments when visiting documents outside of scope. According to
-existing specification, the scope of an app can be made no broader than a single
-[web origin](https://datatracker.ietf.org/doc/rfc6454/). Apps that wish to
-define a scope spanning multiple origins could do so using the proposed
-`scope_extensions` member.
+* [Github issues](https://github.com/WICG/manifest-incubations/issues?q=is%3Aissue+is%3Aopen+label%3Ascope-extensions)
 
 ## Introduction
 
+This explainer proposes a new `scope_extensions` [Web Application
+Manifest](https://www.w3.org/TR/appmanifest/) member that extends the concept of
+[app scope](https://www.w3.org/TR/appmanifest/#understanding-scope). 
+
+The scope of an installed web app "restricts the URLs to which the manifest is
+applied and provides a means to 'deep link' into a web application from other
+applications." User agents apply metadata in the manifest to documents [within
+scope](https://www.w3.org/TR/appmanifest/#dfn-within-scope) and often apply
+differential UX treatments to make it obvious when an app window navigates to
+documents outside of scope.
+
+Currently, the scope of an app can only include URLs from a single [web
+origin](https://datatracker.ietf.org/doc/rfc6454/). Web developers who are
+interested in creating a web app with contents located in multiple different web
+origins find themselves unable to do so. This leads to a poor user experience
+when viewing documents that are part of the app but are technically
+out-of-scope. Users may be confused by browser UI marking the page as
+out-of-scope, and some desired app-like features such as deep linking may not
+function at all for out-of-scope documents.
+
+Apps that wish to define a scope spanning multiple different origins could do so
+using the `scope_extensions` manifest field detailed below.
+
+## What apps could benefit?
+
+For each example below, developers have expressed interest in publishing a
+single installable app instead of one per origin with distinct app identities. 
+
+### TLD locales
+
+An app can have content from multiple Top Level Domains representing different
+locales. Each site is usually structured identically but could have differences
+in policies, displayed language, etc. Example:
+* https://www.starbucks.fr, https://www.starbucks.de, https://www.starbucks.ca, ... 
+
+### Shortened/Vanity URLs
+
+An app can share shortened/vanity URLs and want those URLs to be captured to app
+windows when navigated. Example:
+* https://youtu.be/dQw4w9WgXcQ is the shortened URL for
+  https://www.youtube.com/watch?v=dQw4w9WgXcQ. 
+
+### Sub-domain locales
+
+An app can also use different sub-domains to represent different locales.
+Example:
+* https://en.wikipedia.org, https://fr.wikipedia.org, ...
+
+### Sub-domains that represent different user groups (non-goal)
+Some sites are structured to use sub-domains to represent different groups or
+organizations but may want to publish a single installable app instead of one
+for each. Examples:
+* https://chromium.slack.org, https://foo.slack.org, https://bar.slack.org
+* https://foo.zoom.us, https://bar.zoom.us, ...
+
+Addressing this case is considered a non-goal for this explainer because it is
+not possible to enumerate and validate all of the matching sub-domains at
+install time. This work is left to a future explainer.
+
+## Key User Scenarios
+
+### Out-of-scope UX
+
 In Chromium browsers, top-level app window navigation to an out-of-scope URL
 creates a notification bar - this notification bar informs the user that they
-have navigated outside of app scope or to a different origin altogether, and
-provides a control to return to the `start_url`. Other browser implementations
-may display similar behavior.
+have navigated outside of app scope or to a different origin altogether and
+provides a control to return to the `start_url`. This UI bar protects the user
+by providing useful information about the change in browsing context. It is not
+dismissable without navigating the page back to the `start_url`. Other browser
+implementations may include similar behavior.
 
 <figure>
-    <img src="images/out-of-scope-ux.png" width="600" alt="">
-    <figcaption>Example: installed web app window with out-of-scope bar UI</figcaption>
+    <img src="images/out-of-scope-ux.png" width="800" alt="">
+    <figcaption>Example: installed web app window with out-of-scope UI bar</figcaption>
 </figure>
 
-The app window above has navigated to a url (`https://airhorner.com`) outside of
-its scope (`https://diek.us/pwinter/`). The white bar above the web contents
-informs the user of this difference. This feature aims to keep the user aware of
-the content's security context.
+The app window shown above has navigated to a url (`https://airhorner.com`)
+outside of its scope (`https://diek.us/pwinter/`). The white bar above the web
+contents informs the user of this difference. This feature is important as it
+aims to keep the user aware of the content's security context.
 
 A developer may intentionally want to include documents from different origins
-in app scope. In this case, the out-of-scope bar is not necessary and could
-confuse users. Furthermore, as app scope is used as the boundary for the
-application of manifest features such as `theme_color`, documents intended to be
-part of the app but are excluded from app scope are not presented in a
-consistent manner. 
+in app scope. In this case, an obtrusive out-of-scope bar is not necessary and
+could confuse users. 
 
-## Motivating use cases 
+### Out-of-scope navigations leave the app window
 
-* Multiple TLDs
+When a page in an app window navigates to an out-of-scope URL, some browser
+implementations may handle it by opening a new tab or browsing context in a
+regular browser window. This can appear jarring for users if they are unfamiliar
+with how scope works and the content appears to still be part of the app.
+Developers can use `scope_extensions` to ensure appropriate navigations do not
+leave the app window. 
 
-* Multiple subdomains (slack, zoom, etc)
+### Navigation Capture (a.k.a. In-browser Link Capture)
 
-* Link capturing
-<!-- TODO -->
+Navigation capturing is a behavior that captures suitable browser window page
+navigations and opening them an app window when the target URL matches the scope
+of an installed app. This behavior is common on mobile platforms and is [in
+development](https://issues.chromium.org/issues/40058251) for desktop platforms
+in Chromium. Navigation capturing relies on the scope of an app to decide if a
+navigation is entering or leaving an app. Developers can use `scope_extensions`
+to ensure appropriate browser navigations open in an app window. 
 
-For example, an application might host content that is located
-in one specific origin, and rely on a login page that is out of the scope of the
-application itself to access that content. In other cases, the same application
-might be associated to multiple Top Level Domains, that might respond to
-different locales (`app.com`, `app.co.uk`, `app.co.cr`, etc).
+Navigation capturing can be combined with
+[`launch_handlers`](https://developer.mozilla.org/en-US/docs/Web/Manifest/launch_handler)
+to create a tailored app navigation experience.  
 
+### Other manifest features
+As app scope is used as the boundary for the application of manifest metadata
+such as
+[`theme_color`](https://developer.mozilla.org/en-US/docs/Web/Manifest/theme_color),
+documents intended to be part of the app but are excluded from app scope cannot
+take part and are not presented in a consistent manner. [Window Controls
+Overlay](https://developer.mozilla.org/en-US/docs/Web/API/Window_Controls_Overlay_API)
+is another example - the overlay is not applied to the titlebar when the main
+document in the app window is out-of-scope. 
 
 ## Goals
 
-- Allow sites that control multiple subdomains and top level domains to behave
-  as one contiguous web app.\
-  E.g. a site may span `example.com`, `example.co.uk` and `support.example.com`.
+- Allow developers to define an app scope using a list of origins known at
+  install time.
 
-- Allow web apps to capture user navigations to sites they are affiliated with.\
+- Allow developers to specify a scoping path for each listed origin similar to
+  how the manifest `scope` field works.
+
+- Allow web apps to capture user navigations to sites they are affiliated with.
   E.g. "News Aggregator App" capturing links navigations to examplenewssite.com.
 
 ## Non-goals
 
-<!-- TODO -->
+- Allow developers to define an app scope that includes an unknown number of
+  origins at install time, such as could be done using URL pattern matching or
+  by including all origins of an entire site. 
 
-## Proposal
+- Allow developers to define scope in a single origin using more complicated URL
+  filters, lists of filters, etc.
 
-`scope_extensions` works by ...
-<!-- TODO -->
+- Allow developers to exclude URLs from app scope.
 
-A new field `scope_extensions` in the manifest declares which origins or sites should
-join the app scope. 
+## Proposed solution
 
-To extend the app scope, a developer will need to modify the web app manifest, host
-one or more association files, and may also have to add a new response header with
-returned documents.
+To extend app scope, a developer will:
 
-A two-way handshake between the app and the extension origin/site is established
-when the origin/site hosts a `.well-known/web-app-origin-association` file. This file
-declares which apps are allowed to incorporate itself and which resources can
-participate.
+1. Add a `scope_extensions` section to the web app manifest which lists one or
+  more extensions. 
 
-<!-- TODO: Add graphic illustrating the 3 components. -->
+1. Host a `.well-known/web-app-origin-association` file at each additional
+  origin. This file establishes a two-way handshake between a unique app and the
+  origin owner. It also contains any fine-grain URL filters needed to control
+  scope.
 
 ### Manifest
-Use `scope_extensions` member in the web app manifest to declare origins in the
-the extended app scope. 
-
-<!-- TODO each origin has `scope` parameter as well. -->
 
 Example manifest located at `https://example.com/manifest.webmanifest`:
    ```json
    {
-     "id": "/",
-     "name": "Example App",
+     "id": "https://example.com/app",
+     "name": "My App",
      "display": "standalone",
      "start_url": "/app/index.html",
      "scope": "/app",
      "scope_extensions": [
-       { "type": "site", "value": "https://example.com" },
-       { "type": "site", "value": "https://example.co.uk" },
-       { "type": "origin", "value": "https://helpcenter.example-help-center.com" }
+       { "type": "origin", "value": "https://example.co.uk" },
+       { "type": "origin", "value": "https://help.example.com" }
      ]
    }
    ```
 The "Example" app has a regular scope of `http://example.com/app` and is
-extending its app scope to the sites `https://example.com`,
-`https://example.co.uk`, and the single origin 
-`https://helpcenter.example-help-center.com`. 
+extending its app scope to the origins `https://example.co.uk` and
+`https://help.example.com`.
 
-Each object in `scope_extensions` must contain both `type` and `value` string
-fields. The value of `type` must be one of `["origin" | "site"]`. The `value`
-field must contain a valid URL. 
-
-An `"origin"` extension adds that specific web origin to the app scope, while a
-`"site"` extension adds all origins that passes the
-[same-site](https://html.spec.whatwg.org/multipage/browsers.html#same-site) test with the
-specified host. 
-
-| Type   | Behavior |
-|--------|----------|
-| `origin` | The URL in `value` is converted to an [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). All allowed paths of that origin is added to the extended scope.|
-| `site` | The URL in `value` is converted to a [host](https://url.spec.whatwg.org/#hosts-(domains-and-ip-addresses)). All allowed paths of all origins that pass the [same-site test](https://html.spec.whatwg.org/multipage/browsers.html#obtain-a-site) as the host are added to the extended scope.|
-
-This format is both backward and forward compatibility. Entries with types not recognized
-by a user agent should be ignored.
+* Each entry in `scope_extensions` must contain both `type` and `value` string
+fields.
+* `type` must be `"origin"`. Other types could be added in the future.
+* `value` must a valid URL. The URL is converted to an
+  [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). 
 
 ### Association file
 
-Create a `web-app-origin-association` file that must be downloadable at
-`https://<associated origin/site>/.well-known/web-app-origin-association`. 
-This specifies a list of web apps that may include it as a scope extension.
-
-Origins/sites have the option of filtering what resources are allowed to join 
-the app scope by configuring filters in their 
-`.well-known/web-app-origin-association` file. A `scope` filter will allow paths
-to be included, working the same way as the manifest `scope` field. Other filtering
-formats can be added in the future.
+A `web-app-origin-association` file must be served from
+`https://<associatedorigin>/.well-known/web-app-origin-association`. An app is
+allowed to extend its scope to this origin if their manifest ID is found in this
+file.
 
 Example association file located at
    `https://example.co.uk/.well-known/web-app-origin-association`:
-   ```json
-   {
-     "web_apps": [{
-       "web_app_identity": "https://example.com/", 
-       "scope": "/app"
-     }, {
-       "web_app_identity": "https://associated.site.com/",
-     }]
-   }
-   ```
 
-The `web_app_identity` field must contain a valid [web application
+```json
+{
+  "https://example.com/app": {
+    "scope": "/app"   // Evaluates to https://example.co.uk/app
+  }
+}
+```
+
+* Each dictionary key must be a validly formatted [web application
 id](https://w3c.github.io/manifest/#id-member).
-
-### Resulting extended scope
-A URL is in the extended scope of a web app if both:
-  - It matches an entry in the `scope_extensions` list.
-  - That entry has been validated by fetching the
-    `<origin>/.well-known/web-app-origin-association` association file with an
-    entry matching the app's
-    [identity](https://w3c.github.io/manifest/#id-member).
-
-### Response header
-For `origin` extensions, a `web-app-origin-association` file from the extended
-origin is sufficient to complete the two-way handshake. 
-
-For `site` extensions, a `web-app-origin-association` is necessary but insufficient
-as it cannot represent every origin that passes the same-site test with the site.
-For this reason, documents from the site will need to be accompanied by a 
-`App-Scope-Extension-Allow-Id` response header. 
-
-Example header: 
-`App-Scope-Extension-Allow-Id: https://myapp.com/index.html, https://otherapp.com/index.html`
-
-This response header represents the specific origin and validates that it
-agrees to be incorporated into apps that match a list of manifest IDs.
- 
+* Each dictionary value must be an object.
+* Each dictionary value can optionally contain a `scope` string. If not
+  provided, `scope` defaults to `/`.
+* This `scope` configures the extension scope each identified app is allowed to
+  utilize.
+* This `scope` works the same way as `scope` in the manifest and is relative to
+this origin. 
 
 ## Security Considerations
 
@@ -198,8 +229,8 @@ launches into existing web app contexts.
 
 The combination of link capturing, launch handler and scope extensions leads to
 the following attack vector:
-1. User installs the TestApp web app from app.com.
-1. TestApp's scope includes site.com with valid origin associations.
+1. User installs the "TestApp" web app from app.com.
+1. TestApp's scope includes site.com with valid origin association.
 1. TestApp sets its `launch_handler` to
    ```
    {
@@ -213,20 +244,20 @@ the following attack vector:
    perform a fake navigation with the intention of duping the user into thinking
    they're on site.com.*
 
-## Future extensions
+## Future work under consideration 
 
-- More specific scoping e.g. scope suffix or include/exclude lists or [URL
-  patterns](https://wicg.github.io/urlpattern/).
-  - To be able to apply these more specific scoping rules to the primary scope
-    (including exclusion). One possible approach is to have the primary origin
-    specified in the `scope_extensions` list and have it override the behaviour
-    of `scope`.
-- Replace the constraint on manifest URLs that are bound by scope (except for
+1. More fine-grained scoping mechanisms such as include/exclude lists or [URL
+  patterns](https://wicg.github.io/urlpattern/). These mechanisms could be
+  reused in 3 difference places: in the association file, in `scope_extensions`
+  in the manifest, at the top level in the manifest.
+
+1. Change the constraint on manifest URLs that are bound by scope (except for
   `start_url`) to instead be bound by the extended scope. Validation of the
   associated origins is not required for these URLs to be part of a valid
   manifest. Prior to validation the URLs must be treated as if they were not
   specified.
-- Add an `"authorize"` field to `web-app-origin-association` e.g.:
+
+1. Add an `"authorize"` field to `web-app-origin-association` e.g.:
   ```json
   {
     "web_apps": [{
@@ -242,33 +273,31 @@ the following attack vector:
 ### Extended Scope Permissions
 
 When an application uses `scope_extensions` to expand its scope, **each
-additional scope's permissions remain the same**. Expanding scopes does not
-imply any change in permissions. The only thing that changes after being
-included in a scope is that the security UX will not appear when an app
-navigates to content served from those scopes.
+additional origin's site permissions remain the same**. Expanding scopes does
+not imply any change in permissions. 
 
 ### Additional security UX
 
-For added security when in the installed web application, the app might display
-UX that always displays the current scope that is being served, along with
-privacy and permission settings of that specific scope.
+For added security, app windows may want to implement more visible UI that
+displays the current URL being served, as well the privacy and permission
+information.
 
-![Current scope being displayed on the privacy menu of installed web
-app](images/scope-privacy-info.png)
+<figure>
+    <img src="images/scope-privacy-info.png" width="800" alt="">
+    <figcaption>Domain, privacy, and permissions info in the app menu.</figcaption>
+</figure>
 
-In the previous image, a user can always see which domain is serving content
-under the privacy menu. 
-
-## Alternatives considered
-
-<!-- TODO -->
+In the implementation shown above, the domain, privacy, and permission
+information for the current origin can be found in the app menu. The
+discoverability of this information has room for improvement.
 
 ## Related Proposals
 
-### [URL Handlers][url-handlers]
+### url_handlers
 
-The Scope Extensions proposal is intended to be a replacement for the [URL
-Handlers][url-handlers] proposal with the following changes:
+The `scope_extensions` proposal is a replacement for part of the
+[`url_handlers`](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md)
+proposal with the following changes:
  - Re-orient the goal to be focused just on expanding the set of origins/URLs in
    the web app's scope. Remove the goal of registering web apps as URL handlers
    in the user's operating system. That behaviour will be covered by individual
@@ -282,12 +311,12 @@ Handlers][url-handlers] proposal with the following changes:
  - Change the association file entries to be keyed on the [web app
    identifier](manifest-identity) rather than the web app's manifest URL (the
    former having been added to the Manifest spec in the interim).
- - Rename `"paths"` to `"include_paths"` in the association file entries.
+ - Replace `"paths"` with `scope` in the association file entries.
  - Add an "authorize" field to the association file entries for the associated
    origin to provide explicit opt-in signals for security sensitive
    capabilities.
 
+### Others
 
-[launch-handler]: https://github.com/WICG/sw-launch/blob/main/launch_handler.md
-[url-handlers]: https://github.com/WICG/pwa-url-handler/blob/main/explainer.md
-[manifest-identity]: https://w3c.github.io/manifest/#dfn-identity
+* [launch-handler](https://github.com/WICG/sw-launch/blob/main/launch_handler.md)
+* [manifest-identity](https://w3c.github.io/manifest/#dfn-identity)
