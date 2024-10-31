@@ -32,7 +32,8 @@ using the `scope_extensions` manifest field detailed below.
 ## What apps could benefit?
 
 For each example below, developers have expressed interest in publishing a
-single installable app instead of one per origin with distinct app identities. 
+single installable app instead of one per origin with distinct [manifest
+ids](https://www.w3.org/TR/appmanifest/#id-member). 
 
 ### TLD locales
 
@@ -133,7 +134,8 @@ document in the app window is out-of-scope.
   how the manifest `scope` field works.
 
 - Allow web apps to capture user navigations to sites they are affiliated with.
-  E.g. "News Aggregator App" capturing links navigations to examplenewssite.com.
+  E.g. "Productivity Suite" app capturing links navigations to
+  presentations.productivity.com.
 
 ## Non-goals
 
@@ -180,7 +182,9 @@ extending its app scope to the origins `https://example.co.uk` and
 
 * Each entry in `scope_extensions` must contain both `type` and `value` string
 fields.
-* `type` must be `"origin"`. Other types could be added in the future.
+* `type` must be `"origin"`. Other types could be added in the future. One
+  future addition could be a `site` type which includes a dynamic number of
+  sub-domain origins (stated above as a non-goal). 
 * `value` must a valid URL. The URL is converted to an
   [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). 
 
@@ -188,7 +192,7 @@ fields.
 
 A `web-app-origin-association` file must be served from
 `https://<associatedorigin>/.well-known/web-app-origin-association`. An app is
-allowed to extend its scope to this origin if their manifest ID is found in this
+allowed to extend its scope to this origin if their manifest id is found in this
 file.
 
 Example association file located at
@@ -202,15 +206,16 @@ Example association file located at
 }
 ```
 
-* Each dictionary key must be a validly formatted [web application
-id](https://w3c.github.io/manifest/#id-member).
+* Each dictionary key must be a validly formatted [manifest
+  id](https://w3c.github.io/manifest/#id-member).
 * Each dictionary value must be an object.
 * Each dictionary value can optionally contain a `scope` string. If not
   provided, `scope` defaults to `/`.
 * This `scope` configures the extension scope each identified app is allowed to
   utilize.
-* This `scope` works the same way as `scope` in the manifest and is relative to
-this origin. 
+* This `scope` works the same way as the
+[`scope`](https://www.w3.org/TR/appmanifest/#scope-member) member in the
+manifest and is relative to this origin. 
 
 ## Security Considerations
 
