@@ -9,7 +9,16 @@ This explainer proposes a way to have PWAs fully update their identities in a sa
 1. Uses less resources, making network usage more efficient.  
 2. Prevent user confusion by showing the update UX less often.
 
-Currently, while the manifest update process is well defined, the detection of when an update should happen is not, leading to [problems](#chromium-problems). This proposal attempts to fix that.
+# **Background**
+
+[PWAs](https://web.dev/explore/progressive-web-apps) are app experiences built on the web, and like native apps, they support updating themselves. Developers have the option of changing any field in the manifest (including the [security sensitive fields](https://www.w3.org/TR/appmanifest/#dfn-security-sensitive-members)), and the user agent can then apply the changes in a way as defined in the [manifest updating spec](https://www.w3.org/TR/appmanifest/#updating). One of the ways Chromium does it is by showing the update dialog, as seen below under the `Chromium PWA update detection` section. This is done to prevent known [phishing risks](#phishing).
+
+Updates on PWAs are important because they allow:
+- Rebranding via icon and name changes.
+- Icon changes via changing icon urls in the manifest.
+- Minor visual changes in the icon even if the url has stayed the same (due to dynamic re-encoding by CDNs).
+
+For all these use-cases, the detection of when an update should happen is not clearly defined in the spec, leading to [problems](#chromium-problems). This proposal attempts to fix that.
 
 # [**Chromium PWA update detection, and its problems**](#chromium-problems)
 
@@ -20,6 +29,8 @@ Currently, detecting that a PWA needs an update goes like this:
 - If there is a difference, an update happens.  
   - If the difference is in security sensitive fields, like the name, icon or short name, the user agent shows a UX notifying the user that an update is supposed to happen.  
   - The UX shows the differences between the old and the new sensitive fields, and asks the user to either accept the changes or uninstall the app.
+
+![Update dialogs](./images/current-chromium-dialogs.png)
 
 ## Problem: Update check wastes bandwidth, requiring a throttle
 
@@ -46,18 +57,19 @@ The dialog shows up whenever Chrome sees the new manifest & detects changes. Dev
 
 The current manifest update process gets the job done, but it could be better in a way so that the problems above can be fixed:
 
-* Provide a consistent way to detect when a manifest update should happen.  
-* Users should not see an update dialog more than necessary to confirm security-sensitive changes.  
-  * Tiny image data changes below a threshold should not trigger the update dialog in the algorithm, even if the image URL remains the same. 
-* Developers should have more control over when the update dialog may show to users.  
-* Unnecessary network traffic should be minimized.  
-* Encourage developers to set the manifest 'id' field, preventing a known [foot-gun](https://github.com/w3c/manifest/issues/1148).
+* [**Consistency**](#consistency): Provide a consistent way to detect when a manifest update should happen.
+* [**Preventing unnecessary user interruption**](#useint): Users should not see an update dialog more than necessary to confirm security-sensitive changes.
+* [**User agent flexibility**](#uaf): It should be possible for users agents to use their judgement to block updates for known bad sites, allow known trusted apps to update without UX, or allow tiny visual changes to icons without requiring UX.
+* [**Developer control**](#devc): Developers should have more control over when the update dialog may show to users.
+* [**Reduce network traffic**](#traffic): Unnecessary network traffic should be minimized.
+* [**Prevent manifest id foot-gun**](#footgun): Encourage developers to set the manifest 'id' field, preventing a known [foot-gun](https://github.com/w3c/manifest/issues/1148).
 
 # **Proposal: Introduce 'update\_token', ignore icon changes by default**
 
 The existence and non-existence of the `update_token` field will be used to trigger manifest updating logic, based on the following guidelines:
 
-* `update_token` is parsed if-and-only-if an 'id' field is set.
+* `update_token` is parsed if-and-only-if an 'id' field is set. This helps solve the goal of preventing the [`manifest id foot-gun`](#footgun).
+
 
 ```
 
@@ -86,10 +98,10 @@ Without the presence of an `update_token` in the manifest, **ONLY** icon updates
 
 The below table introduces all possible combinations of behavior that can happen based on the status of the `update_token` field in `seen_manifest` or in `saved_manifest.`
 
-| saved ↓ seen → | “foo” | unspecified |
-| :---: | :---: | :---: |
-| **“foo”** | Token based | Token based |
-| **unspecified** | Token based | Non token based |
+| saved ↓ seen → | “foo2” | “foo” | unspecified |
+| :---: | :---: | :---: | :---: |
+| **“foo”** | Token based | No update | Token-based |
+| **unspecified** | Token based | Token based | Non token based |
 
 ### Pre-requisites:
 
@@ -97,21 +109,19 @@ The below table introduces all possible combinations of behavior that can happen
 
 # **How does this solve the problem?**
 
-Looking at the goals above and tied it to the proposal:
+Let’s review the goals again to see how this proposal meets them: 
 
-> Provide a consistent way to detect when a manifest update should happen.
+> Goal: [`Consistency`](#consistency)
 
-The presence of a different value of `update_token` compared to the one saved, and icon urls changing are the only 2 use-cases where a manifest update can happen.
+The presence of a different value of `update_token` compared to the one saved, and icon urls changing are the only 2 use-cases that can trigger a manifest update.
 
-> Users should not see an update dialog more than necessary to confirm security-sensitive changes.
-> Developers should have more control over when the update dialog may show to users.
-
+> Goal: [`Developer Control`](#devc), [`Preventing unnecessary user interruption.`](#useint)
 
 The users should only see the dialog when the developer wants them to. To do so, the developer has to do either of the 2 things specified (AKA change the  `update_token` value or change the icon urls).
 
-> Unnecessary network traffic should be minimized.
+> Goal: [`Reduce network traffic`](#traffic)
 
-The most network heavy traffic is downloading icons, which will only happen when the developer wants them to, and not randomly.
+The most network heavy traffic is downloading icons, which will only happen when the developer wants them to, and not up to once per day every time the app is accessed.
 
 # **Alternatives considered**
 
@@ -130,37 +140,6 @@ Cons:
 
 While this solution is simple to implement, it breaks existing update behavior, and is also cumbersome for developers, who would have to update where they serve their manifest from every time a change is made.
 
-# **Accessibility, Privacy, and Security Considerations** 
-
-## Abuse Scenarios
-
-### Phishing
-
-A malicious site could add icons and names to its manifest so that it comes across as a non-malicious PWA (like a calculator app). On installation, the site can update the icon, name and short name fields to mimic that of a (bank app) behind the scenes, and end users are tricked into entering their information into a malicious site.
-
-See example below of how this could happen:  
-![Malicious Identity](./images/malicious-identity-example.png)
-
-**Mitigation:** The presence of a UX showing the end user the difference in the icons mitigates this risk.
-
-Also, with the icon update threshold of 10%, the developer will have to make the user visit the site multiple times to trigger silent updates, and make tiny incremental changes to take advantage of the background icon algorithm in order to evade detection. That makes this abuse scenario highly unlikely for the user.
-
-## UX
-
-The current UX dialog being shown to users on Chrome when a security sensitive update happens looks like the following:
-
-![Current UX](./images/current-app-identity-ux.png)
-
-There are a few problems with this UX:
-
-- The wording is a bit strong, and comes across as if PWAs are “tricky”.  
-- The wording around the options to either accept the new manifest fields or uninstall the app could be made more mellow.
-
-**Solution:** The wording can be made more mellower since manifest updates are now being moved to becoming the developer’s intention.
-
-Proposed UX is something like the following (still under investigation):  
-![Proposed UX](./images/proposed-app-identity-ux.png)
-
 ## **Future Considerations**
 
 ### Allow developers to use javascript to trigger a pending update
@@ -173,3 +152,13 @@ This proposal allows developers to control when an update happens in general for
 - The user agent can perform the following tasks if they want:  
   - Notify the end user that the app has been updated, like native apps do.  
   - Provide a warning string in the console for developers if they change icons but forget to add/update the `update_token`.
+
+## [Phishing](#phishing)
+
+A malicious actor can set up an innocent site to come across as non-malicious, and once the user installs it, they can trick the user by acting as a different site by updating itself silently. Some examples of how this can happen:
+- **Buyout**: Where a malicious actor buys a non-malicious site (e.g. Wordle) and updates itself to mimic a bank app.
+- **Bait-and-switch**: A site for a simple use-case (like an innocent calculator app) updates itself to mimic a bank app.
+
+This is currently handled on Chromium by:
+- Showing a dialog if the security sensitive fields have changed.
+- Using [Safe Browsing](https://support.google.com/chrome/answer/9890866?hl=en&co=GENIE.Platform%3DAndroid) on Chrome. 
