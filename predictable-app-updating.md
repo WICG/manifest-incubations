@@ -4,7 +4,7 @@ Author: Dibyajyoti Pal (dibyapal@chromium.org)
 
 # **Introduction**
 
-This explainer proposes a way to have PWAs fully update their identities in a safe and resourceful manner on Desktop and Android, to further bridge the gap between PWAs and native apps. This is done by updating the [manifest spec](https://www.w3.org/TR/appmanifest/#web-application-manifest) to have a specific field for making updates more deterministic by the developer, and for providing a consistent experience. The proposal attempts to do so in a way that:
+This explainer proposes a way to have PWAs fully update their identities in a safe and resourceful manner, to further bridge the gap between PWAs and native apps. This is done by updating the [manifest spec](https://www.w3.org/TR/appmanifest/#web-application-manifest) to have a specific field for making updates more deterministic by the developer, and for providing a consistent experience. The proposal attempts to do so in a way that:
 
 1. Uses less resources, making network usage more efficient.  
 2. Prevent user confusion by showing the update UX less often.
