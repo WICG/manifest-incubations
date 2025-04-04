@@ -1625,38 +1625,34 @@
       </h3>
       <p>
         Each <dfn>scope extension</dfn> extends the [=manifest/navigation scope
-        of a manifest=] by describing groups of URLs that should be treated as
-        being [=manifest/within scope=].
-      </p>
-      <p>
-        The user agent MUST [=process the scope_extensions member=] and 
-        [=validate scope extensions=] to calculate [=scope extensions=] that 
-        should be applied.
+        of a manifest=] by describing [=URLs=] that should be treated as being 
+        [=manifest/within scope=]. [=Scope extensions=] can only add URLs to 
+        scope, not remove them.
       </p>
       <p>
         The [=manifest's=] <code><dfn data-export="" data-dfn-for="manifest">
-          scope_extensions</dfn></code> member describes [=scope extensions=].
+          scope_extensions</dfn></code> member represents a list of desired
+          [=scope extensions=].
       </p>
-
+      <p>
+        The user agent MUST [=process the scope_extensions member=] and 
+        [=validate scope extensions=] before applying them.
+      </p>
       <p class="note">
-        <!-- TODO -->
-         Talk about how [=URL/within scope=] needs to be modified...
+        The [=manifest's=] `scope` member only allows URLs to be added to scope
+        from a single [=origin=]. The `scope_extensions` member allows URLs to
+        be added from multiple [=origins=].
       </p>
-      <p class="note">
-        <!-- TODO -->
-         Talk about how `scope` only allows including URLs from a single origin to scope...
-      </p>
-
       <section class="informative">
         <h2>
           Usage Example
         </h2>
         <p>
           The following shows a [=manifest=] for an application with extended
-          scope. The manifest [=URL=] is 
-          "https://example.com/manifest.webmanifest".
+          scope. The [=manifest url=] is 
+          `https://example.com/manifest.webmanifest`.
         </p>
-        <pre class="example json" title="Application with extended scope">
+        <pre class="example json" title="Manifest with scope_extensions">
           {
             "id": "https://example.com/app",
             "name": "My App",
@@ -1673,15 +1669,23 @@
           }
         </pre>
         <p>
-          The following shows a [=web-app-origin-association file=] hosted at 
-          "https://example.co.uk/.well-known/web-app-origin-association". This
-          file is hosted at the same [=origin=] used in the [=scope extension=]
-          above.
+          The following shows 2 [=web-app-origin-association=] files which can
+          be downloaded from the `.well-known` path of the [=origins=]  listed 
+          in the `scope_extensions` member.
         </p>
-        <pre class="example json" title="web-app-origin-association">
+        <pre class="example json" 
+        title="https://example.co.uk/.well-known/web-app-origin-association">
           {
             "https://example.com/app": {
               "scope": "/app"   
+            }
+          }
+        </pre>
+        <pre class="example json" 
+        title="https://help.example.com/.well-known/web-app-origin-association">
+          {
+            "https://example.com/app": {
+              "scope": "/"   
             }
           }
         </pre>
@@ -1758,7 +1762,7 @@
     <section>
       <h2>web-app-origin-association</h3>
       <!-- TODO -->
-      <p>A <dfn>web-app-origin-association file</dfn> is... </p>
+      <p>A <dfn>web-app-origin-association</dfn> file is... </p>
     </section>
 
     <section>
