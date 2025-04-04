@@ -1624,14 +1624,27 @@
         `scope_extensions` member
       </h3>
       <p>
-        <!-- TODO -->
-        A <dfn>scope extension</dfn> is a ... 
+        Each <dfn>scope extension</dfn> extends the [=manifest/navigation scope
+        of a manifest=] by describing groups of URLs that should be treated as
+        being [=manifest/within scope=].
       </p>
       <p>
+        The user agent MUST [=process the scope_extensions member=] and 
+        [=validate scope extensions=] to calculate [=scope extensions=] that 
+        should be applied.
+      </p>
+      <p>
+        The [=manifest's=] <code><dfn data-export="" data-dfn-for="manifest">
+          scope_extensions</dfn></code> member describes [=scope extensions=].
+      </p>
+
+      <p class="note">
         <!-- TODO -->
-        The [=manifest's=] <code><dfn data-export="" data-dfn-for=
-        "manifest">scope_extensions</dfn></code> member lists <a>scope
-        extensions</a> 
+         Talk about how [=URL/within scope=] needs to be modified...
+      </p>
+      <p class="note">
+        <!-- TODO -->
+         Talk about how `scope` only allows including URLs from a single origin to scope...
       </p>
 
       <section class="informative">
@@ -1674,6 +1687,7 @@
         </pre>
       </section>
 
+      <section>
       <h2>Processing the scope_extensions member</h2>
       <p>
         To <dfn>process the `scope_extensions` member</dfn>, given
@@ -1704,17 +1718,46 @@
             </li>
           </ol>
         </li>
+        <li>[=Validate scope extensions=] given |processedScopeExtensions|</li>
       </ol>
+      </section>
 
-      <h2>Validating the extensions</h2>
+      <section>
+      <h2>Validating scope extensions</h2>
       <p>
-        <!-- TODO -->
+        To <dfn>validate scope extensions</dfn>, given
+        [=ordered map=] |manifest:ordered map|:
       </p>
+      <ol class="algorithm">
+        <!-- <li>Let |processedScopeExtensions:list| be a new [=list=].
+        </li>
+        <li>Set |manifest|["scope_extensions"] to |processedScopeExtensions|.
+        </li>
+        <li>If |json|["scope_extensions"] doesn't [=map/exist=] or
+          |json|["scope_extensions"] is not a [=list=], return.
+        </li>
+        <li>[=list/For each=] <var>entry</var> of |json|["scope_extensions"]:
+          <ol>
+            <li>If <var>entry</var>["type"] or <var>entry</var>["value"]
+              is undefined, [=iteration/continue=].
+            <li>If <var>entry</var>["type"] is not "origin", 
+              [=iteration/continue=].
+            <li>If <var>entry</var>["value"] is not a valid [=URL=], 
+              [=iteration/continue=].
+            <li>Set <var>entry</var>["value"] to its [=origin=].
+            </li>
+            <li>[=list/append=] <var>entry</var> to 
+              <var>processedScopeExtensions</var>.
+            </li>
+            </li>
+          </ol>
+        </li> -->
+      </ol>
+      </section>
 
       <h3>web-app-origin-association</h3>
       <!-- TODO -->
       <p>A <dfn>web-app-origin-association file</dfn> is... </p>
-      <p>Handshake...</p>
 
       <h2>Processing the web-app-origin-association file</h3>
       <p>
@@ -1723,6 +1766,11 @@
         |origin_associations:ordered map|:
         <!-- TODO -->
       </p>
+    </section>
+
+    <section>
+      <h2>Applying scope extensions</h2>
+      <!-- TODO -->
     </section>
 
     <section>
