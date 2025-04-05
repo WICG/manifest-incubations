@@ -1626,8 +1626,8 @@
       <p>
         Each <dfn>scope extension</dfn> extends the [=manifest/navigation scope
         of a manifest=] by describing [=URLs=] that should be treated as being 
-        [=manifest/within scope=]. [=Scope extensions=] can only add URLs to 
-        scope, not remove them.
+        [=manifest/within scope=]. [=Scope extensions=] can add URLs to scope 
+        but not remove them.
       </p>
       <p>
         The [=manifest's=] <code><dfn data-export="" data-dfn-for="manifest">
@@ -1693,6 +1693,26 @@
 
       <section>
       <h2>Processing the scope_extensions member</h2>
+      
+      <p>
+        An <dfn>extension type</dfn> represents a method of selecting URLs to be
+        added to the scope as an extension. 
+      </p>
+      <p>
+        This specification defines the following [=extension types=]:
+      </p>
+      <dl>
+        <dt>
+          <dfn class="export" data-dfn-for="extension type">origin</dfn>
+        </dt>
+        <dd>
+          Adds URLs from a single [=origin=] as a [=scope extension=].
+        </dd>
+      </dl>
+      <p>
+        The <dfn>extension types list</dfn> is the [=list=] 
+        « "[=extension type/origin=]" ».
+      </p>
       <p>
         To <dfn>process the `scope_extensions` member</dfn>, given
         [=ordered map=] |json:ordered map| and [=ordered map=]
@@ -1710,68 +1730,81 @@
           <ol>
             <li>If <var>entry</var>["type"] or <var>entry</var>["value"]
               is undefined, [=iteration/continue=].
-            <li>If <var>entry</var>["type"] is not "origin", 
-              [=iteration/continue=].
+            </li>
+            <li>If [=extension types list=] doesn't [=list/contain=]
+              |entry|["type"], [=iteration/continue=].
+            </li>
             <li>If <var>entry</var>["value"] is not a valid [=URL=], 
               [=iteration/continue=].
-            <li>Set <var>entry</var>["value"] to its [=origin=].
             </li>
-            <li>[=list/append=] <var>entry</var> to 
+            <li>Set <var>entry</var>["value"] to its own [=origin=].
+            </li>
+            <li>Validate |entry| using the steps from [=validate scope 
+              extensions=], given |entry|, [=boolean=] |succeeded:boolean|, 
+              [=URL=] |scope:URL|
+            </li>
+            <li>If |succeeded| is false, [=iteration/continue=].
+            </li>
+            <li>
+              Set |entry|["scope"] to |scope|.
+            </li>
+            <li>[=list/Append=] <var>entry</var> to 
               <var>processedScopeExtensions</var>.
-            </li>
             </li>
           </ol>
         </li>
-        <li>[=Validate scope extensions=] given |processedScopeExtensions|</li>
       </ol>
       </section>
-
       <section>
       <h2>Validating scope extensions</h2>
       <p>
-        To <dfn>validate scope extensions</dfn>, given
-        [=ordered map=] |manifest:ordered map|:
+        To <dfn>validate scope extension</dfn>, given [=ordered map=] 
+        |extension:ordered map|, [=boolean=] |succeeded:boolean|, and [=URL=] 
+        |scope:URL|:
       </p>
       <ol class="algorithm">
-        <!-- <li>Let |processedScopeExtensions:list| be a new [=list=].
+        <li>Let |download_url| be the result of constructing 
+          `web-app-origin-association` URL from the [=origin=] in 
+          |extension|["value"].
         </li>
-        <li>Set |manifest|["scope_extensions"] to |processedScopeExtensions|.
+        <li>Attempt to download the JSON file from |download_url|. 
         </li>
-        <li>If |json|["scope_extensions"] doesn't [=map/exist=] or
-          |json|["scope_extensions"] is not a [=list=], return.
+        <li>If the download fails, set |succeeded| to false and return.
         </li>
-        <li>[=list/For each=] <var>entry</var> of |json|["scope_extensions"]:
-          <ol>
-            <li>If <var>entry</var>["type"] or <var>entry</var>["value"]
-              is undefined, [=iteration/continue=].
-            <li>If <var>entry</var>["type"] is not "origin", 
-              [=iteration/continue=].
-            <li>If <var>entry</var>["value"] is not a valid [=URL=], 
-              [=iteration/continue=].
-            <li>Set <var>entry</var>["value"] to its [=origin=].
-            </li>
-            <li>[=list/append=] <var>entry</var> to 
-              <var>processedScopeExtensions</var>.
-            </li>
-            </li>
-          </ol>
-        </li> -->
+        <li>
+          Let downloaded content be |json:ordered map|.
+        </li>
+        <!-- TODO Let |association| be |json|["manifest id of app"].
+        TODO If |association| doesn't exist or is not a [=map=], set succeeded to false and return; -->
       </ol>
       </section>
 
     <section>
-      <h2>web-app-origin-association</h3>
-      <!-- TODO -->
-      <p>A <dfn>web-app-origin-association</dfn> file is... </p>
-    </section>
-
-    <section>
-      <h2>Processing the web-app-origin-association file</h3>
+      <h2>Processing the web-app-origin-association file</h2>
+      <p>A <dfn>web-app-origin-association</dfn> file is a JSON file that can be
+        used to associate the origin it is in with one or more web applications.
+        It does this by referencing manifest [=manifest/ids=]. 
+      </p>
+      <p>
+        A [=web-app-origin-association=] file is expected to be downloadable
+        from <code>[origin]/.well-known/web-app-origin-association</code>.
+      </p>
       <p>
         To <dfn>process the `web-app-origin-association` file</dfn>, given
         [=ordered map=] |json:ordered map| and [=ordered map=]
         |origin_associations:ordered map|:
-        <!-- TODO -->
+      <ol class="algorithm">
+
+        <li>Let |processedAssociations:ordered map| be a new [=ordered map=].
+        </li>
+
+        <li>Set |manifest|["scope_extensions"] to |processedScopeExtensions|.
+        </li>
+
+        <li>If |json|["scope_extensions"] doesn't [=map/exist=] or
+          |json|["scope_extensions"] is not a [=list=], return.
+        </li>
+      </ol>
       </p>
     </section>
     <section>
