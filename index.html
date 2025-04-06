@@ -1638,21 +1638,21 @@
         The user agent MUST [=process the scope_extensions member=] and 
         [=validate scope extensions=] before applying them.
       </p>
-      <p class="note">
+      <aside class="note">
         The [=manifest's=] `scope` member only allows URLs to be added to scope
         from a single [=origin=]. The `scope_extensions` member allows URLs to
         be added from multiple [=origins=].
-      </p>
+      </aside>
       <section class="informative">
         <h2>
           Usage Example
         </h2>
         <p>
-          The following shows a [=manifest=] for an application with extended
-          scope. The [=manifest url=] is 
-          `https://example.com/manifest.webmanifest`.
+          The following example shows a [=manifest=] for an application with 
+          extended scope.
         </p>
-        <pre class="example json" title="Manifest with scope_extensions">
+        <pre class="example json" 
+          title="https://example.com/manifest.webmanifest">
           {
             "id": "https://example.com/app",
             "name": "My App",
@@ -1689,30 +1689,14 @@
             }
           }
         </pre>
+        <p> 
+          Thus the scope of this app includes all URLs that are
+          [=manifest/within scope=] of each of `https://example.com/app`, 
+          `https://example.co.uk/app`, and `https://help.example.com`. 
+        </p>
       </section>
-
       <section>
       <h2>Processing the scope_extensions member</h2>
-      
-      <p>
-        An <dfn>extension type</dfn> represents a method of selecting URLs to be
-        added to the scope as an extension. 
-      </p>
-      <p>
-        This specification defines the following [=extension types=]:
-      </p>
-      <dl>
-        <dt>
-          <dfn class="export" data-dfn-for="extension type">origin</dfn>
-        </dt>
-        <dd>
-          Adds URLs from a single [=origin=] as a [=scope extension=].
-        </dd>
-      </dl>
-      <p>
-        The <dfn>extension types list</dfn> is the [=list=] 
-        « "[=extension type/origin=]" ».
-      </p>
       <p>
         To <dfn>process the `scope_extensions` member</dfn>, given
         [=ordered map=] |json:ordered map| and [=ordered map=]
@@ -1731,8 +1715,8 @@
             <li>If <var>entry</var>["type"] or <var>entry</var>["value"]
               is undefined, [=iteration/continue=].
             </li>
-            <li>If [=extension types list=] doesn't [=list/contain=]
-              |entry|["type"], [=iteration/continue=].
+            <li>If |entry|["type"] is not `origin`, 
+              [=iteration/continue=].
             </li>
             <li>If <var>entry</var>["value"] is not a valid [=URL=], 
               [=iteration/continue=].
@@ -1740,13 +1724,13 @@
             <li>Set <var>entry</var>["value"] to its own [=origin=].
             </li>
             <li>Validate |entry| using the steps from [=validate scope 
-              extensions=], given |entry|, [=boolean=] |succeeded:boolean|, 
-              [=URL=] |scope:URL|
+              extensions=], given [=ordered map=] |entry:ordered map|, and 
+              [=URL=] |resolved_scope:URL|.
             </li>
-            <li>If |succeeded| is false, [=iteration/continue=].
+            <li>If validation failed, [=iteration/continue=].
             </li>
             <li>
-              Set |entry|["scope"] to |scope|.
+              Set |entry|["scope"] to |resolved_scope|.
             </li>
             <li>[=list/Append=] <var>entry</var> to 
               <var>processedScopeExtensions</var>.
@@ -1754,33 +1738,44 @@
           </ol>
         </li>
       </ol>
+      <aside class="note">
+        `origin` is the only type of scope extension entry that is 
+        currently supported. Other types may be added in the future to
+        support different use cases. 
+      </aside>
       </section>
       <section>
       <h2>Validating scope extensions</h2>
       <p>
         To <dfn>validate scope extension</dfn>, given [=ordered map=] 
-        |extension:ordered map|, [=boolean=] |succeeded:boolean|, and [=URL=] 
-        |scope:URL|:
+        |extension:ordered map|, [=URL=] |manifest_id:URL| and [=URL=] 
+        |resolved_scope:URL|:
       </p>
       <ol class="algorithm">
+        <li>Set |resolved_scope| to empty URL.</li>
         <li>Let |download_url| be the result of constructing 
-          `web-app-origin-association` URL from the [=origin=] in 
+          [=web-app-origin-association=] URL from the [=origin=] in 
           |extension|["value"].
         </li>
         <li>Attempt to download the JSON file from |download_url|. 
         </li>
-        <li>If the download fails, set |succeeded| to false and return.
+        <li>If the download fails, return false.
         </li>
         <li>
-          Let downloaded content be |json:ordered map|.
+          Let downloaded file be |json:ordered map|.
         </li>
-        <!-- TODO Let |association| be |json|["manifest id of app"].
-        TODO If |association| doesn't exist or is not a [=map=], set succeeded to false and return; -->
+        <li>If |json|[|manifest_id|] does not exist or is not an 
+          [=ordered map=], return false</li>
+        <li>If |json|[|manifest_id|]["scope"] does not exist or is not 
+          [=string=], return false</li>
+        <li>Let [=string=] |scope_path:string| be 
+          |json|[|manifest_id|]["scope"]</li>
+        <li>Let [=URL] |resolved_scope:URL| be the result of resolving
+          |scope_path| against the origin |extension|["value"].
+        </li>
+        <li>return true</li>
       </ol>
-      </section>
-
-    <section>
-      <h2>Processing the web-app-origin-association file</h2>
+      <h3>The web-app-origin-association file</h3>
       <p>A <dfn>web-app-origin-association</dfn> file is a JSON file that can be
         used to associate the origin it is in with one or more web applications.
         It does this by referencing manifest [=manifest/ids=]. 
@@ -1789,30 +1784,14 @@
         A [=web-app-origin-association=] file is expected to be downloadable
         from <code>[origin]/.well-known/web-app-origin-association</code>.
       </p>
-      <p>
-        To <dfn>process the `web-app-origin-association` file</dfn>, given
-        [=ordered map=] |json:ordered map| and [=ordered map=]
-        |origin_associations:ordered map|:
-      <ol class="algorithm">
-
-        <li>Let |processedAssociations:ordered map| be a new [=ordered map=].
-        </li>
-
-        <li>Set |manifest|["scope_extensions"] to |processedScopeExtensions|.
-        </li>
-
-        <li>If |json|["scope_extensions"] doesn't [=map/exist=] or
-          |json|["scope_extensions"] is not a [=list=], return.
-        </li>
-      </ol>
-      </p>
     </section>
     <section>
       <h2>Applying scope extensions</h2>
-      <!-- TODO -->
+      <p>The user agent MAY apply extended scope to some features but 
+        not others.
+      </p>
     </section>
     </section>
-
     <section>
       <h2>
         External application resource
