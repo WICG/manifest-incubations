@@ -1618,7 +1618,6 @@
         <a>related applications</a> instead.
       </p>
     </section>
-
     <section>
       <h3>
         `scope_extensions` member
@@ -1631,8 +1630,8 @@
       </p>
       <p>
         The [=manifest's=] <code><dfn data-export="" data-dfn-for="manifest">
-          scope_extensions</dfn></code> member represents a list of desired
-          [=scope extensions=].
+          scope_extensions</dfn></code> member represents a list of an
+          application's desired [=scope extensions=].
       </p>
       <p>
         The user agent MUST [=process the scope_extensions member=] and 
@@ -1690,9 +1689,10 @@
           }
         </pre>
         <p> 
-          Thus the scope of this app includes all URLs that are
-          [=manifest/within scope=] of each of `https://example.com/app`, 
-          `https://example.co.uk/app`, and `https://help.example.com`. 
+          The navigation scope of this app should be all URLs that are 
+          [=manifest/within scope=] of each of 
+          `https://example.com/app`, `https://example.co.uk/app`, and 
+          `https://help.example.com`. 
         </p>
       </section>
       <section>
@@ -1740,7 +1740,7 @@
       </ol>
       <aside class="note">
         `origin` is the only type of scope extension entry that is 
-        currently supported. Other types may be added in the future to
+        currently specified. Other types may be added in the future to
         support different use cases. 
       </aside>
       </section>
