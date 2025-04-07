@@ -1757,23 +1757,22 @@
           [=web-app-origin-association=] URL from the [=origin=] in 
           |extension|["value"].
         </li>
-        <li>Attempt to download the JSON file from |download_url|. 
+        <li>Let [=ordered map=] |json:ordered map| be the result of downloading
+          |download_url|. 
         </li>
         <li>If the download fails, return false.
         </li>
-        <li>
-          Let downloaded file be |json:ordered map|.
-        </li>
         <li>If |json|[|manifest_id|] does not exist or is not an 
-          [=ordered map=], return false</li>
-        <li>If |json|[|manifest_id|]["scope"] does not exist or is not 
-          [=string=], return false</li>
-        <li>Let [=string=] |scope_path:string| be 
-          |json|[|manifest_id|]["scope"]</li>
-        <li>Let [=URL] |resolved_scope:URL| be the result of resolving
-          |scope_path| against the origin |extension|["value"].
+          [=ordered map=], return false.</li>
+        <li>Let [=string=] |scope_path:string| be "/".</li>
+
+        <li>If |json|[|manifest_id|]["scope"] exists and is [=string=], 
+          set |scope_path| to |json|[|manifest_id|]["scope"]. 
         </li>
-        <li>return true</li>
+        <li>Set |resolved_scope:URL| be the result of parsing |scope_path| with 
+          |extension|["value"] as the base URL.
+        </li>
+        <li>return true.</li>
       </ol>
       <h3>The web-app-origin-association file</h3>
       <p>A <dfn>web-app-origin-association</dfn> file is a JSON file that can be
