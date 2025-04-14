@@ -10,9 +10,10 @@ This explainer proposes a new `scope_extensions` [Web Application
 Manifest](https://www.w3.org/TR/appmanifest/) member that extends the concept of
 [app scope](https://www.w3.org/TR/appmanifest/#understanding-scope). 
 
-The scope of an installed web app "restricts the URLs to which the manifest is
+The scope of an installed web app ["restricts the URLs to which the manifest is
 applied and provides a means to 'deep link' into a web application from other
-applications." User agents apply metadata in the manifest to documents [within
+applications."](https://www.w3.org/TR/appmanifest/#abstract) User agents apply
+metadata in the manifest to documents [within
 scope](https://www.w3.org/TR/appmanifest/#dfn-within-scope) and often apply
 differential UX treatments to make it obvious when an app window navigates to
 documents outside of scope.
@@ -96,7 +97,7 @@ could confuse users.
 
 When a page in an app window navigates to an out-of-scope URL, some browser
 implementations may handle it by opening a new tab or browsing context in a
-regular browser window. This can appear jarring for users if they are unfamiliar
+regular browser window. This can appear jarring to users if they are unfamiliar
 with how scope works and the content appears to still be part of the app.
 Developers can use `scope_extensions` to ensure appropriate navigations do not
 leave the app window. 
@@ -171,8 +172,8 @@ Example manifest located at `https://example.com/manifest.webmanifest`:
      "start_url": "/app/index.html",
      "scope": "/app",
      "scope_extensions": [
-       { "type": "origin", "value": "https://example.co.uk" },
-       { "type": "origin", "value": "https://help.example.com" }
+       { "type": "origin", "origin": "https://example.co.uk" },
+       { "type": "origin", "origin": "https://help.example.com" }
      ]
    }
    ```
@@ -180,20 +181,19 @@ The "Example" app has a regular scope of `http://example.com/app` and is
 extending its app scope to the origins `https://example.co.uk` and
 `https://help.example.com`.
 
-* Each entry in `scope_extensions` must contain both `type` and `value` string
+* Each entry in `scope_extensions` must contain both `type` and `origin` string
 fields.
 * `type` must be `"origin"`. Other types could be added in the future. One
   future addition could be a `site` type which includes a dynamic number of
   sub-domain origins (stated above as a non-goal). 
-* `value` must a valid URL. The URL is converted to an
+* `origin` must a valid URL. The URL is converted to an
   [origin](https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-tuple). 
 
 ### Association file
 
-A `web-app-origin-association` file must be served from
-`https://<associatedorigin>/.well-known/web-app-origin-association`. An app is
-allowed to extend its scope to this origin if their manifest id is found in this
-file.
+A `web-app-origin-association` file must be served from `https://<associated
+origin>/.well-known/web-app-origin-association`. An app is allowed to extend its
+scope to this origin if its manifest id is found in this file.
 
 Example association file located at
    `https://example.co.uk/.well-known/web-app-origin-association`:
@@ -254,7 +254,7 @@ the following attack vector:
 1. More [fine-grained scoping
   mechanisms](https://github.com/w3c/manifest/issues/996) such as
   include/exclude lists or [URL patterns](https://wicg.github.io/urlpattern/).
-  These mechanisms could be reused in 3 difference places: in the association
+  These mechanisms could be reused in 3 different places: in the association
   file, in `scope_extensions` in the manifest, at the top level in the manifest.
 
 1. Change the constraint on manifest URLs that are bound by scope (except for
