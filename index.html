@@ -1809,6 +1809,18 @@
       <p>The user agent MAY choose to apply <dfn>apply extended scope</dfn> in
         some scenarios and [=manifest/scope=] in others. 
       </p>
+      <p>
+        If the [=application context=]'s [=navigable/active document=]'s [=URL=]
+        is not [=manifest/within scope=] but is [=within extended scope=], the
+        user agent SHOULD provide UI that allows the user to determine the
+        [=URL=] or at least its [=origin=], including whether it is served over
+        a secure connection. This UI SHOULD differ from any UI used when the
+        [=URL=] is not [=manifest/within scope=] of the [=application
+        context=]'s [=Document/processed manifest=], in order to make it obvious
+        that the user is still navigating the intended contents of the
+        application but also keep the user informed of the privacy and security
+        implications of navigating to a different [=origin=].
+      </p>
     </section>
     </section>
     <section>
