@@ -4,24 +4,23 @@ Author: Dibyajyoti Pal (dibyapal@chromium.org)
 
 # **Introduction**
 
-This explainer proposes a way to have PWAs fully update their identities in a safe and resourceful manner, to further bridge the gap between PWAs and native apps. This is done by updating the [manifest spec](https://www.w3.org/TR/appmanifest/#web-application-manifest) to have a specific field for making updates more deterministic by the developer, and for providing a consistent experience across different user agents. The proposal attempts to do so in a way that:
+This explainer proposes a consistent way for developers to identify when to fully update their PWA in a safe and resourceful manner that is backwards compatible. This is done by updating the [manifest spec](https://www.w3.org/TR/appmanifest/#web-application-manifest) to have a specific field for making updates more deterministic and consistent. The proposal attempts to do so in a way that:
 
-1. Uses less resources, making network usage more efficient.  
+1. Specifies the update check algorithm to ensure the user agent can use minimal network resources.
 2. Prevent user confusion by showing the update UX less often.
-3. Allows user agents who haven't yet implemented manifest updating to do so in a different way.
 
-One thing to note here is that installed PWAs are inherently different from how the rest of the Web Platform works. While the origin is the security boundary of the Web Platform, the installed experience has [different security parameters](https://www.w3.org/TR/appmanifest/#dfn-security-sensitive-members).
+Doing so helps to further bridge the gap between PWAs and native apps.
 
 # **Background**
 
-[PWAs](https://web.dev/explore/progressive-web-apps) are app experiences built on the web, and like native apps, they support updating themselves. Developers have the option of changing any field in the manifest (including the [security sensitive fields](https://www.w3.org/TR/appmanifest/#dfn-security-sensitive-members)), and the user agent can then apply the changes in a way as defined in the [manifest updating spec](https://www.w3.org/TR/appmanifest/#updating). For example, in an effort to prevent [phishing risks](#phishing), some user agents like Chromium shows an update dialog to the user.
+[PWAs](https://web.dev/explore/progressive-web-apps) are app experiences built on the web, and like native apps, they support updating themselves. Developers have the option of changing any field in the manifest (including the [security sensitive fields](https://www.w3.org/TR/appmanifest/#dfn-security-sensitive-members)), and the user agent can then apply the changes in a way as defined in the [manifest updating spec](https://www.w3.org/TR/appmanifest/#updating). For example, changes to the security sensitive manifest properties **require** the user agent to explicitly get user permission, which is why Chromium shows an update dialog to the user. This helps prevent [phishing risks](#phishing).
 
 Updates on PWAs are important because they allow:
 - Rebranding via icon and name changes.
 - Icon changes via changing icon urls in the manifest.
 - Minor visual changes in the icon even if the url has stayed the same (due to dynamic re-encoding by CDNs).
 
-For all these use-cases however, the **detection** of when an update should happen is not clearly defined in the spec, leading to [problems](#chromium-problems). The next session attempts to dive into these problems, and [propose](#proposal) a solution that all user agents can implement without running into the same problems.
+gFor all these use-cases however, the **detection** of when an update should happen is not clearly defined in the spec, leading to [problems](#chromium-problems). The next session attempts to dive into these problems, and [propose](#proposal) a solution that all user agents can implement without running into the same problems.
 
 # [**Chromium PWA update detection, and its problems**](#chromium-problems)
 
@@ -37,7 +36,7 @@ Currently, detecting that a PWA needs an update goes like this:
 
 ## Problem: Developers have no control over when the update dialog may show up
 
-The dialog shows up whenever Chrome sees the new manifest & detects changes. Developers have to accept that every change to security sensitive members could trigger this. They cannot, for example, make a number of incremental changes, and then trigger one update dialog at the end once they are all done.
+The dialog shows up whenever Chromium sees the new manifest & detects changes. Developers have to accept that every change to security sensitive members could trigger this. They cannot, for example, make a number of incremental changes, and then trigger one update dialog at the end once they are all done.
 
 ## Problem: Update check wastes bandwidth, requiring a throttle
 
@@ -58,7 +57,7 @@ Chrome on Android solved it with a stop gap where PWA updates were automatic if 
 
 # **Goals**
 
-The current manifest update process gets the job done, but it could be better in a way so that the problems above can be fixed, and can be [specified properly](https://github.com/w3c/manifest/issues/384).
+The current manifest update process gets the job done, but if it could be [specified properly](https://github.com/w3c/manifest/issues/384) to know when that should happen and be backwards compatible, it would certainly help developers. As such, the goals to solve are:
 
 * [**Developer control**](#devc): Support developers to allow them to update their installed experiences:
   - Do not negatively affect developers who do not change their icon urls.
@@ -102,7 +101,7 @@ This has already been discussed extensively in [TPAC 2022](https://www.w3.org/20
 
 ## Default (non-token-based) update detection
 
-Without the presence of an `update_token` in the manifest, **ONLY** icon updates will be allowed if there are changes in the icon url specified in the manifest.
+Without the presence of an `update_token` in the manifest, **ONLY** icon updates will be allowed if there are changes in the icon url specified in the manifest. This is similar to the behavior shown by [Cache-Control:Immutable](https://caniuse.com/mdn-http_headers_cache-control_immutable). The reason why the `Cache-Control` is not being used is the absense of backwards compatibility with existing PWAs on Android, where updates can only be triggered by changing the icon bitmap and not the url.
 
 ## Behavior
 
@@ -123,7 +122,7 @@ window.addEventListener('appupdateprompt', (e) => {
   // Save the event to trigger it later.
   deferredUpdatePrompt = e;
   // Show customized update prompt for PWA.
-  showInAppInstallPromotion();
+  showAppUpdateDialog();
 });
 ```
 
@@ -148,7 +147,7 @@ updateButton.addEventListener('click', async () => {
 
 Let’s review the goals again to see how this proposal meets them: 
 
-> Goal: [`Consistency`](#consistency)
+> Goal: [`Consistency`](#consistency), [`User Agent Flexibility`](#uaf)
 
 The presence of a different value of `update_token` compared to the one saved, and icon urls changing are the only 2 use-cases that can trigger a manifest update. Since this will be specified in the manifest, user agents can choose to implement their own behavior around this.
 
@@ -170,10 +169,8 @@ Pros:
 - This would also help support this [FR about changelogs](https://github.com/w3c/manifest-app-info/issues/1).
 
 Cons:
-- As commented in [the issue](https://github.com/w3c/manifest/issues/1036), there is general conflation about what this field will be used for. The term is highly overloaded, and it is [hard to get consensus on the data type](https://github.com/w3c/manifest/issues/446#issuecomment-904359501) and what its purpose is. Compared to that, `update_token` is highly confined to a specific use-case, and is simpler to reason
-about.
-- Leads to complications around supporting [version downgrades](https://github.com/w3c/manifest/issues/446#issuecomment-905725612).
-- This does not actually empower developers to have more control over app updates.
+- The term is highly overloaded, and it is [hard to get consensus on the data type](https://github.com/w3c/manifest/issues/446#issuecomment-904359501) and what its purpose is. Compared to that, `update_token` is highly confined to a specific use-case, and is simpler to reason about.
+- Leads to complications around supporting a lot of things like [version downgrades](https://github.com/w3c/manifest/issues/446#issuecomment-905725612), upgrades as well as [ overall interpretation of the field](https://github.com/w3c/manifest/issues/1036).
 
 ## Allow end users to ignore updates
 
