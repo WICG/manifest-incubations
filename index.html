@@ -1649,15 +1649,15 @@
       </p>
       <ol class="algorithm">
         <li>Let [=URL=] |resolved_scope:URL| be
-          |validated_scope_extensions:ordered map|["scope"]. </li>
+          |validated_scope_extension:ordered map|["scope"]. </li>
         <li>If |target| is [=URL/within scope=] of |resolved_scope|, return
           `true`.</li>
         <li>Return `false`.</li>
       </ol>
       <aside class="note">
-        The [=manifest's=] `scope` member only allows URLs to be added to scope
+        The [=manifest's=] `scope` member only allows URLs to be considered for scope
         from a single [=origin=]. The `scope_extensions` member allows URLs to
-        be added from multiple [=origins=].
+        be considered from multiple [=origins=].
       </aside>
       <section class="informative">
         <h2>
