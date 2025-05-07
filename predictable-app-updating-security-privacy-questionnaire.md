@@ -48,7 +48,7 @@ Yes. User agents can create their own native UI based on whether the field in th
 
 ## What temporary identifiers do the features in this specification create or expose to the web?
 
-`update_token` could be used to distinguish between manifests being served to a single site.
+N/A.
 
 ## How does this specification distinguish between behavior in first-party and third-party contexts?
 

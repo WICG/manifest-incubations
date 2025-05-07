@@ -4,12 +4,12 @@ Author: Dibyajyoti Pal (dibyapal@chromium.org)
 
 # **Introduction**
 
-This explainer proposes a consistent way for developers to identify when to fully update their PWA in a safe and resourceful manner that is backwards compatible. This is done by updating the [manifest spec](https://www.w3.org/TR/appmanifest/#web-application-manifest) to have a specific field for making updates more deterministic and consistent. The proposal attempts to do so in a way that:
+This explainer proposes a consistent way for developers to identify when to fully update their PWA in a safe and resourceful manner that is flexible enough to be adapted by different user agents. This involves modifying the [manifest updating spec](https://www.w3.org/TR/appmanifest/#updating) to make update detection more deterministic. The proposal attempts to do so in a way that:
 
-1. Specifies the update check algorithm to ensure the user agent can use minimal network resources.
+1. Ensures lesser usage of network resources by the user agent.
 2. Prevent user confusion by showing the update UX less often.
 
-Doing so helps to further bridge the gap between PWAs and native apps.
+Doing so helps further bridge the gap between PWAs and native apps.
 
 # **Background**
 
@@ -57,57 +57,26 @@ Chrome on Android solved it with a stop gap where PWA updates were automatic if 
 
 # **Goals**
 
-The current manifest update process gets the job done, but if it could be [specified properly](https://github.com/w3c/manifest/issues/384) to know when that should happen and be backwards compatible, it would certainly help developers. As such, the goals to solve are:
+The current manifest update process gets the job done, but if it could be [specified properly](https://github.com/w3c/manifest/issues/384) to know when that should happen, it would certainly help developers. As such, the goals to solve are:
 
-* [**Developer control**](#devc): Support developers to allow them to update their installed experiences:
-  - Do not negatively affect developers who do not change their icon urls.
-  - Empower developers to choose when to update their installed experiences.
+* [**Developer control**](#devc): Support developers to allow them to update their installed experiences when they want to, and keep functional behavior like [file handling](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/file_handlers) consistent across app updates.
 * [**Preventing unnecessary user interruption**](#useint): Users should not see an update dialog more than necessary to confirm security-sensitive changes.
 * [**Consistency**](#consistency): Provide a consistent way to detect when a manifest update should happen, which can be implemented across all user agents.
 * [**User agent flexibility**](#uaf): It should be possible for user agents to use their judgement to block updates for known bad sites, allow known trusted apps to update without UX, or allow tiny visual changes to icons without requiring UX.
 * [**Reduce network traffic**](#traffic): Unnecessary network traffic should be minimized.
-* [**Prevent manifest id foot-gun**](#footgun): Encourage developers to set the manifest 'id' field, preventing a known [foot-gun](https://github.com/w3c/manifest/issues/1148).
 
-# [**Proposal: Introduce 'update\_token', ignore icon changes by default**](#proposal)
+# [**Proposal: Perform non-security-sensitive field updates silently, icon updates only when icon url changes, and security-sensitive field updates are optional (or user-agent mediated)**](#proposal)
 
-The proposal is to introduce a new field in the manifest called `update_token`, whose existence (and non-existence) will be used to trigger manifest updating logic, based on the following guidelines:
+The proposal is to:
+- Allow the updating of non-security sensitive members silently.
+- Allow updating security sensitive members like name with an UX shown by the user agent.
+- For icons, only consider an icon updated for a given size if the [icon url in the manifest](https://www.w3.org/TR/appmanifest/#icons-member) has changed, similar to [Cache-Control:Immutable](https://caniuse.com/mdn-http_headers_cache-control_immutable) behavior.
 
-* `update_token` is parsed if-and-only-if an 'id' field is set. This helps solve the goal of preventing the [`manifest id foot-gun`](#footgun).
-
-This has already been discussed extensively in [TPAC 2022](https://www.w3.org/2022/09/13-webapps-minutes.html#t02) and [TPAC 2023](https://docs.google.com/document/d/1QDqllh8inOcIkTrblERm4HRKYh8Ce9Lu5S7WhOygs_0/edit?tab=t.0#heading=h.sg3uxnf61udd), with consensus received from developers and WebKit.
-
-```
-
-{
-  "name": "The Best App",
-  "id": "app",
-  "start_url": ".",
-  "display": "standalone",
-   ....
-   "update_token": "foo1"
-}
-
-```
+The algorithm will treat a url as 'updated' or 'changed' by looking at the previously seen manifest's specified icon for each size and purpose. This means that a developer who specifies the same icon url, but for a different size, is technically eligible for a re-download by the user agent, as the user agent may cache icons by downloading them at the sizes specified by the developer. This behavior keeps the implementation & expectations simple.
 
 ## Pre-requisites:
 
 - An app corresponding to the manifest has already been installed.
-
-## Token based update detection
-
-* If `seen_manifest.update_token` and is changed from the `saved_manifest.update_token,`then a manifest update is triggered.  
-* If an `seen_manifest.update_token` is provided but is unchanged from the app’s `saved_manifest.update_token`, no update is triggered.  
-  * This includes fields outside of `name, short_name` and `icons`, AKA fields that are not tied to the identity of the manifest and is thus not secure.
-
-## Default (non-token-based) update detection
-
-Without the presence of an `update_token` in the manifest, **ONLY** icon updates will be allowed if there are changes in the icon url specified in the manifest. This is similar to the behavior shown by [Cache-Control:Immutable](https://caniuse.com/mdn-http_headers_cache-control_immutable). The reason why the `Cache-Control` is not being used is the absense of backwards compatibility with existing PWAs on Android, where updates can only be triggered by changing the icon bitmap and not the url.
-
-## Behavior
-
-The below table introduces all possible combinations of behavior that can happen based on the status of an `existing update token` that is in the saved manifest vs a `new update token` that is newly seen in the manifest.
-
-![Update behavior](./images/proposed-update-behavior.png)
 
 ## Future Considerations
 
@@ -143,25 +112,31 @@ updateButton.addEventListener('click', async () => {
 });
 ```
 
+This would be an ultimate solution for developer control, because it gives the developer "full" control over the manifest update process. However, allowing the security sensitive members to be mediated by the user agent allows the update process to be less blocking, so the main developer complaint of not wanting blocking dialogs for users is mitigated.
+
 # **How does this solve the problem?**
 
 Let’s review the goals again to see how this proposal meets them: 
 
 > Goal: [`Consistency`](#consistency), [`User Agent Flexibility`](#uaf)
 
-The presence of a different value of `update_token` compared to the one saved, and icon urls changing are the only 2 use-cases that can trigger a manifest update. Since this will be specified in the manifest, user agents can choose to implement their own behavior around this.
+Since the change in an icon url is the **`signal`** that a manifest update can be triggered, this allows user agents to implement their own behavior around it. This will be [speced in the manifest](https://www.w3.org/TR/appmanifest/#updating) for consistency across multiple user agents.
 
 > Goal: [`Developer Control`](#devc), [`Preventing unnecessary user interruption.`](#useint)
 
-The users should only see the dialog when the developer wants them to. To do so, the developer has to do either of the 2 things specified (AKA change the  `update_token` value or change the icon urls).
+The users should only see the dialog when the developer wants them to. To do so, the developer only has to change the icon urls. The manifest fields that determine the functionality of the app (like [`file_handlers`](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/file_handlers) or [`launch_handlers`](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/launch_handler)) update silently, so multiple functional copies of the app are not available everywhere.
 
 > Goal: [`Reduce network traffic`](#traffic)
 
 The most network heavy traffic is downloading icons, which will only happen when the developer wants them to, and not up to once per day every time the app is accessed.
 
+## Cons
+
+The proposal is not backwards compatible for certain platforms where developers rely on icon bits changing while the url still stays the same for triggering a manifest update. However, there is a workaround for end users in this case, which is to uninstall and re-install the site as a PWA.
+
 # **Alternatives considered**
 
-## Use a `version` field to trigger manifest updates
+## [Use a `version` field to trigger manifest updates](#version)
 
 Add the concept of versioning to the web app manifest, so that the developer can change "versions" of their installed experiences to trigger updates. This has been proposed earlier in the manifest spec multiple times (like [manifest#1036](https://github.com/w3c/manifest/issues/1036) and [manifest#1157](https://github.com/w3c/manifest/issues/1157)).
 
@@ -171,6 +146,15 @@ Pros:
 Cons:
 - The term is highly overloaded, and it is [hard to get consensus on the data type](https://github.com/w3c/manifest/issues/446#issuecomment-904359501) and what its purpose is. Compared to that, `update_token` is highly confined to a specific use-case, and is simpler to reason about.
 - Leads to complications around supporting a lot of things like [version downgrades](https://github.com/w3c/manifest/issues/446#issuecomment-905725612), upgrades as well as [ overall interpretation of the field](https://github.com/w3c/manifest/issues/1036).
+
+## Use an `update_token` field, only for manifest updates
+
+This is kind of similar to the above suggestion of using a [version field](#version), with the only difference being that the field is highly confined to be of a single data type like string, and has a single purpose, which is to signal that the manifest needs updating.
+
+Cons:
+- This requires an extra image diff algorithm to determine if icon bits have changed if the url is still the same during the update process.
+- There is still a chance that developers might make a mistake while setting the `update_token` or removing it, leading to unwanted updates.
+- There is also a potential foot-gun here of different app functionalities in the wild without the developer knowing if the token is not updated by them, or if they gradually change the manifest.
 
 ## Allow end users to ignore updates
 
