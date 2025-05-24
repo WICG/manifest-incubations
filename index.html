@@ -1795,13 +1795,13 @@
         </li>
         <li>If |json|[|manifest_id|] does not exist or is not an 
           [=ordered map=], return an error.</li>
-        <li>Let [=string=] |scope_path:string| be "/".</li>
+        <li>Let [=string=] |scope:string| be "/".</li>
         <li>If |json|[|manifest_id|]["scope"] exists and is a [=string=], set
-          |scope_path| to |json|[|manifest_id|]["scope"]. 
+          |scope| to |json|[|manifest_id|]["scope"]. 
         </li>
         <li>Let [=URL=] |resolved_scope:URL| be the result of [=URL
-          Parser|parsing=] |scope_path| with |extension|["origin"] as the base
-          URL.
+          Parser|parsing=] |scope| with |extension|["origin"] as the base 
+          [=URL=].
         </li>
         <li>Return |resolved_scope|.</li>
       </ol>
