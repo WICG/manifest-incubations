@@ -1715,9 +1715,8 @@
       <section>
       <h2>Processing the scope_extensions member</h2>
       <p>
-        To <dfn>process the `scope_extensions` member</dfn>, given
-        [=ordered map=] |json:ordered map| and [=ordered map=]
-        |manifest:ordered map|:
+        To <dfn>process the `scope_extensions` member</dfn>, given [=ordered
+        map=] |json:ordered map| and [=ordered map=] |manifest:ordered map|:
       </p>
       <ol class="algorithm">
         <li>Let |processedScopeExtensions:list| be a new [=list=].
@@ -1737,18 +1736,20 @@
             <li>If |entry|["origin"] is not a [=string=],
               [=iteration/continue=].
             </li>
-            <li>Set |entry|["origin"] to the result of parsing it as an
-              [=origin=].
+            <li>Let [=URL=] |origin_url:URL| be the result of [=URL
+              Parser|parsing=] |entry|["origin"].
             </li>
-            <li>Let [=URL=] |resolved_scope:URL| be an empty [=URL=]. </li>
+            <li>If |origin_url| is a valid |URL| with [=URL/scheme=] "https",
+              set |entry|["origin"] to the [=URL/origin=] of |origin_url|.
+            <li>Else [=iteration/continue=].</li>
             <li>Validate |entry| using the algorithm from [=validate scope
-              extensions=], given [=ordered map=] |entry:ordered map|, [=URL=]
-              |manifest_id:URL|, and [=URL=] |resolved_scope:URL|. 
+              extensions=], given [=ordered map=] |entry:ordered map|, and 
+              [=URL=] |manifest_id:URL|. 
             </li>
-            <li>If validation failed, [=iteration/continue=].
+            <li>If the previous step returned an error, [=iteration/continue=].
             </li>
             <li>
-              Set |entry|["scope"] to |resolved_scope|.
+              Else, set |entry|["scope"] to the returned [=URL=].
             </li>
             <li>[=list/Append=] |entry| to |processedScopeExtensions|.
             </li>
@@ -1778,30 +1779,31 @@
       <h2>Validating scope extensions</h2>
       <p>
         To <dfn>validate scope extensions</dfn>, given [=ordered map=] 
-        |extension:ordered map|, [=URL=] |manifest_id:URL| and [=URL=] 
-        |resolved_scope:URL|:
+        |extension:ordered map| and [=URL=] |manifest_id:URL|:
       </p>
       <ol class="algorithm">
-        <li>Set |resolved_scope| to empty URL.</li>
-        <li>Let [=URL=] |download_url| be the result of parsing 
-          "/.well-known/web-app-origin-association" using |extension|["origin"] 
-          as the base [=URL=].
+        <li>Let [=URL=] |origin_url:URL| be the [=URL=] of the [=URL/origin=]
+          |extension|["origin"].</li>
+        <li>Let [=URL=] |download_url:URL| be the result of [=URL
+          Parser|parsing=] the [=URL=] "/.well-known/web-app-origin-association"
+          using |origin_url| as the base [=URL=].
         </li>
-        <li>Let [=ordered map=] |json:ordered map| be the result of downloading
-          |download_url|. 
+        <li>Let [=ordered map=] |json:ordered map| be the result of a [=fetch=] 
+          using |download_url|. 
         </li>
-        <li>If the download fails, return false.
+        <li>If the [=fetch=] failed, return an error.
         </li>
         <li>If |json|[|manifest_id|] does not exist or is not an 
-          [=ordered map=], return false.</li>
+          [=ordered map=], return an error.</li>
         <li>Let [=string=] |scope_path:string| be "/".</li>
         <li>If |json|[|manifest_id|]["scope"] exists and is a [=string=], set
           |scope_path| to |json|[|manifest_id|]["scope"]. 
         </li>
-        <li>Set |resolved_scope:URL| be the result of parsing |scope_path| with 
-          |extension|["origin"] as the base URL.
+        <li>Let [=URL=] |resolved_scope:URL| be the result of [=URL
+          Parser|parsing=] |scope_path| with |extension|["origin"] as the base
+          URL.
         </li>
-        <li>return true.</li>
+        <li>Return |resolved_scope|.</li>
       </ol>
     </section>
     <section>
