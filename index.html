@@ -1644,15 +1644,19 @@
       </p>
       <p>
         A [=URL=] |target:URL| <dfn>matches a validated scope extension</dfn> if
-        the following algorithm returns `true`, given |target| and [=ordered map=]
-        |validated_scope_extension:ordered map|:
+        the following algorithm returns `true`, given [=URL=] |target:URL| and
+        [=list=] |validated_scope_extensions:list|:
       </p>
       <ol class="algorithm">
-        <li>Let [=URL=] |resolved_scope:URL| be
-          |validated_scope_extension:ordered map|["scope"]. </li>
-        <li>If |target| is [=URL/within scope=] of |resolved_scope|, return
-          `true`.</li>
-        <li>Return `false`.</li>
+        <li>[=list/For each=] |entry:ordered map| of
+          |validated_scope_extensions:list|:
+          <ol>
+            <li>Let [=URL=] |resolved_scope:URL| be
+              |validated_scope_extension:ordered map|["scope"]. </li>
+            <li>If |target| is [=URL/within scope=] of |resolved_scope|, return
+              `true`.</li>
+            <li>Return `false`.</li>
+          </ol>
       </ol>
       <aside class="note">
         The [=manifest's=] `scope` member only allows URLs to be considered for scope
@@ -1744,7 +1748,7 @@
               set |entry|["origin"] to the [=URL/origin=] of |origin_url|.
             <li>Else [=iteration/continue=].</li>
             <li>Validate |entry| using the algorithm from [=validate scope
-              extensions=], given [=ordered map=] |entry:ordered map|, and 
+              extensions=], given [=ordered map=] |entry:ordered map| and 
               [=URL=] |manifest_id:URL|. 
             </li>
             <li>If the previous step returned an error, [=iteration/continue=].
