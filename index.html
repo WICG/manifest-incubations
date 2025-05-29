@@ -1653,7 +1653,7 @@
           <ol>
             <li>
             If |entry| is not an [=ordered map=], or |entry|["scope"] does not
-              exist or is not a [=URL=], continue.</li>
+              [=map/exist=] or is not a [=URL=], continue.</li>
             <li>Let [=URL=] |resolved_scope:URL| be |entry:ordered
               map|["scope"]. </li>
             <li>If |target| is [=URL/within scope=] of |resolved_scope|, return
@@ -1731,12 +1731,12 @@
         </li>
         <li>Set |manifest|["scope_extensions"] to |processedScopeExtensions|.
         </li>
-        <li>If |json|["scope_extensions"] doesn't [=map/exist=] or is not a 
+        <li>If |json|["scope_extensions"] does not [=map/exist=] or is not a 
           [=list=], return.
         </li>
         <li>[=list/For each=] |entry:ordered map| of |json|["scope_extensions"]:
           <ol>
-            <li>If |entry|["type"] or |entry|["origin"] is undefined,
+            <li>If |entry|["type"] or |entry|["origin"] do not [=map/exist=],
               [=iteration/continue=].
             </li>
             <li>If |entry|["type"] is not "origin", [=iteration/continue=].
@@ -1793,19 +1793,19 @@
         <li>Let [=URL=] |origin_url:URL| be the [=URL=] of the [=URL/origin=]
           |extension|["origin"].</li>
         <li>Let [=URL=] |download_url:URL| be the result of [=URL
-          Parser|parsing=] the [=URL=] "/.well-known/web-app-origin-association"
-          using |origin_url| as the base [=URL=].
+          Parser|parsing=] "/.well-known/web-app-origin-association" using 
+          |origin_url| as the base [=URL=].
         </li>
         <li>Let [=ordered map=] |json:ordered map| be the result of a [=fetch=] 
-          using |download_url|. 
+          given |download_url|. 
         </li>
         <li>If the [=fetch=] failed, return an error.
         </li>
-        <li>If |json|[|manifest_id|] does not exist or is not an 
+        <li>If |json|[|manifest_id|] does not [=map/exist=] or is not an 
           [=ordered map=], return an error.</li>
         <li>Let [=string=] |scope:string| be "/".</li>
-        <li>If |json|[|manifest_id|]["scope"] exists and is a [=string=], set
-          |scope| to |json|[|manifest_id|]["scope"]. 
+        <li>If |json|[|manifest_id|]["scope"] [=map/exists=] and is a
+          [=string=], set |scope| to |json|[|manifest_id|]["scope"]. 
         </li>
         <li>Let [=URL=] |resolved_scope:URL| be the result of [=URL
           Parser|parsing=] |scope| with |extension|["origin"] as the base 
