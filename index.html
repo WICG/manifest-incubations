@@ -1651,8 +1651,9 @@
         <li>[=list/For each=] |entry:ordered map| of
           |validated_scope_extensions:list|:
           <ol>
+            <li>
             If |entry| is not an [=ordered map=], or |entry|["scope"] does not
-              exist or is not a [=URL=], continue.
+              exist or is not a [=URL=], continue.</li>
             <li>Let [=URL=] |resolved_scope:URL| be |entry:ordered
               map|["scope"]. </li>
             <li>If |target| is [=URL/within scope=] of |resolved_scope|, return
