@@ -28,7 +28,7 @@ This feature aims to make that transition seamless. Instead of a broken experien
 
 ### Non-goals
 
-*   **Cross-Site Migration:** This feature will not support migration between origins that are not "same-site" (e.g., from `example.com` to `another-site.com`).
+*   **Cross-Site Migration:** While we may explore solutions for cross-origin migration in the future, this initial proposal is limited to same-site migrations. Allowing migration between different sites (e.g., from `example.com` to `another-site.com`) would introduce significantly more security risks. For example, if a site were compromised, an attacker could migrate its users to a malicious phishing site, potentially transferring user trust and any granted permissions. The same-site restriction ensures that both the old and new origins are controlled by the same entity, reducing the risk of this category of attack.
 *   **Data Migration:** User data stored locally (e.g., in IndexedDB, Cache Storage) is not within the scope of this migration. Developers are responsible for migrating this data, typically via server-side logic.
 
 ## Proposed Approach
@@ -46,7 +46,7 @@ This proposal is designed to work with and depends on the [Predictable App Updat
 
 **1. The "New" App Confirms the Migration (Required):**
 
-The developer adds a `migrate_from` member to the manifest of the PWA at the new origin. This confirms that it is the legitimate successor to the old app and is the minimum requirement to enable migration.
+The developer adds a `migrate_from` member to the manifest of the PWA at the new origin. This confirms that it is the legitimate successor to the old app. For the browser to process the `migrate_from` field, the manifest must also contain an `id` field.
 
 *Manifest on `social.example.com`:*
 ```json
@@ -165,13 +165,24 @@ However, there is a critical security consideration for `"force"` migrations. To
 
 A mandatory waiting period (e.g., 2 weeks) after a migration is declared was considered to help prevent malicious activity if a site is compromised. However, this was deemed overly complex and potentially not useful, as there's no guarantee a developer would notice a compromise within that period. The **same-site restriction** is a much stronger and more reliable security guarantee, as it ensures both origins are controlled by the same entity.
 
-### Only require a one-way reference
+### Require a two-way reference
 
-We considered only requiring the `migrate_to` field in the old manifest. This would simplify the developer's work slightly. However, it would make it impossible for the browser to verify the migration if the user navigates directly to the new app's origin first. The two-way handshake ensures the migration can be discovered and verified from either direction, providing a more robust solution.
+We are currently proposing to only require a one-way reference from the new manifest to the old one. An alternative we considered is to require a two-way reference, where the old manifest must point to the new one, and the new one must point back.
+
+The main advantage of a two-way reference would be enhanced security. A clear handshake between both sites would make it more difficult for a malicious actor to initiate a migration. However, this benefit is less critical given that the proposal is already restricted to same-site migrations. The downsides of this approach are:
+* In difficult scenarios where the old site is already redirecting to the new one, it can be hard to host a manifest on the old site.
+* For very old installs, the developer might not maintain the old site / manifest anymore.
+* It can be slow, as the browser needs to fetch the old manifest to verify the migration, even if the user navigated to the new site directly.
+
+Given these downsides, we believe that a one-way reference is the better solution.
 
 ### Require an Explicit `id` in both manifests
 
-Another alternative considered was to make the `id` manifest member mandatory for both the old and new apps. In this model, the browser would ignore the `migrate_to` and `migrate_from` fields entirely if an explicit `id` was not present in the manifest. This would enforce the best practice of using a stable identifier, preventing developers from accidentally creating new app identities by changing the `start_url`, which would break the migration. However, this was rejected as it would create significant friction for developers with existing PWAs that do not have an `id` set. They would be forced to update their old app first and wait for it to propagate before they could begin a migration, adding complexity and delay to the process. The current proposal is more flexible and accommodating to existing applications.
+Another alternative considered was to make the `id` manifest member mandatory for not just the new, but also the old app. In this model, the browser would ignore the `migrate_to` and `migrate_from` fields entirely if an explicit `id` was not present in the manifest. This would enforce the best practice of using a stable identifier, preventing developers from accidentally creating new app identities by changing the `start_url`, which would break the migration. However, this was rejected as it would create significant friction for developers with existing PWAs that do not have an `id` set. They would be forced to update their old app first and wait for it to propagate before they could begin a migration, adding complexity and delay to the process. The current proposal is more flexible and accommodating to existing applications.
+
+### Never require an `id`
+
+We also considered not requiring an `id` field in the manifest at all for migrations. The migration process itself does not technically depend on the `id` field. The primary motivation for requiring it is to encourage the adoption of a best practice that provides a stable identity for a PWA, preventing potential issues in the future. However, making this a requirement for an unrelated feature could be seen as using the migration mechanism to enforce an orthogonal best practice.
 
 ### Differentiated Rules for Same-Site Migrations
 
