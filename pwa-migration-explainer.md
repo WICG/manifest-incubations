@@ -79,7 +79,7 @@ To proactively trigger the update flow without waiting for the user to visit the
 
 Once the migration is discovered (via either method), the browser will present the user with an update prompt. The developer can control the user experience with the optional `behavior` field in the `migrate_from` object:
 *   `"suggest"`: The user is (passively) notified of the update but can ignore it.
-*   `"force"`: The next time the user launches the app, they are presented with a blocking dialog requiring them to either migrate or uninstall the app.
+*   `"force"`: The next time the user launches the app being migrated (after a manifest is parsed with this behavior specified), they are presented with a blocking dialog requiring them to either migrate or uninstall the app.
 
 ### Permission Migration and User Experience
 
@@ -182,7 +182,7 @@ Another alternative considered was to make the `id` manifest member mandatory fo
 
 ### Never require an `id`
 
-We also considered not requiring an `id` field in the manifest at all for migrations. The migration process itself does not technically depend on the `id` field. The primary motivation for requiring it is to encourage the adoption of a best practice that provides a stable identity for a PWA, preventing potential issues in the future. However, making this a requirement for an unrelated feature could be seen as using the migration mechanism to enforce an orthogonal best practice.
+We also considered not requiring an `id` field in the manifest at all for migrations. The migration process itself does not technically depend on the `id` field. The primary motivation for requiring it is to encourage the adoption of a best practice that provides a stable identity for a PWA, preventing [potential issues in the future](https://docs.google.com/presentation/d/1QqriRwxqzo8Dqwj3BOixE6AWIm0Kr4y9-ScOm-MKhMs/edit?slide=id.g2f9677cb0f8_0_0#slide=id.g2f9677cb0f8_0_0). However, making this a requirement for an unrelated feature could be seen as using the migration mechanism to enforce an orthogonal best practice.
 
 ### Differentiated Rules for Same-Site Migrations
 
