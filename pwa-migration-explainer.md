@@ -208,3 +208,73 @@ The primary security threat is a hostile takeover, where a malicious actor could
 
 *   **Major App Developers:** Positive. Several have expressed a strong need for this feature to support their product roadmaps. Their feedback has been crucial in defining the requirements, particularly the need for both "suggested" and "forced" migration behaviors.
 *   **Browser Implementors:** No signals. This is a new proposal being incubated.
+
+## Security and Privacy Self-Review
+
+This section contains answers to the [W3C Security and Privacy Self-Review Questionnaire](https://w3c.github.io/security-questionnaire/).
+
+### 2.1 What information does this feature expose, and for what purposes?
+This feature does not directly expose user information to websites. It allows a website (`new.example.com`) to declare a relationship with another (`old.example.com`). The browser uses this information, combined with its own knowledge of whether the user has the old PWA installed, to initiate a migration UI. The new site does not receive a confirmation that the user has the old app installed; the entire process is mediated by the user through the browser's UI.
+
+### 2.2 Do features in your specification expose the minimum amount of information necessary to implement the intended functionality?
+Yes. The feature only exposes the developer-declared relationship between two origins. No user-specific information is exposed to the web.
+
+### 2.3 Do the features in your specification expose personal information, personally-identifiable information (PII), or information derived from either?
+No.
+
+### 2.4 How do the features in your specification deal with sensitive information?
+Not applicable. No sensitive information is exposed.
+
+### 2.5 Does data exposed by your specification carry related but distinct information that may not be obvious to users?
+No.
+
+### 2.6 Do the features in your specification introduce state that persists across browsing sessions?
+Yes, the result of a successful migration is persistent: the installed PWA's identity is permanently changed from the old origin to the new one. This is a change to existing persistent state (the app installation), not the introduction of a new type of storage.
+
+### 2.7 Do the features in your specification expose information about the underlying platform to origins?
+No.
+
+### 2.8 Does this specification allow an origin to send data to the underlying platform?
+No.
+
+### 2.9 Do features in this specification enable access to device sensors?
+Not directly. It allows for the migration of *permissions* to access sensors (e.g., camera, microphone, location) from the old origin to the new, same-site origin. This permission migration only occurs after the user has approved the origin migration and then explicitly consented to the permission transfer via a post-migration UI prompt.
+
+### 2.10 Do features in this specification enable new script execution/loading mechanisms?
+No.
+
+### 2.11 Do features in this specification allow an origin to access other devices?
+No.
+
+### 2.12 Do features in this specification allow an origin some measure of control over a user agent’s native UI?
+Yes. The core purpose of the feature is to change the origin associated with an installed PWA's window and identity. This is a significant change to the user's app experience, and it is explicitly communicated to the user for their approval before it occurs.
+
+### 2.13 What temporary identifiers do the features in this specification create or expose to the web?
+None.
+
+### 2.14 How does this specification distinguish between behavior in first-party and third-party contexts?
+This feature is only relevant in a first-party context, as a web app manifest is only applicable to a top-level browsing context.
+
+### 2.15 How do the features in this specification work in the context of a browser’s Private Browsing or Incognito mode?
+This feature does not apply to Private Browsing or Incognito mode, as PWA installation is generally not available in those modes.
+
+### 2.16 Does this specification have both "Security Considerations" and "Privacy Considerations" sections?
+Yes, they are present in this document.
+
+### 2.17 Do features in your specification enable origins to downgrade default security protections?
+No.
+
+### 2.18 What happens when a document that uses your feature is kept alive in BFCache (instead of getting destroyed) after navigation, and potentially gets reused on future navigations back to the document?
+The migration process is managed by the browser's systems, not by a specific document. The discovery of a migration might be triggered by fetching a manifest from a document, but the subsequent UI and state changes are not tied to that document's lifecycle. Therefore, a document involved in the discovery process being placed in BFCache will not affect the migration.
+
+### 2.19 What happens when a document that uses your feature gets disconnected?
+Similar to the BFCache case, the migration process is not tied to the lifecycle of any single document. If a document that triggered a migration check is disconnected (e.g., an iframe is removed), the browser-level migration process will proceed unaffected.
+
+### 2.20 Does your spec define when and how new kinds of errors should be raised?
+The specification will need to define error handling for cases such as a `migrate_to` field pointing to a URL that returns a 404 error, or a manifest that is invalid or does not contain the required reciprocal `migrate_from` field. These errors will be handled by the browser and will result in the migration not being offered to the user. They could be exposed to developers in the DevTools console but will not be exposed to the web.
+
+### 2.21 Does your feature allow sites to learn about the user’s use of assistive technology?
+No. The UI surfaces for this feature (dialogs, notifications) will be implemented using standard, accessible browser components and will not introduce any mechanism for detecting the use of assistive technology.
+
+### 2.22 What should this questionnaire have asked?
+N/A
