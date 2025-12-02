@@ -33,10 +33,10 @@ This feature aims to make that transition seamless. Instead of a broken experien
 
 ## Proposed Approach
 
-The solution is a manifest-based handshake between the old and new origins. A developer signals the migration by adding new members to the web app manifests of both the old and new applications. The migration can be discovered in two ways:
+The solution is a handshake between the old and new origins. A developer signals the migration by adding a `migrate_from` member to the web app manifest of the new application, and confirms this on the old origin using a `.well-known` association file. The migration can be discovered in two ways:
 
-1.  **By visiting the new app:** The user navigates to the new site (for example because the old site redirects to the new site). The browser fetches its manifest, sees a `migrate_from` field pointing to the old, installed app, and initiates the migration flow for the old app.
-2.  **By visiting the old app:** The browser checks for an update to the old app's manifest and sees a `migrate_to` field. The browser fetches the manifest for the new site, verifyeis it has a matching `migrate_from` field, and initiated the migration flow for the old app.
+1.  **By visiting the new app:** The user navigates to the new site (for example because the old site redirects to the new site). The browser fetches its manifest, sees a `migrate_from` field pointing to the old, installed app, and validates this against the `.well-known` file on the old origin.
+2.  **By visiting the old app:** The browser checks for an update to the old app's manifest and sees a `migrate_to` field. The browser fetches the manifest for the new site, verifies it has a matching `migrate_from` field, and validates this against the `.well-known` file on the old origin.
 
 ### Dependencies on non-stable features
 
@@ -44,9 +44,9 @@ This proposal is designed to work with and depends on the [Predictable App Updat
 
 ### Solving the PWA Migration with Manifests
 
-**1. The "New" App Confirms the Migration (Required):**
+**1. The "New" App Declares the Migration (Required):**
 
-The developer adds a `migrate_from` member to the manifest of the PWA at the new origin. This confirms that it is the legitimate successor to the old app. For the browser to process the `migrate_from` field, the manifest must also contain an `id` field.
+The developer adds a `migrate_from` member to the manifest of the PWA at the new origin. This declares that it claims to be the successor to the old app. For the browser to process the `migrate_from` field, the manifest must also contain an `id` field.
 
 *Manifest on `social.example.com`:*
 ```json
@@ -60,9 +60,22 @@ The developer adds a `migrate_from` member to the manifest of the PWA at the new
 }
 ```
 
-**2. The "Old" App Declares the Migration (Optional):**
+**2. The "Old" App Confirms the Migration (Required):**
 
-To proactively trigger the update flow without waiting for the user to visit the new site, the developer can add a `migrate_to` member to the manifest of the PWA at the original origin. The `migrate_to` member contains both the `id` of the app the site wants to migrate to, as well as an `install_url` that can be used by the browser to fetch a manifest matching the given `id`.
+The old origin must confirm the migration by hosting a `web-app-origin-association` file in the `/.well-known/` directory. This file must list the `id` of the new app, and explicitly authorize the migration by setting `"allow_migration": true`. This allows *any* PWA hosted on the old origin to migrate to the specific PWA identified by that ID on the new origin. This mechanism is shared with [Scope Extensions](https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md).
+
+*File at `https://www.example.com/.well-known/web-app-origin-association`:*
+```json
+{
+  "https://social.example.com/": {
+    "allow_migration": true
+  }
+}
+```
+
+**3. The "Old" App Proactively Signals the Migration (Optional):**
+
+To proactively trigger the update flow without waiting for the user to visit the new site, the developer can add a `migrate_to` member to the manifest of the PWA at the original origin.
 
 *Manifest on `www.example.com`:*
 ```json
@@ -77,7 +90,7 @@ To proactively trigger the update flow without waiting for the user to visit the
 }
 ```
 
-Once the migration is discovered (via either method), the browser will present the user with an update prompt. The developer can control the user experience with the optional `behavior` field in the `migrate_from` object:
+Once the migration is discovered and validated, the browser will present the user with an update prompt. The developer can control the user experience with the optional `behavior` field in the `migrate_from` object:
 *   `"suggest"`: The user is (passively) notified of the update but can ignore it.
 *   `"force"`: The next time the user launches the app being migrated (after a manifest is parsed with this behavior specified), they are presented with a blocking dialog requiring them to either migrate or uninstall the app.
 
@@ -90,6 +103,12 @@ It's possible that a user has already interacted with the new origin in a regula
 After the user has approved the app migration and launches the app on its new origin for the first time, the browser should present a UI element (for example, a prompt or a highly visible notification) explaining that the permissions granted to the old app can be carried over to the new one. The migration of these permissions will only complete after the user acknowledges this UI.
 
 This confirmation step ensures the user is explicitly aware that permissions are moving to a new URL and remains in control. It also provides a consistent point of information for migrations that may have occurred automatically on a secondary device via browser sync.
+
+### Same-Origin Migrations
+
+While this proposal primarily focuses on cross-origin, same-site migrations, the same manifest fields can also be used for same-origin migrations. For example, a developer might want to change the `id` of their PWA, consolidate multiple PWAs on the same origin, or fix a common issue where the PWA's identity accidentally changes. This can happen if a developer modifies the `start_url` of their app without having an explicit `id` set in the manifest, as the `start_url` is used as a fallback for the PWA's identity. A same-origin migration can be used to seamlessly move users from the old identity to a new, explicitly defined one.
+
+In these cases, because the origin of the PWA is not changing, the security context and user-granted permissions remain tied to the same origin. As such, the user agent would not need to show any UI to the user and could perform a silent migration in the background. This provides a seamless way for developers to manage the identity of their PWAs on the same origin without disrupting the user.
 
 ### Example User Interface
 
@@ -165,16 +184,15 @@ However, there is a critical security consideration for `"force"` migrations. To
 
 A mandatory waiting period (e.g., 2 weeks) after a migration is declared was considered to help prevent malicious activity if a site is compromised. However, this was deemed overly complex and potentially not useful, as there's no guarantee a developer would notice a compromise within that period. The **same-site restriction** is a much stronger and more reliable security guarantee, as it ensures both origins are controlled by the same entity.
 
-### Require a two-way reference
+### Require `install_url` in `migrate-from`
 
-We are currently proposing to only require a one-way reference from the new manifest to the old one. An alternative we considered is to require a two-way reference, where the old manifest must point to the new one, and the new one must point back.
+Instead of relying on a `.well-known` file on the old origin, we considered requiring the `migrate_from` field in the new manifest to always specify an `install_url`. This URL would point to the old origin's manifest, allowing the browser to fetch and verify the old manifest's intent to migrate (via a `migrate_to` field). While this achieves a two-way handshake, it requires the old manifest to be updated and maintained, which can be challenging if the old site is already redirecting or is no longer actively developed. The `.well-known` file approach is preferred as it decouples the verification from the manifest update cycle and aligns with `scope_extensions`.
 
-The main advantage of a two-way reference would be enhanced security. A clear handshake between both sites would make it more difficult for a malicious actor to initiate a migration. However, this benefit is less critical given that the proposal is already restricted to same-site migrations. The downsides of this approach are:
-* In difficult scenarios where the old site is already redirecting to the new one, it can be hard to host a manifest on the old site.
-* For very old installs, the developer might not maintain the old site / manifest anymore.
-* It can be slow, as the browser needs to fetch the old manifest to verify the migration, even if the user navigated to the new site directly.
+### Don't require a two-way reference
 
-Given these downsides, we believe that a one-way reference is the better solution.
+We previously considered only requiring a one-way reference from the new manifest to the old one. The main advantage of this approach was simplicity and resilience in scenarios where the old site might be difficult to update or no longer actively maintained.
+
+However, security reviews highlighted that without a two-way reference, the security of an origin is effectively only as strong as the weakest same-site origin. A compromised same-site origin could unilaterally claim to be the successor to another app, potentially hijacking it. Therefore, a strict two-way handshake (via `.well-known` or `install_url`) is now required.
 
 ### Require an Explicit `id` in both manifests
 
@@ -247,7 +265,7 @@ No.
 No.
 
 ### 2.12 Do features in this specification allow an origin some measure of control over a user agent’s native UI?
-Yes. The core purpose of the feature is to change the origin associated with an installed PWA's window and identity. This is a significant change to the user's app experience, and it is explicitly communicated to the user for their approval before it occurs.
+Yes. The core purpose of the feature is to change the origin associated with an installed PWA's window and identity. For cross-origin migrations, this is a significant change to the user's app experience, and it is explicitly communicated to the user for their approval before it occurs. For same-origin migrations, this change can happen without user interaction as the security context remains the same.
 
 ### 2.13 What temporary identifiers do the features in this specification create or expose to the web?
 None.
