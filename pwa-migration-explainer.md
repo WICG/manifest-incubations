@@ -207,7 +207,11 @@ The primary security threat is a hostile takeover, where a malicious actor could
 ## Stakeholder Feedback / Opposition
 
 *   **Major App Developers:** Positive. Several have expressed a strong need for this feature to support their product roadmaps. Their feedback has been crucial in defining the requirements, particularly the need for both "suggested" and "forced" migration behaviors.
-*   **Browser Implementors:** No signals. This is a new proposal being incubated.
+*   **W3C TAG Review:** [Issue 1164](https://github.com/w3ctag/design-reviews/issues/1164)
+*   **Browser Standards Positions:**
+    *   **Chrome:** [Prototyping/Implementing](https://chromestatus.com/feature/5123349239955456)
+    *   **Mozilla:** [mozilla/standards-positions#1313](https://github.com/mozilla/standards-positions/issues/1313)
+    *   **WebKit:** [WebKit/standards-positions#568](https://github.com/WebKit/standards-positions/issues/568)
 
 ## Security and Privacy Self-Review
 
