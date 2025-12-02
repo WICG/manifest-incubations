@@ -108,7 +108,7 @@ This confirmation step ensures the user is explicitly aware that permissions are
 
 While this proposal primarily focuses on cross-origin, same-site migrations, the same manifest fields can also be used for same-origin migrations. For example, a developer might want to change the `id` of their PWA, consolidate multiple PWAs on the same origin, or fix a common issue where the PWA's identity accidentally changes. This can happen if a developer modifies the `start_url` of their app without having an explicit `id` set in the manifest, as the `start_url` is used as a fallback for the PWA's identity. A same-origin migration can be used to seamlessly move users from the old identity to a new, explicitly defined one.
 
-In these cases, because the origin of the PWA is not changing, the security context and user-granted permissions remain tied to the same origin. As such, the user agent would not need to show any UI to the user and could perform a silent migration in the background. This provides a seamless way for developers to manage the identity of their PWAs on the same origin without disrupting the user.
+In these cases, because the origin of the PWA is not changing, the security context and user-granted permissions remain tied to the same origin. As such, the `.well-known` association file is not required, and the user agent would not need to show any UI to the user and could perform a silent migration in the background. This provides a seamless way for developers to manage the identity of their PWAs on the same origin without disrupting the user.
 
 ### Example User Interface
 
