@@ -1,6 +1,6 @@
 # Self-Review Questionnaire: Security and Privacy
 
-Security and Privacy questionnaire for [`update-token`](https://github.com/Dp-Goog/manifest-incubations/blob/gh-pages/predictable-app-updating.md)
+Security and Privacy questionnaire for [`predictable app updating`](https://github.com/Dp-Goog/manifest-incubations/blob/gh-pages/predictable-app-updating.md)
 
 ## What information might this feature expose to Web sites or other parties, and for what purposes is that exposure necessary?
 
