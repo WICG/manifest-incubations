@@ -1419,9 +1419,10 @@
                   <li>[=list/for each=] |file| of |files|
                     <ol>
                       <li>Let |params:LaunchParams| be a new {{LaunchParams}}
-                      with {{LaunchParams/files}} set to a {{FrozenArray}} with
-                      a single element that is a {{FileSystemHandle}}
-                      corresponding to |file|.
+                      with {{LaunchParams/targetURL}} set to
+                      |file_handler|["action"] and {{LaunchParams/files}} set
+                      to a {{FrozenArray}} with a single element that is a
+                      {{FileSystemHandle}} corresponding to |file|.
                       </li>
                       <li>[=Launch a web application with handling=], passing
                       |manifest| and |params|.
@@ -1433,7 +1434,8 @@
               <li>Else,
                 <ol>
                   <li>Let |params:LaunchParams| be a new {{LaunchParams}} with
-                  {{LaunchParams/files}} set to a {{FrozenArray}} of
+                  {{LaunchParams/targetURL}} set to |file_handler|["action"]
+                  and {{LaunchParams/files}} set to a {{FrozenArray}} of
                   {{FileSystemHandle}}s that correspond to the file paths named
                   by |files|.
                   </li>
