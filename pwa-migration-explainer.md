@@ -17,13 +17,20 @@ When a user installs a Progressive Web App (PWA), its identity and security cont
 
 Imagine you have the "SocialApp" app installed on your computer from `www.example.com/social`. One day, the company decides to move the app to its own dedicated home at `social.example.com`. Without a migration mechanism, the app you have installed would either break or redirect you to the new site in a generic browser window, losing its app-like feel. You would have to figure out that you need to uninstall the old app and install the new one from the new address. You might also lose your settings, like whether you've allowed the app to send notifications.
 
-This feature aims to make that transition seamless. Instead of a broken experience, the app would notify you of an available update. With your approval, the app would relaunch from its new home at `social.example.com`, with your notification settings intact.
+This feature aims to make that transition seamless. Instead of a broken experience, the app would notify you of an available update. With your approval, the app would relaunch from its new home at `social.example.com`.
+
+### Duplicate App Identity ("Split Apps")
+
+Another common problem occurs when a developer accidentally creates multiple "apps" for the same service. Because a PWA's identity historically defaulted to its `start_url`, a developer who changed the starting path of their app (e.g., from `/app` to `/launcher`) without specifying a stable `id` would inadvertently create a second, separate app installation for their users.
+
+In this scenario, a user might end up with two versions of the same app on their device. The older version becomes "stale"—it can no longer be updated because the site it pointed to has changed—but it remains in the user's app list, leading to confusion and a cluttered experience. This proposal provides a way for developers to merge these "split" apps by migrating the identity of the stale app into the new, correct one.
 
 ### Goals
 
 *   **Seamless User Experience:** Users should be able to transition to a new PWA origin with a simple, non-disruptive update flow.
 *   **Developer Enablement:** Provide a clear mechanism for developers to migrate their PWAs for reasons like rebranding (e.g., "ConnectApp" to "ConnectX"), SEO optimization (e.g., `photo-app.example.com` to `photos.example.com/app`), or backend architecture changes (e.g., `mail.example.com` to `app.example.com`).
-*   **Permission Persistence:** User-granted permissions (e.g., notifications, location) should be securely and transparently migrated to the new origin where possible.
+*   **Resolve Duplicate Identities:** Allow developers to fix "split apps" where multiple installations were created accidentally due to changing URLs without a stable manifest ID.
+*   **Permission Persistence (Future):** While not in the initial version, the design should allow for future secure migration of user-granted permissions.
 *   **Security:** The migration process must be secure, preventing malicious takeovers or phishing attacks.
 
 ### Non-goals
@@ -81,15 +88,11 @@ Once the migration is discovered (via either method), the browser will present t
 *   `"suggest"`: The user is (passively) notified of the update but can ignore it.
 *   `"force"`: The next time the user launches the app being migrated (after a manifest is parsed with this behavior specified), they are presented with a blocking dialog requiring them to either migrate or uninstall the app.
 
-### Permission Migration and User Experience
+#### Future Extension: Permission Migration
 
-A key part of this proposal is the migration of user-granted permissions from the old origin to the new one. To maintain user trust and transparency, this does not happen silently in the background.
+In the initial version of this proposal, **permissions are not migrated**. When an app migrates to a new origin, it is treated as a new entity with whatever permissions were previously denied or granted to the new origin. The user will be prompted to grant permissions (like Notifications or Location) again when the new app requests them.
 
-It's possible that a user has already interacted with the new origin in a regular browser tab and has set different permissions than those for the old PWA. To handle this safely and prevent unexpected granting of capabilities, the migration will use the **most restrictive** permission setting. For example, if a user had denied camera access on the old PWA's origin but had previously allowed it on the new origin, the resulting permission for the migrated app will be 'denied'. This ensures the user's most cautious intent is respected.
-
-After the user has approved the app migration and launches the app on its new origin for the first time, the browser should present a UI element (for example, a prompt or a highly visible notification) explaining that the permissions granted to the old app can be carried over to the new one. The migration of these permissions will only complete after the user acknowledges this UI.
-
-This confirmation step ensures the user is explicitly aware that permissions are moving to a new URL and remains in control. It also provides a consistent point of information for migrations that may have occurred automatically on a secondary device via browser sync.
+We may explore migrating user-granted permissions in the future. If implemented, this would likely involve a "most restrictive" merge strategy (respecting the strictest setting between the old and new origin) and require explicit user confirmation. However, to reduce initial complexity and potential confusion, this is currently out of scope.
 
 ### Example User Interface
 
@@ -115,20 +118,6 @@ This dialog can be triggered when a migration is available and the developer has
 ```
 
 For "force" update, a similar dialog would appear on next launch, with the major difference being that the "Ignore" button is absent.
-
-**Post-Migration Permission Notification:**
-
-This notification appears after the migration is complete to confirm the permission change. Permissions won't be migrated until the user interacts with this dialog.
-
-```
-  /---------------------------------------------\
- (  Check permissions for this app           [X] )
- (-----------------------------------------------)
- (  This app's URL has updated and permissions   )
- (  you gave now apply to any page that is part  )
- (  of social.example.com                        )
-  \______________________[ Change ]__[ Got it ]_/
-```
 
 ### Handling Redirects and Pre-Migration Updates
 
@@ -160,6 +149,34 @@ Developers can combine an origin migration with other manifest changes, such as 
 However, there is a critical security consideration for `"force"` migrations. To prevent a developer from forcing a user to accept a potentially deceptive name or icon change, the browser will enforce a separation of concerns. During a **forced migration, the browser will only apply the URL change**. If the new manifest also contains changes to security-sensitive fields like `name` or `icon`, the browser will defer these changes. After the migration is complete, these deferred changes will be processed as a standard, ignorable update, allowing the user to review them separately and preserving user control over the app's identity.
 
 ## Alternatives considered
+
+### Using HTTP Redirects
+
+We considered using HTTP redirects (e.g., 301 Moved Permanently) as the primary mechanism for triggering a migration, rather than a manifest-based handshake.
+
+*   **Pros:** 
+    *   **Strong Signal:** A 301 redirect is a standard, explicit signal that a resource has moved. It works without requiring the old site to host a specific manifest or verification file (like the origin association file).
+    
+*   **Cons:**
+    *   **Limited Discovery:** Migration detection via redirect only works if the user navigates to the *old* URL. This is effective if the user launches the old installed app (which loads the old `start_url`), but fails if the user accesses the new app directly (e.g., via a link shared by a colleague or a calendar invite). In those cases, the browser never hits the old origin and thus never sees the redirect signal to trigger the migration.
+    *   **Conflation of Navigation and Identity:** A redirect signals that a *page* has moved, but not necessarily that the *app identity* should change. Relying solely on redirects makes it difficult to distinguish between a simple URL restructuring (where the app identity remains the same) and a true migration.
+    *   **No "Soft" Migration:** Redirects are immediate. It is difficult to support the "suggest" behavior (where the user is notified but can choose to migrate later) because the navigation has already happened. The user is effectively forced into the new experience immediately.
+    *   **Cannot Handle "Split" Apps:** As described in the "User-Facing Problem", developers may have accidentally created multiple app installations for the same logical app. If these apps are on the same origin and don't involve a URL change (just a manifest/ID fix), a redirect cannot trigger the migration because the URL hasn't changed.
+
+While redirects are a useful *trigger* for discovery (and indeed, if an old app redirects to a new one, the browser will see the new manifest and can initiate the handshake), we believe the manifest-based approach is necessary to provide the metadata required for a controlled, secure, and predictable application lifecycle transition.
+
+### Always use "force" behavior (No `behavior` flag)
+
+We considered removing the optional `behavior` field and having all migrations default to the "force" behavior (blocking the user until they migrate or uninstall).
+
+*   **Pros:** 
+    *   **API Simplicity:** Simplifies the manifest schema by removing a configuration member.
+    *   **Developer Certainty:** Ensures that developers can reliably move their entire user base to the new origin without leaving "zombie" installations on the old, unsupported origin.
+*   **Cons:**
+    *   **Disruptive UX:** Not all migrations require a hard cutover. Developers might prefer a "soft" transition period where the migration is suggested but the user can continue using the old app for a few weeks (e.g., while legacy backend APIs are still being phased out).
+    *   **Identity Change Friction:** As described in the security section, "force" migrations defer name and icon changes to a second, separate update to prevent deceptive branding changes. If every migration were forced, users would *always* be required to undergo a two-step branding update, which could be more confusing than a single, ignorable "suggested" update that includes both the URL and branding changes.
+
+By providing the `behavior` flag, we give developers the flexibility to manage their transition according to their specific technical and product requirements.
 
 ### Require a 'cooling off' period
 
@@ -196,9 +213,7 @@ The user-facing UI for the migration (update notifications, confirmation dialogs
 
 ### Privacy
 
-The primary privacy consideration is the migration of permissions. A user who granted permissions to `old.example.com` might not want `new.example.com` to have them. This is mitigated in two ways:
-1.  The **same-site restriction** ensures the same entity controls both origins.
-2.  The user is **explicitly informed** via UI that their permissions will be moved to the new URL after the migration is complete, and no permissions are migrated until the user acknowledges this.
+The primary privacy consideration is the migration of identity. A user who installed an app from `old.example.com` might not want `new.example.com` to control that app. This is mitigated by the **same-site restriction** ensuring the same entity controls both origins. In the initial version of this proposal, permissions are NOT migrated, meaning the new origin starts with default permissions.
 
 ### Security
 
@@ -242,7 +257,7 @@ No.
 No.
 
 ### 2.9 Do features in this specification enable access to device sensors?
-Not directly. It allows for the migration of *permissions* to access sensors (e.g., camera, microphone, location) from the old origin to the new, same-site origin. This permission migration only occurs after the user has approved the origin migration and then explicitly consented to the permission transfer via a post-migration UI prompt.
+No. While future extensions might allow for permission migration, the initial version treats the new origin as a fresh install with default permissions. The user must grant access to device sensors again on the new origin.
 
 ### 2.10 Do features in this specification enable new script execution/loading mechanisms?
 No.
