@@ -240,6 +240,12 @@
         <li>[=Process the `scope_extensions` member=], passing |json| and
         |manifest|.
         </li>
+        <li>[=Process the `migrate_from` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
+        <li>[=Process the `migrate_to` member=], passing |json|, |manifest|
+        and |manifest URL|.
+        </li>
       </ol>
     </section>
     <section>
@@ -1780,22 +1786,6 @@
           different use cases.
         </aside>
       </section>
-      <section class="informative">
-        <h3>
-          The web-app-origin-association file
-        </h3>
-        <p>
-          A <dfn>web-app-origin-association</dfn> file is a JSON file that can
-          be used to [=validate scope extensions=]. It confirm an association
-          between the origin it is in with one or more web applications. It
-          identifies apps uniquely by referencing manifest [=manifest/ids=].
-        </p>
-        <p>
-          Given [=origin=] |origin:origin|, a [=web-app-origin-association=]
-          file is expected to be downloadable from
-          <code>[origin]/.well-known/web-app-origin-association</code>.
-        </p>
-      </section>
       <section>
         <h2>
           Validating scope extensions
@@ -1853,6 +1843,350 @@
           contents of the application but also keep the user informed of the
           privacy and security implications of navigating to a different
           [=origin=].
+        </p>
+      </section>
+    </section>
+    <section class="informative">
+      <h2>
+        The web-app-origin-association file
+      </h2>
+      <p>
+        A <dfn>web-app-origin-association</dfn> file is a JSON file that can
+        be used to [=validate scope extensions=] or [=validate origin
+        migration=]. It confirms an association between the origin it is in
+        with one or more web applications. It identifies apps uniquely by
+        referencing manifest [=manifest/ids=].
+      </p>
+      <p>
+        Given [=origin=] |origin:origin|, a [=web-app-origin-association=]
+        file is expected to be downloadable from
+        <code>[origin]/.well-known/web-app-origin-association</code>.
+      </p>
+    </section>
+    <section>
+      <h2>
+        Web Application Origin Migration
+      </h2>
+      <p>
+        Web Application Origin Migration allows a web application to indicate
+        to the user agent that it moved from one origin to another (within the
+        same site). This then enables the user agent to migrate an installed
+        web application while preserving the user's installation and potentially
+        their settings.
+      </p>
+      <section class="informative">
+        <h3>
+          Usage Example
+        </h3>
+        <p>
+          The following example shows how a web application hosted at
+          <code>https://old.example.com</code> can be migrated to
+          <code>https://new.example.com</code>. Both origins must be
+          [=same site=] and must explicitly agree to the migration.
+        </p>
+        <p>
+          First, the old application's manifest can optionally include a
+          `migrate_to` member to signal to the user agent that it intends to
+          move (alternatively the old application can redirect to the new
+          application):
+        </p>
+        <pre class="example json" title="https://old.example.com/manifest.json">
+          {
+            "name": "My App",
+            "id": "/",
+            "migrate_to": {
+              "id": "https://new.example.com/",
+              "install_url": "https://new.example.com/install"
+            }
+          }
+        </pre>
+        <p>
+          Next, the new application's manifest includes a `migrate_from` member
+          to claim the migration from the old application:
+        </p>
+        <pre class="example json" title="https://new.example.com/manifest.json">
+          {
+            "name": "My New App",
+            "id": "/",
+            "migrate_from": [
+              {
+                "id": "https://old.example.com/",
+                "install_url": "https://old.example.com/install",
+                "behavior": "force"
+              }
+            ]
+          }
+        </pre>
+        <p>
+          Finally, the old origin must host a `web-app-origin-association`
+          file to definitively validate that it permits the new application to
+          take over. Without this file, a malicious new application could
+          claim to migrate from an old application without permission.
+        </p>
+        <pre class="example json" title="https://old.example.com/.well-known/web-app-origin-association">
+          {
+            "https://new.example.com/": {
+              "allow_migration": true
+            }
+          }
+        </pre>
+      </section>      
+      <section>
+        <h3>
+          <code><dfn data-export="" data-dfn-for=
+          "manifest">migrate_from</dfn></code> member
+        </h3>
+        <p>
+          The [=manifest/migrate_from=] member is a [=list=] of either
+          [=strings=] or [=ordered maps=] that identifies the old web
+          applications that are being migrated from.
+        </p>
+        <p>
+          If an entry is a [=string=], it is treated as the [=manifest/id=] of
+          the old application.
+        </p>
+        <p>
+          If an entry is an [=ordered map=], it can have the following members:
+        </p>
+        <ul>
+          <li>
+            <code><dfn data-dfn-for="migrate_from_item">id</dfn></code>: A
+            [=string=] representing the [=manifest/id=] of the old application.
+          </li>
+          <li>
+            <code><dfn data-dfn-for=
+            "migrate_from_item">install_url</dfn></code>: A [=string=]
+            representing a URL of a page that links to the old application's
+            manifest. A user agent can use this field to fetch the manifest of
+            the old application in order to apply updates even if every other
+            URL that is part of the old application redirects to the new
+            application.
+          </li>
+          <li>
+            <code><dfn data-dfn-for="migrate_from_item">behavior</dfn></code>: A
+            [=string=] that can be either `"suggest"` or `"force"`. This is a
+            hint to the user agent that might influence how forceful the UI is
+            that the user agent presents to the user to tell them about the
+            migration.
+          </li>
+        </ul>
+        <div class="note">
+          For the user agent to process the [=manifest/migrate_from=] member,
+          the manifest needs to also contain a valid explicit
+          <a data-cite="appmanifest#dfn-id">id</a> member in its JSON.
+        </div>
+      </section>
+      <section>
+        <h3>
+          <code><dfn data-export="" data-dfn-for=
+          "manifest">migrate_to</dfn></code> member
+        </h3>
+        <p>
+          The [=manifest/migrate_to=] member is an optional [=ordered map=] that
+          proactively signals a migration to a new application. It has the
+          following members:
+        </p>
+        <ul>
+          <li>
+            <code><dfn data-dfn-for="migrate_to_item">id</dfn></code>: A
+            [=string=] representing the [=manifest/id=] of the new application.
+          </li>
+          <li>
+            <code><dfn data-dfn-for=
+            "migrate_to_item">install_url</dfn></code>: A [=string=]
+            representing a URL of a page that links to the new application's
+            manifest. The manifest on this page needs to include a
+            [=manifest/migrate_from=] field that points back at this application
+            for the migration to be processed.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h3>
+          Validating origin migration
+        </h3>
+        <p>
+          To <dfn>validate origin migration</dfn>, given [=URL=]
+          |old_manifest_id:URL| and [=URL=] |new_manifest_id:URL|:
+        </p>
+        <ol class="algorithm">
+          <li>If |old_manifest_id|'s [=URL/origin=] and |new_manifest_id|'s
+          [=URL/origin=] are not [=same site=], return an error.
+          </li>
+          <li>Let [=URL=] |origin_url:URL| be the [=URL/origin=] of
+          |old_manifest_id|.
+          </li>
+          <li>Let [=URL=] |download_url:URL| be the result of [=URL
+          Parser|parsing=] "/.well-known/web-app-origin-association" using
+          |origin_url| as the base [=URL=].
+          </li>
+          <li>Let [=ordered map=] |json:ordered map| be the result of a
+          [=fetch=] given |download_url|.
+          </li>
+          <li>If the [=fetch=] failed, return an error.
+          </li>
+          <li>If |json|[|new_manifest_id|] does not [=map/exist=] or is not an
+          [=ordered map=], return an error.
+          </li>
+          <li>If |json|[|new_manifest_id|]["allow_migration"] is not `true`,
+          return an error.
+          </li>
+          <li>Return success.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Processing the `migrate_from` member
+        </h3>
+        <p>
+          To <dfn>process the `migrate_from` member</dfn>, given [=ordered
+          map=] |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
+          [=URL=] |manifest URL:URL|:
+        </p>
+        <ol class="algorithm">
+          <li>If |json|["id"] does not [=map/exist=] or is not a [=string=],
+          return.
+          </li>
+          <li>If |json|["id"] is the empty string, return.
+          </li>
+          <li>Let |base_origin:origin| be |manifest|["start_url"]'s
+          [=URL/origin=].
+          </li>
+          <li>Let |id_url:URL| be the result of [=URL Parser|parsing=]
+          |json|["id"] with |base_origin| as the base URL.
+          </li>
+          <li>If |id_url| is failure, return.
+          </li>
+          <li>If |id_url| is not [=same origin=] as |manifest|["start_url"],
+          return.
+          </li>
+          <li>Let |processed_migrate_from:list| be a new [=list=].
+          </li>
+          <li>Set |manifest|["migrate_from"] to |processed_migrate_from|.
+          </li>
+          <li>If |json|["migrate_from"] does not [=map/exist=] or is not a
+          [=list=], return.
+          </li>
+          <li>[=list/For each=] |entry| of |json|["migrate_from"]:
+            <ol>
+              <li>Let |processed_entry:ordered map| be a new [=ordered map=].
+              </li>
+              <li>If |entry| is a [=string=]:
+                <ol>
+                  <li>Let |id:URL| be the result of [=URL Parser|parsing=]
+                  |entry| with |manifest URL| as the base URL.
+                  </li>
+                  <li>If |id| is failure, [=iteration/continue=].
+                  </li>
+                  <li>Set |processed_entry|["id"] to |id|.
+                  </li>
+                </ol>
+              </li>
+              <li>Else if |entry| is an [=ordered map=]:
+                <ol>
+                  <li>If |entry|["id"] does not [=map/exist=] or is not a
+                  [=string=], [=iteration/continue=].
+                  </li>
+                  <li>Let |id:URL| be the result of [=URL Parser|parsing=]
+                  |entry|["id"] with |manifest URL| as the base URL.
+                  </li>
+                  <li>If |id| is failure, [=iteration/continue=].
+                  </li>
+                  <li>Set |processed_entry|["id"] to |id|.
+                  </li>
+                  <li>If |entry|["install_url"] [=map/exists=] and is a
+                  [=string=]:
+                    <ol>
+                      <li>Let |install_url:URL| be the result of [=URL
+                      Parser|parsing=] |entry|["install_url"] with |manifest
+                      URL| as the base URL.
+                      </li>
+                      <li>If |install_url| is not failure, set
+                      |processed_entry|["install_url"] to |install_url|.
+                      </li>
+                    </ol>
+                  </li>
+                  <li>If |entry|["behavior"] [=map/exists=] and is a
+                  [=string=]:
+                    <ol>
+                      <li>If |entry|["behavior"] is "suggest" or "force", set
+                      |processed_entry|["behavior"] to |entry|["behavior"].
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+              <li>Else, [=iteration/continue=].
+              </li>
+              <li>Validate |processed_entry|["id"] using the algorithm from
+              [=validate origin migration=], given [=URL=]
+              |processed_entry|["id"] and [=URL=] |id_url|.
+              </li>
+              <li>If the previous step returned an error,
+              [=iteration/continue=].
+              </li>
+              <li>[=list/Append=] |processed_entry| to
+              |processed_migrate_from|.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Processing the `migrate_to` member
+        </h3>
+        <p>
+          To <dfn>process the `migrate_to` member</dfn>, given [=ordered
+          map=] |json:ordered map|, [=ordered map=] |manifest:ordered map|, and
+          [=URL=] |manifest URL:URL|:
+        </p>
+        <ol class="algorithm">
+          <li>If |json|["migrate_to"] does not [=map/exist=] or is not an
+          [=ordered map=], return.
+          </li>
+          <li>Let |entry:ordered map| be |json|["migrate_to"].
+          </li>
+          <li>If |entry|["id"] does not [=map/exist=] or is not a [=string=],
+          return.
+          </li>
+          <li>Let |id:URL| be the result of [=URL Parser|parsing=]
+          |entry|["id"] with |manifest URL| as the base URL.
+          </li>
+          <li>If |id| is failure, return.
+          </li>
+          <li>Let |processed_migrate_to:ordered map| be a new [=ordered map=].
+          </li>
+          <li>Set |processed_migrate_to|["id"] to |id|.
+          </li>
+          <li>If |entry|["install_url"] [=map/exists=] and is a [=string=]:
+            <ol>
+              <li>Let |install_url:URL| be the result of [=URL
+              Parser|parsing=] |entry|["install_url"] with |manifest URL| as
+              the base URL.
+              </li>
+              <li>If |install_url| is not failure, set
+              |processed_migrate_to|["install_url"] to |install_url|.
+              </li>
+            </ol>
+          </li>
+          <li>Set |manifest|["migrate_to"] to |processed_migrate_to|.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Privacy and Security Considerations
+        </h3>
+        <p>
+          To prevent malicious actors from silently taking over applications (e.g., a simple calculator updating itself to mimic a banking app), the [=validate origin migration=] algorithm enforces a two-way handshake. Both the new and the old application origins must explicitly agree to the migration via the [=web-app-origin-association=] file.
+        </p>
+        <p>
+          Furthermore, migrations are restricted to be [=same site=] to ensure they are used for legitimate rebranding and architecture changes within an organization's control, rather than transferring ownership to unverified third parties.
+        </p>
+        <p>
+          User agents should consider including an explicit user confirmation dialog as part of the migration flow, especially if an update to security-sensitive fields (such as the app name and icons) is included.
         </p>
       </section>
     </section>
