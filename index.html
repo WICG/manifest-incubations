@@ -2013,6 +2013,9 @@
           <li>If |old_manifest_id|'s [=URL/origin=] and |new_manifest_id|'s
           [=URL/origin=] are not [=same site=], return an error.
           </li>
+          <li>If |old_manifest_id|'s [=URL/origin=] is [=same origin=] as
+          |new_manifest_id|'s [=URL/origin=], return success.
+          </li>
           <li>Let [=URL=] |origin_url:URL| be the [=URL/origin=] of
           |old_manifest_id|.
           </li>
