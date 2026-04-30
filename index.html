@@ -39,7 +39,7 @@
         Feature specifications for <a href=
         "https://www.w3.org/TR/appmanifest/">Web Application Manifest</a>
         extensions & incubations which Chromium has shipped but do not have
-        committments / implementations from other user agents. Instead of
+        commitments / implementations from other user agents. Instead of
         keeping these features as explainers, they are documented more
         officially here.
       </p>
@@ -100,14 +100,14 @@
           </ol>
         </li>
       </ol>
-      <p class="note">
+      <aside class="note">
         This member is intended to be only used for advanced cases, where the
         developer wants explicit control over the fallback order of their
         display modes, or for modes that are not available in the basic
         <a data-cite="appmanifest/#dfn-display-modes-list">display modes
         list</a>. Otherwise, the [=manifest/display=] member is sufficient for
         most use cases.
-      </p>
+      </aside>
       <section>
         <h3>
           Concepts
@@ -986,7 +986,7 @@
           protocol handler URL, the user agent SHOULD run <a>handling a
           protocol launch</a>.
         </p>
-        <p class="note">
+        <aside class="note">
           [[HTML]]'s {{NavigatorContentUtils/registerProtocolHandler()}} allows
           web sites to register themselves as possible handlers for particular
           protocols. What constitutes valid [=protocol handler
@@ -995,7 +995,7 @@
           API. Also note that the [[HTML]] API uses <code>scheme</code> where
           we use [=protocol handler description/protocol=] but the same
           restrictions apply.
-        </p>
+        </aside>
         <section>
           <h3>
             `protocol` member
@@ -1970,11 +1970,11 @@
             migration.
           </li>
         </ul>
-        <div class="note">
+        <aside class="note">
           For the user agent to process the [=manifest/migrate_from=] member,
           the manifest needs to also contain a valid explicit
           <a data-cite="appmanifest#dfn-id">id</a> member in its JSON.
-        </div>
+        </aside>
       </section>
       <section>
         <h3>
@@ -2515,13 +2515,13 @@
         <h3>
           <dfn>BeforeInstallPromptEvent</dfn> Interface
         </h3>
-        <div class="note">
+        <aside class="note">
           The <a>beforeinstallprompt</a> event is somewhat misnamed, as it does
           not necessarily signal that a <a>manual installation</a> will follow
           (depending on the user agent, it might just be giving the site the
           ability to trigger an install prompt). It is so named for historical
           reasons.
-        </div>
+        </aside>
         <pre class="idl" data-cite="DOM">
           [Exposed=Window]
           interface BeforeInstallPromptEvent : Event {
@@ -2545,7 +2545,7 @@
           allows the site to cancel the <a>automated install prompt</a>, as
           well as manually present the <a>site-triggered install prompt</a>.
         </p>
-        <div class="note">
+        <aside class="note">
           If the {{BeforeInstallPromptEvent}} is <em>not</em> cancelled, the
           user agent is allowed to <a>present an install prompt</a>
           (specifically, an <a>automated install prompt</a>) to the end-user.
@@ -2553,7 +2553,7 @@
           prevents the user agent from <a>presenting an install prompt</a>. The
           user agent is free to run <a>steps to notify that an install prompt
           is available</a> again at a later time.
-        </div>
+        </aside>
         <p>
           The <dfn>PromptResponseObject</dfn> contains the result of calling
           {{BeforeInstallPromptEvent/prompt()}}. It contains one member,
