@@ -2090,39 +2090,39 @@
                   </li>
                   <li>If |id| is failure, [=iteration/continue=].
                   </li>
-                  <li>Set |processed_entry|["id"] to |id|.
+                  <li>Set |processed_entry|'s [=migrate_from_item/id=] to |id|.
                   </li>
                 </ol>
               </li>
               <li>Else if |entry| is an [=ordered map=]:
                 <ol>
-                  <li>If |entry|["id"] does not [=map/exist=] or is not a
+                  <li>If |entry|'s [=migrate_from_item/id=] does not [=map/exist=] or is not a
                   [=string=], [=iteration/continue=].
                   </li>
                   <li>Let |id:URL| be the result of [=URL Parser|parsing=]
-                  |entry|["id"] with |manifest URL| as the base URL.
+                  |entry|'s [=migrate_from_item/id=] with |manifest URL| as the base URL.
                   </li>
                   <li>If |id| is failure, [=iteration/continue=].
                   </li>
-                  <li>Set |processed_entry|["id"] to |id|.
+                  <li>Set |processed_entry|'s [=migrate_from_item/id=] to |id|.
                   </li>
-                  <li>If |entry|["install_url"] [=map/exists=] and is a
+                  <li>If |entry|'s [=migrate_from_item/install_url=] [=map/exists=] and is a
                   [=string=]:
                     <ol>
                       <li>Let |install_url:URL| be the result of [=URL
-                      Parser|parsing=] |entry|["install_url"] with |manifest
+                      Parser|parsing=] |entry|'s [=migrate_from_item/install_url=] with |manifest
                       URL| as the base URL.
                       </li>
                       <li>If |install_url| is not failure, set
-                      |processed_entry|["install_url"] to |install_url|.
+                      |processed_entry|'s [=migrate_from_item/install_url=] to |install_url|.
                       </li>
                     </ol>
                   </li>
-                  <li>If |entry|["behavior"] [=map/exists=] and is a
+                  <li>If |entry|'s [=migrate_from_item/behavior=] [=map/exists=] and is a
                   [=string=]:
                     <ol>
-                      <li>If |entry|["behavior"] is "suggest" or "force", set
-                      |processed_entry|["behavior"] to |entry|["behavior"].
+                      <li>If |entry|'s [=migrate_from_item/behavior=] is "suggest" or "force", set
+                      |processed_entry|'s [=migrate_from_item/behavior=] to |entry|'s [=migrate_from_item/behavior=].
                       </li>
                     </ol>
                   </li>
@@ -2130,9 +2130,9 @@
               </li>
               <li>Else, [=iteration/continue=].
               </li>
-              <li>Validate |processed_entry|["id"] using the algorithm from
+              <li>Validate |processed_entry|'s [=migrate_from_item/id=] using the algorithm from
               [=validate origin migration=], given [=URL=]
-              |processed_entry|["id"] and [=URL=] |id_url|.
+              |processed_entry|'s [=migrate_from_item/id=] and [=URL=] |id_url|.
               </li>
               <li>If the previous step returned an error,
               [=iteration/continue=].
@@ -2159,26 +2159,26 @@
           </li>
           <li>Let |entry:ordered map| be |json|["migrate_to"].
           </li>
-          <li>If |entry|["id"] does not [=map/exist=] or is not a [=string=],
+          <li>If |entry|'s [=migrate_to_item/id=] does not [=map/exist=] or is not a [=string=],
           return.
           </li>
           <li>Let |id:URL| be the result of [=URL Parser|parsing=]
-          |entry|["id"] with |manifest URL| as the base URL.
+          |entry|'s [=migrate_to_item/id=] with |manifest URL| as the base URL.
           </li>
           <li>If |id| is failure, return.
           </li>
           <li>Let |processed_migrate_to:ordered map| be a new [=ordered map=].
           </li>
-          <li>Set |processed_migrate_to|["id"] to |id|.
+          <li>Set |processed_migrate_to|'s [=migrate_to_item/id=] to |id|.
           </li>
-          <li>If |entry|["install_url"] [=map/exists=] and is a [=string=]:
+          <li>If |entry|'s [=migrate_to_item/install_url=] [=map/exists=] and is a [=string=]:
             <ol>
               <li>Let |install_url:URL| be the result of [=URL
-              Parser|parsing=] |entry|["install_url"] with |manifest URL| as
+              Parser|parsing=] |entry|'s [=migrate_to_item/install_url=] with |manifest URL| as
               the base URL.
               </li>
               <li>If |install_url| is not failure, set
-              |processed_migrate_to|["install_url"] to |install_url|.
+              |processed_migrate_to|'s [=migrate_to_item/install_url=] to |install_url|.
               </li>
             </ol>
           </li>
@@ -2338,8 +2338,8 @@
         <p>
           A <dfn data-local-lt="fingerprints">fingerprint</dfn> represents a
           set of cryptographic fingerprints used for verifying the application.
-          A fingerprint has the following two members: <dfn data-dfn-for=
-          "fingerprint">type</dfn> and <dfn data-dfn-for=
+          A fingerprint has the following two members: <dfn class="lint-ignore" data-dfn-for=
+          "fingerprint">type</dfn> and <dfn class="lint-ignore" data-dfn-for=
           "fingerprint">value</dfn>. Each of these are <a>string</a>s, but
           their syntax and semantics are platform-defined.
         </p>
