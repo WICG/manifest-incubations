@@ -67,47 +67,41 @@
         used to specify a custom fallback order of <a data-cite=
         "appmanifest#dfn-display-modes-list">display mode list values</a> for
         developers to choose their preferred <a data-cite=
-        "appmanifest#dfn-display">display mode</a> for the web application. Its
-        value is a [=display mode=].
+        "appmanifest#dfn-display">display mode</a> for the web application.
       </p>
       <p>
         The [=manifest/display_override=] member of the [=application
-        manifest=] is a <a>sequence</a> of <a data-cite=
-        "appmanifest#dfn-display-modes-list">display mode list values</a>
-        including extensions like [=display mode/window-controls-overlay=] and
-        [=display mode/unframed=]. This member represents the developer's
-        preferred fallback chain for [=display mode=]s. This field overrides
-        the [=manifest/display=] member. If the user agent does not support any
-        of the [=display mode=]s specified here, then it falls back to
-        considering the [=manifest/display=] member. See <a data-cite=
-        "appmanifest#dfn-process-the-display-member">processing the display
-        members</a> for the algorithm steps.
+        manifest=] is a [=list=] of [=display override entries=].
+        A <dfn>display override entry</dfn> is either a <a data-cite=
+        "appmanifest#dfn-display-modes-list">display modes list value</a>
+        (including [=display mode extensions|extensions=] like
+        [=display mode/window-controls-overlay=], [=display mode/tabbed=], and
+        [=display mode/unframed=]) or a [=DisplayOverrideEntryObject=].
       </p>
       <p>
-        The following steps are added to the [=application manifest/processing
-        extension-point=] in <a data-cite=
-        "appmanifest#dfn-steps-for-determining-the-web-app-s-chosen-display-mode">
-        determining the web app's chosen display mode</a>:
+        This member represents the developer's preferred fallback chain for
+        [=display modes=]. This field overrides the [=manifest/display=]
+        member. If the user agent does not support any of the [=display modes=]
+        specified here, then it falls back to considering the
+        [=manifest/display=] member. See <a data-cite=
+        "appmanifest#dfn-process-the-display-member"> processing the display
+        members</a> for the algorithm steps. </p>
+      <p>
+        A <dfn>DisplayOverrideEntryObject</dfn> is an [=ordered map=] with the
+        following members:
       </p>
-      <ol>
-        <li>[=list/For each=] |candidate_display_mode:DisplayModeType| of
-        |manifest:ordered map|.[=manifest/display_override=] member:
-          <ol class="algorithm">
-            <li>If <a data-cite="appmanifest/#dfn-display-modes-list">display
-            modes list</a> contains |candidate_display_mode:DisplayModeType|,
-            return that |candidate_display_mode:DisplayModeType|
-            </li>
-            <li>If |candidate_display_mode:DisplayModeType| is [=display
-            mode/window-controls-overlay=] and the user agent supports this,
-            then return that |candidate_display_mode:DisplayModeType|.
-            </li>
-            <li>If |candidate_display_mode:DisplayModeType| is [=display
-            mode/tabbed=] and the user agent supports this, then return that
-            |candidate_display_mode:DisplayModeType|.
-            </li>
-          </ol>
+      <ul>
+        <li>
+          <dfn data-dfn-for="DisplayOverrideEntryObject">display</dfn>: a
+          <a data-cite="appmanifest#dfn-display-modes-list">display modes list
+          value</a> including [=display mode extensions|extensions=].
         </li>
-      </ol>
+        <li>
+          <dfn data-dfn-for="DisplayOverrideEntryObject">url_patterns</dfn>
+          (optional): a [=list=] of [=URL patterns=]. Defaults to an [=list/is
+          empty|empty list=] if omitted.
+        </li>
+      </ul>
       <aside class="note">
         This member is intended to be only used for advanced cases, where the
         developer wants explicit control over the fallback order of their
@@ -116,6 +110,128 @@
         list</a>. Otherwise, the [=manifest/display=] member is sufficient for
         most use cases.
       </aside>
+      <section>
+        <h3>
+          Determining the chosen display mode
+        </h3>
+        <p>
+          The following steps are added to the [=application manifest/processing
+          extension-point=] in <a data-cite=
+          "appmanifest#dfn-steps-for-determining-the-web-app-s-chosen-display-mode">
+          determining the web app's chosen display mode</a>, which now also
+          takes an optional [=URL=] |document URL|:
+        </p>
+        <ol>
+          <li>[=list/For each=] |entry:display override entry| of |manifest:ordered map|'s [=manifest/display_override=] member:
+            <ol class="algorithm">
+              <li>Let |candidate display mode| be null.
+              </li>
+              <li>If |entry| is a [=display mode=]:
+                <ol>
+                  <li>Set |candidate display mode| to |entry|.
+                  </li>
+                </ol>
+              </li>
+              <li>Else if |entry| is a [=DisplayOverrideEntryObject=]:
+                <ol>
+                  <li>If |entry|'s [=DisplayOverrideEntryObject/url_patterns=] [=list/is empty=]:
+                    <ol>
+                      <li>Set |candidate display mode| to |entry|'s [=DisplayOverrideEntryObject/display=].
+                      </li>
+                    </ol>
+                  </li>
+                  <li>Else if |document URL| is not null:
+                    <ol>
+                      <li>[=list/For each=] |pattern| of |entry|'s [=DisplayOverrideEntryObject/url_patterns=]:
+                        <ol>
+                          <li>If |pattern| [=URL pattern/matches=] |document URL|, set |candidate display mode| to |entry|'s [=DisplayOverrideEntryObject/display=] and [=iteration/break=].
+                          </li>
+                        </ol>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+              <li>If |candidate display mode| is null, [=iteration/continue=].
+              </li>
+              <li>If <a data-cite="appmanifest/#dfn-display-modes-list">display modes list</a> contains |candidate display mode|, return that |candidate display mode|.
+              </li>
+              <li>If |candidate display mode| is [=display mode/window-controls-overlay=] and the [=user agent=] supports this, then return that |candidate display mode|.
+              </li>
+              <li>If |candidate display mode| is [=display mode/tabbed=] and the [=user agent=] supports this, then return that |candidate display mode|.
+              </li>
+              <li>If |candidate display mode| is [=display mode/unframed=], the [=user agent=] supports this, and the application is an Isolated Web Application [[isolated-web-apps]], then return that |candidate display mode|.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Processing the `display_override` member
+        </h3>
+        <p>
+          To <dfn>process the `display_override` member</dfn>, given [=ordered map=]
+          |json:ordered map|, [=ordered map=] |manifest:ordered map|, and [=URL=]
+          |manifest URL:URL|, run the following:
+        </p>
+        <ol class="algorithm">
+          <li>Set |manifest|["display_override"] to a new [=list=].
+          </li>
+          <li>If |json|["display_override"] does not [=map/exist=], return.
+          </li>
+          <li>If |json|["display_override"] is not a [=list=], return.
+          </li>
+          <li>Let |processed display override:list| be a new [=list=].
+          </li>
+          <li>[=list/For each=] |entry| of |json|["display_override"]:
+            <ol>
+              <li>If |entry| is a [=string=]:
+                <ol>
+                  <li>If the <a data-cite="appmanifest#dfn-display-modes-list">display modes list</a> (including [=display mode extensions|extensions=]) contains |entry|, [=list/append=] |entry| to |processed display override|.
+                  </li>
+                </ol>
+              </li>
+              <li>Else if |entry| is an [=ordered map=]:
+                <ol>
+                  <li>If |entry|["display"] does not [=map/exist=] or is not a [=string=], [=iteration/continue=].
+                  </li>
+                  <li>If the <a data-cite="appmanifest#dfn-display-modes-list">display modes list</a> (including [=display mode extensions|extensions=]) does not contain |entry|["display"], [=iteration/continue=].
+                  </li>
+                  <li>If the [=user agent=] does not support URL patterns for |entry|["display"], [=iteration/continue=].
+                  </li>
+                  <li>Let |override object| be a new [=DisplayOverrideEntryObject=] with its [=DisplayOverrideEntryObject/display=] set to |entry|["display"].
+                  </li>
+                  <li>If |entry|["url_patterns"] [=map/exists=]:
+                    <ol>
+                      <li>If |entry|["url_patterns"] is not a [=list=], [=iteration/continue=].
+                      </li>
+                      <li>[=list/For each=] |pattern entry| of |entry|["url_patterns"]:
+                        <ol>
+                          <li>Let |pattern:URL pattern| be the result of [=build a URL pattern from an infra value=] given |pattern entry| and |manifest URL|.
+                            If this process throws or returns null, [=iteration/continue=].
+                          </li>
+                          <li>[=list/append=] |pattern| to |override object|'s [=DisplayOverrideEntryObject/url_patterns=].
+                          </li>
+                        </ol>
+                      </li>
+                    </ol>
+                  </li>
+                  <li>[=list/append=] |override object| to |processed display override|.
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+          <li>Set |manifest|["display_override"] to |processed display override|.
+          </li>
+        </ol>
+        <aside class="note">
+          After processing, the only dictionary entries that can exist in the
+          manifest's `display_override` are for display modes that the [=user
+          agent=] supports URL patterns for.
+        </aside>
+      </section>
       <section>
         <h3>
           Concepts
@@ -128,6 +244,10 @@
             to control the application. Common actions in the [=window
             controls=] include minimize, maximize/restore, and close buttons.
           </li>
+          <li>
+            <dfn>Window frame</dfn>:
+            The host-native decorations, including borders, title bar, and window controls, that surround the web contents of an application window.
+          </li>
         </ul>
       </section>
       <section>
@@ -137,22 +257,25 @@
         <p>
           Additionally to the normal <a data-cite=
           "appmanifest#dfn-display-modes-list">display modes</a>,
-          [=manifest/display_override=] also supports certain extensions to it.
+          [=manifest/display_override=] also supports certain <dfn>display mode extensions</dfn>.
         </p>
         <dl>
           <dt>
-            <dfn data-export="" data-dfn-for="display mode">unframed</dfn>
+            [=display mode/unframed=]
           </dt>
           <dd>
-            Windows of [[[isolated-web-apps]]] do not have any host-native title
-            bar or [=window controls=] visible and with the web contents
-            extended to the whole title bar area. The app can specify
-            [=draggable region=]s in the web contents to create a customized
-            title bar.
+            The app window is [=display mode/unframed=], meaning it does not have a [=Window frame=].
+            It does not have any host-native title bar, and [=window controls=] are not visible.
+            Web contents extend to the entire window area. [=display mode/Unframed=] is restricted
+            to [[[isolated-web-apps]]].
           </dd>
           <dt>
             [=display mode/window-controls-overlay=]
           </dt>
+          <dd>
+            The app window has a [=display mode/window-controls-overlay=] instead of regular
+            [=window controls=].
+          </dd>
           <dt>
             <dfn data-export="" data-dfn-for="display mode">tabbed</dfn>
           </dt>
@@ -194,15 +317,89 @@
       </section>
       <section>
         <h3>
+          <code><dfn data-export="" data-dfn-for="display mode">unframed</dfn></code> display mode
+        </h3>
+        <p>
+          The [=display mode/unframed=] display mode enables [[[isolated-web-apps]]] to have full
+          control over the appearance of the app window, including the title bar area.
+        </p>
+        <p>
+          A window in [=display mode/unframed=] does not have any host-native title
+          bar or [=window controls=] visible, and the web contents are extended to
+          the whole window area. The app can specify [=draggable regions=] in the
+          web contents to create a customized title bar.
+        </p>
+        <p>
+          [=User agents=] MUST restrict the use of [=display mode/unframed=] to
+          [[[isolated-web-apps]]].
+        </p>
+        <p>
+          Once an [=display mode/unframed=] window has been created, its display
+          mode is fixed for the lifetime of the window. The [=user agent=] MUST
+          NOT allow navigation to out-of-scope URLs to take place within the
+          unframed window.
+        </p>
+        <section class="informative">
+          <h3>
+            Visual Example
+          </h3>
+          <p>
+            The following figures illustrate the visual difference between a standard web
+            application window and one utilizing the [=display mode/unframed=] display mode. The
+            regular app window (left) includes the host-native title bar and standard window
+            controls. In contrast, the unframed app window (right) removes these host-provided frame
+            decorations, allowing the web contents to occupy the entire window area.
+          </p>
+          <div style="display: flex; gap: 20px; margin-top: 15px;">
+            <figure style="margin: 0;">
+              <img src="images/example-non-unframed-window.png" alt="Example regular app window" style="max-width: 100%; height: auto;">
+              <figcaption style="text-align: center; font-size: 0.9em; color: #555;">Regular app window in standalone mode</figcaption>
+            </figure>
+            <figure style="margin: 0;">
+              <img src="images/example-unframed-window.png" alt="Example unframed app window" style="max-width: 100%; height: auto;">
+              <figcaption style="text-align: center; font-size: 0.9em; color: #555;">App window in unframed mode</figcaption>
+            </figure>
+          </div>
+        </section>
+        <section>
+          <h3>
+            CSS Media Query
+          </h3>
+          <p>
+            The [=display mode/unframed=] display mode can be queried using the
+            <a data-cite="MEDIAQUERIES-5#descdef-media-display-mode">`display-mode` media
+            feature</a>.
+          </p>
+          <pre class="example css" title="Querying unframed display mode">
+            @media (display-mode: unframed) {
+              /* styles for unframed mode */
+            }
+          </pre>
+        </section>
+        <section>
+          <h3>
+            Security and Privacy Considerations
+          </h3>
+          <p>
+            Giving developers control of the title bar enables them to spoof content in what was
+            previously a trusted, user agent-controlled region. To mitigate this threat, the feature
+            must only be available for [[[isolated-web-apps]]] and gated behind a window management
+            permission.
+          </p>
+          <p>
+            Since there is no title bar in [=display mode/unframed=] windows, important indicators
+            like the app origin or privacy indicators (e.g., for camera and microphone access) that
+            the [=user agent=] normally displays in the title bar will need to be shown elsewhere.
+            The specific location to display those indicators is platform dependent and to be
+            decided by the user agent.
+          </p>
+        </section>
+      </section>
+      <section>
+        <h3>
           Defining <dfn data-export="" data-lt="draggable region">draggable
           regions</dfn>
         </h3>
-        <p class="issue" title="At risk feature">
-          [=app-region=] CSS property has not been implemented in any user
-          agent, so it is at risk. Note that some user agents use the
-          non-standard CSS property <dfn data-export="" data-lt=
-          "-webkit-app-region">`-webkit-app-region`</dfn> for the same purpose.
-        </p>
         <p>
           The <dfn data-export="" data-lt="app-region">`app-region`</dfn>
           property can be used to define with CSS which regions or elements in
@@ -214,6 +411,14 @@
           <li>To disable dragging an element, shall be set to `no-drag`.
           </li>
         </ul>
+        <p>
+          The `app-region` property MUST only take effect when the applied [=display mode=] of the
+          window is [=display mode/unframed=] or [=display mode/window-controls-overlay=].
+        </p>
+        <aside class="note">
+          Some [=user agents=] use the non-standard CSS property <dfn data-export=""
+          data-lt="-webkit-app-region">`-webkit-app-region`</dfn> for the same purpose.
+        </aside>
       </section>
     </section>
     <section>
@@ -230,6 +435,9 @@
         |json:ordered map|, and [=ordered map=] |manifest:ordered map|):
       </p>
       <ol>
+        <li>[=Process the `display_override` member=], passing |json|, |manifest| and
+        |manifest URL|.
+        </li>
         <li>[=Process the `tab_strip` member=], passing |json|, |manifest| and
         |manifest URL|.
         </li>
@@ -639,9 +847,8 @@
             tab|["scope_patterns"]:
               <ol>
                 <li>Let |pattern:URL pattern| be the result of [=build a URL
-                pattern from an infra value|building a URL pattern from an
-                infra value=] |entry| given |manifest URL|. If this process
-                throws or returns null, continue.
+                pattern from an infra value=] given |entry| and |manifest URL|.
+                If this process throws or returns null, continue.
                 </li>
                 <li>Append |pattern| to |processed scope patterns|.
                 </li>
