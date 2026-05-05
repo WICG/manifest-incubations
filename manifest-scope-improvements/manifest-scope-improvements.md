@@ -69,7 +69,7 @@ Design constraints:
 
 ### Layer 2 — In-App Behavior (fine-grained)
 
-This layer answers: *"Now that we know this URL is part of the app, how should the browser handle it?"* This is where richer pattern matching (potentially `URLPattern`) becomes appropriate, because evaluation happens inside the browser after the OS has already routed the URL to the app.
+This layer answers: *"Now that we are in the app, how should the browser handle this URL?"* This is where richer pattern matching (potentially `URLPattern`) becomes appropriate, because evaluation happens inside the browser after the OS has already routed the URL to the app.
 
 **Prior art.** The [`tab_strip.home_tab.scope_patterns`](https://wicg.github.io/manifest-incubations/#home_tab-member) feature in the Manifest Incubations spec already uses `URLPattern` to define which URLs belong to a tabbed app's home tab vs. regular tabs. This demonstrates that URL-pattern-based behavior differentiation *within* a manifest is already a proven pattern, and the work proposed here can build on that precedent.
 
