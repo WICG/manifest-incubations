@@ -28,7 +28,7 @@ This document describes the concrete problems app developers are hitting and pro
 
 **Why it matters.** Navigation capturing is an all-or-nothing proposition today: it applies to every URL inside scope. Developers cannot differentiate between "this URL is part of my app" and "this URL should pull the user into the app window when clicked externally." These are distinct intents, and conflating them forces developers into workarounds (e.g., moving content to a different origin).
 
-**What developers need.** A mechanism to define a **capture scope** that is a subset of (or different from) the application scope — controlling which URLs trigger navigation capturing independently of which URLs render in the app window.
+**What developers need.** A mechanism to define a **capture scope** that is different from the application scope — controlling which URLs trigger navigation capturing independently of which URLs render in the app window.
 
 ---
 
