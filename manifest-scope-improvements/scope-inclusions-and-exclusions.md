@@ -11,7 +11,7 @@
 
 ## Introduction
 
-This proposal adds two scope-refinement members — **`scope_exclusions`** and **`scope_inclusions`** — to the Web App Manifest and to app entries in [web-app-origin-association](https://wicg.github.io/manifest-incubations/#the-web-app-origin-association-file) (WAOA) files. They let developers remove specific paths from scope and add non-contiguous or parameterized paths into scope using [URLPattern](https://urlpattern.spec.whatwg.org/). The two lists are **order-independent**, and each manifest or WAOA entry controls only its own origin. The application's effective scope is the union of those independently evaluated, origin-owned scopes.
+This proposal adds two scope-refinement members — **`scope_exclusions`** and **`scope_inclusions`** — to the Web App Manifest and to app entries in [web-app-origin-association](https://wicg.github.io/manifest-incubations/#the-web-app-origin-association-file) (WAOA) files. They let developers remove specific paths from scope and add non-contiguous or parameterized paths into scope using [URLPattern](https://urlpattern.spec.whatwg.org/). The two lists are **order-independent**: the top-level manifest configuration controls only the app's primary origin, and each WAOA entry controls only the origin hosting that file. The application's effective scope is the union of those independently evaluated, origin-owned scopes.
 
 ## Developer Problem
 
@@ -27,7 +27,7 @@ Many apps set a broad `scope` (often `scope: "/"`) because the app spans the ori
 
 ```json
 {
-  "scope": "/",  // Too broad - captures /about, /download, /api/*, etc.
+  "scope": "/",
   "start_url": "/"
 }
 ```
@@ -54,15 +54,15 @@ An app that extends its scope to another origin via [`scope_extensions`](https:/
 - Allow PWAs to **exclude specific paths** from an otherwise broad primary or extended scope
 - Keep every origin's scope configuration **owned by that origin**
 - Support **URL patterns** (named parameters, wildcards) for flexible matching
-- **Maintain backward compatibility**: apps work unchanged on old browsers that only understand `scope`
+- **Maintain backward compatibility**: browsers that do not recognize the new members continue applying their existing `scope` behavior
 
 ### Non-goals
 
 - Manifest-authored **cross-origin patterns** — top-level `scope_inclusions` and `scope_exclusions` cannot affect another origin. An extended origin can refine only its own scope in its WAOA entry after the existing `scope_extensions` consent handshake.
-- Regular expression groups (may be restricted for performance/security, per §4 of URL Pattern spec)
+- Custom regular-expression groups
 - Replacing or deprecating the `scope` member
-- **Ordered, position-dependent matching and re-inclusion** (excluding a subtree then re-including a leaf) — deliberately out of scope; see [Alternatives considered](#alternatives-considered)
-- Platform-specific scoping APIs (Android App Links, iOS Universal Links) — those remain independent mechanisms
+- Re-inclusion, and any ordered or position-dependent matching semantics — deliberately out of scope; see [Alternatives considered](#alternatives-considered)
+- Defining or changing platform-specific scoping APIs (Android App Links, iOS Universal Links) — user agents may translate these web rules into existing platform mechanisms
 
 ## Proposed Approach
 
@@ -71,7 +71,7 @@ Introduce two new members that refine the set of in-scope URLs described by a `s
 - **`scope_exclusions`** — a list of URL patterns to *remove* from the declaring configuration's scope; the primary, urgently-requested capability.
 - **`scope_inclusions`** — a list of URL patterns to *add* to the declaring configuration's scope, for apps whose in-scope URLs are non-contiguous or parameterized and cannot be captured by a single `scope` prefix.
 
-Both are JSON arrays of URL patterns, evaluated as **sets** so that matching is **order-independent** (entry order carries no meaning), drawn from a restricted, OS-mappable subset of the URL Pattern Standard (see [Accepted URLPattern Subset](#accepted-urlpattern-subset)). Bare strings and `URLPatternInit` objects are both accepted. They can appear alongside `scope` at the top level of a manifest or inside that app's entry in an extended origin's WAOA file.
+Both are JSON arrays of URL patterns, evaluated as **sets** so that matching is **order-independent** (entry order carries no meaning), drawn from a restricted subset of the URL Pattern Standard that can be translated into OS link rules without causing the OS to miss valid app URLs (see [Accepted URLPattern Subset](#accepted-urlpattern-subset)). Bare strings and `URLPatternInit` objects are both accepted. They can appear alongside `scope` at the top level of a manifest or inside that app's entry in an extended origin's WAOA file.
 
 ### Placement and Origin Ownership
 
@@ -103,31 +103,33 @@ Within one origin's scope configuration, a URL is *in scope* when it is **includ
 
 The lists are **order-independent**: entries may appear in any order and the result is identical. This makes scope configurations easy to author, generate, merge, and reason about.
 
+The OS link rules do not need to match the web scope exactly. When an OS cannot express a pattern, the browser may register a broader URL range so that it still receives every in-scope link. After launch, the browser checks the exact web scope and opens any extra URL in the normal browser window.
+
 ### Accepted URLPattern Subset
 
-For **portability** (keeping scope mappable to OS deep-link mechanisms such as [Android App Links](https://developer.android.com/training/app-links), [iOS Universal Links](https://developer.apple.com/documentation/xcode/allowing-apps-and-websites-to-link-to-your-content), and [Windows AppUriHandler](https://learn.microsoft.com/en-us/windows/apps/develop/launch/web-to-app-linking)) and **performance** (matching runs on the navigation hot path), `scope_inclusions` and `scope_exclusions` accept a **restricted subset** of URLPattern syntax rather than the full grammar:
+For **portability** across OS link mechanisms, such as [Android App Links](https://developer.android.com/training/app-links), [iOS Universal Links](https://developer.apple.com/documentation/xcode/allowing-apps-and-websites-to-link-to-your-content), and [Windows AppUriHandler](https://learn.microsoft.com/en-us/windows/apps/develop/launch/web-to-app-linking), and for **performance** on the navigation hot path, `scope_inclusions` and `scope_exclusions` accept a **restricted subset** of URLPattern syntax rather than the full grammar:
 
-**Supported:**
+**Supported pathname syntax:**
 - Literal path segments (`/app/about`)
 - Named segments (`:name`, e.g. `/users/:id/dashboard`) — match a single path segment
-- Wildcards (`*`, e.g. `/app/*`)
-- Prefixes
+- Full wildcards (`*`); a trailing wildcard expresses a prefix such as `/app/*`
 
-This is an **allowlist**: any URLPattern feature not listed above — including custom regexp groups (`:id(\d+)`), modifiers (`?`, `+`, `{n,m}`), and query/fragment matching — is unsupported. An entry using an unsupported feature is **ignored** (processing continues with the next entry), and the user agent **SHOULD** emit a console warning. Because ignoring an exclusion fails *open* (the exclusion is lost), authors should validate their patterns; tooling and the console warning surface this at authoring time. The subset is intentionally conservative and can be **expanded additively** in future versions without breaking older user agents.
+This is an **allowlist**: any URLPattern feature not listed above — including custom regexp groups (`:id(\d+)`), optional or repeated named/grouped segments (`:id?`, `:id+`, `:id*`), and query/fragment matching — is unsupported. Static protocol, hostname, and port values are allowed only when they identify the declaring configuration's origin; they are not pattern-bearing components. A resulting pattern must not constrain username, password, search, or hash. An entry using an unsupported feature is **ignored** (processing continues with the next entry), and the user agent **SHOULD** emit a console warning. Because ignoring an exclusion fails *open* (the exclusion is lost), authors should validate their patterns; tooling and the console warning surface this at authoring time.
 
-**Resolution and origin.** Pattern inputs follow the existing base-URL rules of the format that contains them. A top-level Web App Manifest entry is built using the manifest URL as its base, consistent with existing manifest URL-valued members and `display_override.url_patterns`. An entry in a validated WAOA app record is built using that scope extension's origin URL as its base, consistent with existing WAOA `scope` processing. After resolution, a pattern whose origin differs from the scope configuration's origin is ignored:
-- `"/logout"` in the Web App Manifest's top-level `scope_exclusions` excludes `/logout` only on the primary origin.
+**Resolution and origin.** Pattern inputs use the URL Pattern Standard's ["build a URL pattern from an Infra value"](https://urlpattern.spec.whatwg.org/#build-a-url-pattern-from-an-infra-value) algorithm. The user agent passes the manifest URL as the base for a top-level Web App Manifest entry, consistent with `scope` and `display_override.url_patterns`, and passes the validated scope extension's origin URL for a WAOA entry, consistent with existing WAOA `scope` processing. The algorithm also processes an explicit `URLPatternInit.baseURL`. After construction, a pattern whose origin differs from the scope configuration's origin is ignored:
+- `"/logout"` in a same-origin Web App Manifest's top-level `scope_exclusions` excludes `/logout` only on the primary origin.
 - `"/logout"` in `help.example.com`'s WAOA `scope_exclusions` excludes `/logout` only on `help.example.com`.
+- If the manifest is fetched from another origin, a relative top-level pattern resolves against that manifest URL and is then ignored by the primary-origin check; it never configures the manifest resource's origin.
 - `"https://other.example/logout"` is ignored when it appears in either of those configurations.
 
 ### Backward Compatibility
 
-- **Old browser** (knows `scope` but not the new members): ignores both new members and uses only the `scope` value from the Web App Manifest and each validated WAOA entry.
-  - Ignoring `scope_inclusions` → the extra sections are simply *not* captured (under-inclusion — safe; the app never captures more than intended).
-  - Ignoring `scope_exclusions` → excluded paths *are* captured (the exclusion "fails open"). This is **no worse than the status quo**: without this feature the developer would have shipped the same broad `scope` anyway.
+- **Browser without the new members**: ignores both of them and uses the existing scope model it supports — the Web App Manifest's `scope`, plus each validated WAOA `scope` if it supports `scope_extensions`.
+  - Ignoring `scope_inclusions` → the extra sections are simply not captured.
+  - Ignoring `scope_exclusions` → excluded paths *are* captured (the exclusion "fails open"), which is the same result as applying the authored `scope` without refinement.
 - **New browser**: refines each origin's scope independently, then unions the resulting scopes.
 
-> **Developer rule:** design every `scope` to be acceptable on its own — both the manifest's primary scope and each WAOA entry's extended scope — because any browser that doesn't parse the new members falls back to that `scope` alone. Treat `scope_inclusions` and `scope_exclusions` as progressive enhancement: inclusions degrade to under-capture and exclusions to today's behavior, so the feature is safe to adopt incrementally.
+> **Developer rule:** design every `scope` to be acceptable on its own — both the manifest's primary scope and each WAOA entry's extended scope — because any browser that doesn't parse the new members falls back to that `scope` alone. Treat `scope_inclusions` and `scope_exclusions` as progressive enhancement: inclusions degrade to under-capture and exclusions to the unrefined `scope`.
 
 ### Solving Use Case 1: Exclusions at Root Level
 
@@ -136,6 +138,7 @@ This is an **allowlist**: any URLPattern feature not listed above — including 
 ```json
 {
   "name": "Conferencing App",
+  "start_url": "/",
   "scope": "/",
   "scope_exclusions": ["/about", "/download"]
 }
@@ -149,6 +152,7 @@ This is an **allowlist**: any URLPattern feature not listed above — including 
 
 ```json
 {
+  "start_url": "/app/",
   "scope": "/app/",
   "scope_inclusions": ["/help/*", "/products/*"]
 }
@@ -162,6 +166,7 @@ This is an **allowlist**: any URLPattern feature not listed above — including 
 
 ```json
 {
+  "start_url": "/app/",
   "scope": "/app/",
   "scope_inclusions": ["/users/:id/dashboard"]
 }
@@ -170,7 +175,7 @@ This is an **allowlist**: any URLPattern feature not listed above — including 
 - `/users/:id/dashboard` matches `/users/123/dashboard` and `/users/456/dashboard` (`:id` matches one path segment), but not `/users/123/settings` or `/users/123/billing`.
 - This is something a prefix-based `scope` fundamentally cannot express — the value of URL-pattern-based inclusion.
 
-> **Not supported: re-inclusion.** Excluding a broad subtree and then re-including a specific leaf under it (e.g. exclude `/docs/internal/*` but re-include `/docs/internal/preview`) is intentionally **not** expressible, because it requires position-dependent precedence. No collected use case needs it, and OS support is inconsistent: Apple Universal Links and Android 15+ Dynamic App Links can represent ordered re-inclusion, while Windows and older Android cannot. See [Alternatives considered](#alternatives-considered) for the full rationale.
+> **Not supported: re-inclusion.** Excluding a broad subtree and then re-including a specific leaf under it (e.g. exclude `/docs/internal/*` but re-include `/docs/internal/preview`) is intentionally **not** expressible because exclusions always win over inclusions in this model. No collected use case needs it, and OS support is inconsistent: Apple Universal Links and Android 15+ Dynamic App Links can represent ordered re-inclusion, while Windows and older Android cannot. See [Alternatives considered](#alternatives-considered) for the full rationale.
 
 ### Solving Use Case 4: Excluding Parameterized URLs
 
@@ -178,6 +183,7 @@ This is an **allowlist**: any URLPattern feature not listed above — including 
 
 ```json
 {
+  "start_url": "/users/123/dashboard",
   "scope": "/users/",
   "scope_exclusions": ["/users/:id/settings"]
 }
@@ -194,6 +200,7 @@ Primary manifest at `https://app.example.com/manifest.webmanifest`:
 ```json
 {
   "id": "/app",
+  "start_url": "/",
   "scope": "/",
   "scope_extensions": [
     { "type": "origin", "origin": "https://help.example.com" }
@@ -240,14 +247,14 @@ A single `scope_patterns` member holding an **ordered list** of entries, each `{
 
 #### Cons
 - **Order-sensitivity is an authoring footgun.** Rearranging entries silently changes meaning; a broad include placed before a specific exclude makes the exclude a **dead, shadowed entry** with no error. The two-list model is order-independent and has no such trap.
-- **Re-inclusion is not portable across OS deep-link filters.** Apple Universal Links and Android 15+ Dynamic App Links use ordered rules that can represent it, but Windows and older Android cannot. Translating an ordered list for those platforms can **silently drop re-inclusion**, so an app relying on it would behave **differently via OS deep-link than in-browser** — a correctness divergence, not merely reduced precision.
+- **More extra app launches on some platforms.** Apple Universal Links and Android 15+ Dynamic App Links can represent ordered re-inclusion directly, but Windows and older Android cannot. On those platforms, the browser would register a broader URL range and reject extra launches after checking the exact web scope.
 - **No grounded use case needs re-inclusion.** Every collected developer report is plain include-minus-exclude.
 
 A **last-match-wins** variant (mirroring `.gitignore` negation) was also considered; it has the same order-sensitivity and OS-mapping problems.
 
 #### Reason for rejection
 
-The single ordered list's only advantage over the proposed two-list model is re-inclusion. No collected use case needs re-inclusion, it lacks uniform OS support, and the ordered model makes authoring more error-prone. The proposed two-list model therefore deliberately does not support it.
+The single ordered list's only additional expressiveness over the proposed two-list model is re-inclusion. No collected use case needs it, some OS formats would require broader URL ranges, and the ordered model makes authoring more error-prone. That complexity is not justified for this proposal.
 
 ### Alternative 2: Prefix-only patterns (no URL Pattern dependency)
 
@@ -261,7 +268,7 @@ Restrict patterns to simple path/URL prefixes, avoiding the URL Pattern Standard
 ```
 
 #### Pros
-- **Best platform compatibility**: pure prefixes map directly to OS deep-link filters (Android `pathPrefix`, iOS Universal Links) with no widening.
+- **Best platform compatibility**: prefix inclusions map directly to OS filters such as Android `pathPrefix` and iOS Universal Links. On platforms without prefix exclusions, the browser registers a broader prefix and filters extra launches.
 - **Simplest matching**: prefix lookup is cheaper than matching named segments or wildcards.
 
 #### Cons
@@ -270,7 +277,7 @@ Restrict patterns to simple path/URL prefixes, avoiding the URL Pattern Standard
 
 #### Reason for rejection
 
-Prefix-only can't match the parameterized URLs developers need (Use Case 3), and URLPattern is already adopted by the manifest and shipping in browsers — so the added expressiveness is worth the modest cost.
+Prefix-only can't match the parameterized URL boundary in Use Case 3, and URLPattern is already used by manifest-incubation features and implemented in browsers — so the added expressiveness is worth the modest cost.
 
 **Note**: Developers should still prefer simple prefixes (e.g. `/app/*`) when they suffice, for better performance and platform compatibility.
 
@@ -291,22 +298,22 @@ included = scope_inclusions present ? matchesAny(scope_inclusions) : within(scop
 - **Clean separation**: `scope` reads as a pure legacy fallback and `scope_inclusions` as the authoritative definition.
 
 #### Cons
-- **Unsafe degradation** (decisive): a browser that ignores `scope_inclusions` applies `scope` alone, so it captures the `scope`-minus-`inclusions` region that the developer intended to leave *out*. This is **over-capture** — the dangerous direction — whereas union only ever **under-captures** on old browsers (safe). Staying safe would require the developer to keep `scope ⊆ inclusions`, and `scope` becomes dormant in new browsers but active in old, so its fallback behavior diverges from its role — directly at odds with the "design `scope` to stand alone" guidance.
+- **Unsafe degradation** (decisive): a browser that ignores `scope_inclusions` applies `scope` alone, so it captures the `scope`-minus-`inclusions` region that the developer intended to leave *out*. This is **over-capture** — the dangerous direction — whereas ignoring union-style inclusions only under-captures. (`scope_exclusions` have the same fail-open behavior under either model.) Avoiding the replace-specific over-capture would require the developer to keep `scope ⊆ inclusions`, and `scope` becomes dormant in new browsers but active in old, so its fallback behavior diverges from its role — directly at odds with the "design `scope` to stand alone" guidance.
 - **Mode-switch semantics**: `scope`'s effect depends on whether `scope_inclusions` is present, which is harder to specify and teach than one uniform rule.
 - **Changes `scope`'s established meaning** for existing tooling and readers.
 
 #### Reason for rejection
 
-Union keeps a single uniform per-origin rule, preserves `scope`'s existing meaning, and — most importantly — degrades safely: a browser that drops the new members under-captures via a still-additive `scope`, never over-captures. Replace's extra expressiveness only enables semantically-odd scopes (those excluding the `start_url` region, which developers rarely want) at the cost of the over-capture failure mode.
+Union keeps a single uniform per-origin rule, preserves `scope`'s existing meaning, and ensures that a browser that drops `scope_inclusions` only under-captures. Replace's extra expressiveness does not justify its fallback over-capture and mode-switch semantics.
 
 ## Dependencies on non-stable features
 
 This proposal depends on the **URL Pattern Standard** ([urlpattern.spec.whatwg.org](https://urlpattern.spec.whatwg.org/)), specifically:
 
-- §4.2 "Integrating with JSON data formats" — the "build a URL pattern from an Infra value" algorithm
-- The concept of `has regexp groups` for optionally restricting patterns
+- The ["build a URL pattern from an Infra value"](https://urlpattern.spec.whatwg.org/#build-a-url-pattern-from-an-infra-value) algorithm
+- The concept of `has regexp groups` for rejecting custom regular-expression groups
 
-URL Pattern is a WHATWG standard and is being implemented across major browser engines; see [MDN's browser compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern#browser_compatibility) for current support.
+URL Pattern is a WHATWG standard; see [MDN's browser compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern#browser_compatibility) for current engine support.
 
 ## Privacy and Security Considerations
 
@@ -331,9 +338,9 @@ No new privacy surface: scope matching is a local, in-browser decision that expo
 
 ### How are WAOA scope changes activated and revoked?
 
-An extension origin can update its WAOA entry independently of the primary manifest. The browser's precise scope and the OS deep-link registration may therefore update at different times. To avoid losing valid deep links, an expansion should not become active in browser scope until the OS registration covers it. A contraction or revocation should take effect in browser scope first; a temporarily stale OS registration then only over-routes URLs that the browser can reject.
+An extension origin can update its WAOA entry independently of the primary manifest. The browser's precise scope and the OS link registration may therefore update at different times. To avoid losing valid deep links, an expansion should not become active in browser scope until the OS registration covers it. A contraction or revocation should take effect in browser scope first; a temporarily stale OS registration then only sends extra URLs to the browser, which can reject them.
 
-The processing model still needs to define WAOA refresh and cache lifetime, replacement of one validated generation with another, behavior on fetch failure versus explicit revocation, and rollback when native registration cannot be updated.
+The processing model still needs to define WAOA refresh and cache lifetime, replacement of one validated generation with another, behavior on fetch failure versus explicit revocation, and rollback when the OS link registration cannot be updated.
 
 ### What if an exclusion matches `start_url`?
 
@@ -341,7 +348,7 @@ The Web App Manifest algorithm for [processing the `scope` member](https://www.w
 
 ### Ship `scope_exclusions` alone first, or both members together?
 
-Exclusions are the urgent, dominant real-world request; inclusions serve the real-but-less-common non-contiguous / parameterized cases. Options: (a) ship `scope_exclusions` only in v1 and add `scope_inclusions` later; (b) ship both together for a symmetric, complete model. Either order is safe — shipping `scope_inclusions` in a later release is a purely additive change, not a breaking one.
+Exclusions are the urgent, dominant real-world request; inclusions serve the real-but-less-common non-contiguous / parameterized cases. Options: (a) ship `scope_exclusions` only in v1 and add `scope_inclusions` later; (b) ship both together for a symmetric, complete model. Either sequence is backward-compatible: a later `scope_inclusions` member is additive, and implementations that do not recognize it continue using `scope`.
 
 ## Acknowledgements
 
