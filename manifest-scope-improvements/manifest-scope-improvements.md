@@ -62,18 +62,18 @@ The problems above point to a unifying design: **separate the concept of "app bo
 
 ### Layer 1 — OS-to-App Scope (coarse-grained)
 
-This layer answers: *"Does this URL belong to the application?"* It determines install-time registration with the OS, deep-link routing, and display-mode application. Because it must map to OS-level URL filtering (Android intent filters, Windows protocol/URI handling, etc.), it should remain **simple** — path prefixes, origin lists, and at most basic include/exclude patterns.
+This layer answers: *"Does this URL belong to the application?"* It determines install-time registration with the OS, deep-link routing, and display-mode application. Because operating systems use their own link-handling formats (Android intent filters, Windows protocol/URI handling, etc.), these rules must be translated into those formats and should remain **simple** — path prefixes, origin lists, and basic include/exclude patterns.
 
 Design constraints:
-- Must be expressible using primitives that operating systems support for URL filtering. Prior work on the (now-obsolete) [`pwa-url-handler` explainer](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md#os-specific-implementation-notes) documented these OS mechanisms: Android [intent filters](https://developers.google.com/web/fundamentals/integration/webapks?hl=ro#android_intent_filters) via WebAPK, Windows ["Apps for Websites"](https://docs.microsoft.com/en-us/windows/uwp/launch-resume/web-to-app-linking), and iOS/macOS [Universal Links](https://developer.apple.com/ios/universal-links/). All are origin- or prefix-based — none support regex or complex pattern matching — which bounds the expressiveness of this layer.
-- Must perform well on low-end devices (no regex evaluation at navigation time).
-- Keep the existing `scope` member as-is for backward compatibility; introduce new top-level manifest members (e.g., `scope_exclusions` or an enhanced `scope` object) to add or remove paths.
+- Every Layer 1 rule must work with OS link handling. If an OS cannot express a rule exactly, the browser may register a broader set of URLs and apply the precise scope after launch. Prior work on the (now-obsolete) [`pwa-url-handler` explainer](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md#os-specific-implementation-notes) documented these OS mechanisms: Android [intent filters](https://developers.google.com/web/fundamentals/integration/webapks?hl=ro#android_intent_filters) via WebAPK, Windows ["Apps for Websites"](https://docs.microsoft.com/en-us/windows/uwp/launch-resume/web-to-app-linking), and iOS/macOS [Universal Links](https://developer.apple.com/ios/universal-links/). Their path, wildcard, exclusion, ordering, and regex-like capabilities vary by platform and version; none supports full URLPattern uniformly. This bounds the portable expressiveness of this layer.
+- Browser-side matching must perform well on low-end devices and on the navigation hot path, so the Layer 1 pattern profile excludes custom regular-expression groups and other complex syntax.
+- Keep the existing `scope` member as-is for backward compatibility; add `scope_inclusions` and `scope_exclusions` to the Web App Manifest and to validated web-app-origin-association entries.
 
 ### Layer 2 — In-App Behavior (fine-grained)
 
-This layer answers: *"Now that we are in the app, how should the browser handle this URL?"* This is where richer pattern matching (potentially `URLPattern`) becomes appropriate, because evaluation happens inside the browser after the OS has already routed the URL to the app.
+This layer answers: *"Now that we are in the app, how should the browser handle this URL?"* This is where a broader `URLPattern` feature set becomes appropriate than the restricted profile used for Layer 1, because evaluation happens inside the browser after the OS has already routed the URL to the app.
 
-**Prior art.** The [`tab_strip.home_tab.scope_patterns`](https://wicg.github.io/manifest-incubations/#home_tab-member) feature in the Manifest Incubations spec already uses `URLPattern` to define which URLs belong to a tabbed app's home tab vs. regular tabs. This demonstrates that URL-pattern-based behavior differentiation *within* a manifest is already a proven pattern, and the work proposed here can build on that precedent.
+**Prior art.** The [`tab_strip.home_tab.scope_patterns`](https://wicg.github.io/manifest-incubations/#home_tab-member) feature in the Manifest Incubations spec already uses `URLPattern` to define which URLs belong to a tabbed app's home tab vs. regular tabs. This provides an existing specification precedent for URL-pattern-based behavior differentiation within a manifest.
 
 Possible features governed by this layer:
 - **Capture scope**: which in-scope URLs trigger navigation capturing.
@@ -86,9 +86,9 @@ This layer could be expressed as extensions to existing manifest members (e.g., 
 
 ## Design Principles
 
-1. **Backward compatibility.** The existing `scope` member must continue to work unchanged. New capabilities are additive.
-2. **One syntax, three locations.** The `scope_extensions` explainer's [future work section](https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md#future-work-under-consideration) identifies that fine-grained scoping mechanisms "could be reused in 3 different places: in the association file, in `scope_extensions` in the manifest, at the top level in the manifest." Whatever pattern language is adopted should work consistently across all three. Developers should learn one new concept, not three.
-3. **OS-mappable where it counts.** Layer 1 scope definitions must map to OS URL filtering primitives. Overly powerful syntax (full regex, complex URLPattern) at this layer risks poor performance and inconsistent OS support.
+1. **Backward compatibility.** The existing `scope` member must continue to work unchanged. The new members are optional and independently ignored by implementations that do not recognize them.
+2. **One syntax, origin-local configuration.** The primary origin defines `scope`, `scope_inclusions`, and `scope_exclusions` in the Web App Manifest. Each extended origin defines the same members in its own web-app-origin-association entry. The manifest's `scope_extensions` member identifies the origins to validate but does not duplicate their path configuration. Developers learn one refinement algorithm, and every origin retains control over its own scope.
+3. **Works across OS link formats.** Layer 1 rules must be translatable into OS link-handling rules without causing the OS to miss valid app URLs. Overly powerful syntax (full regex, complex URLPattern) risks poor performance and causes more out-of-scope URLs to launch the app before the browser rejects them.
 4. **Progressive enhancement.** Apps that don't need fine-grained control should not need to add any new manifest members. The defaults should match today's behavior.
 
 ---
@@ -97,7 +97,7 @@ This layer could be expressed as extensions to existing manifest members (e.g., 
 
 | # | Problem | Proposed Solution Area |
 |---|---------|----------------------|
-| 1 | Cannot exclude paths from scope | New manifest members for scope include/exclude lists |
+| 1 | Cannot exclude paths from scope | Origin-local `scope_inclusions` and `scope_exclusions` members |
 | 2 | Navigation capture scope ≡ app scope | Separate "capture scope" concept (Layer 2) |
 | 3 | Single launch behavior for all URLs | URL-pattern-keyed launch handlers (Layer 2) |
 | 4 | `scope_extensions` lacks feature annotations | Per-origin opt-in/out in association file |
