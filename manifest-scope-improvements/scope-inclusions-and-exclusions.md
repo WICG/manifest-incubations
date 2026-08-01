@@ -82,14 +82,7 @@ Scope is configured independently for each origin:
 - The manifest's `scope_extensions` member requests additional origins, but it does not configure their paths. The user agent uses an origin's refinements only after validating that origin's WAOA entry through the existing `scope_extensions` handshake.
 - A configuration cannot include or exclude URLs on any other origin.
 
-The same refinement algorithm is therefore reused for the primary origin and every validated extension origin:
-
-```text
-primary scope = refine(manifest scope configuration)
-extension scope N = refine(validated WAOA scope configuration N)
-
-effective app scope = primary scope ∪ extension scope 1 ∪ extension scope 2 ∪ ...
-```
+The same matching algorithm is therefore applied independently to the primary origin and every validated extension origin.
 
 ### Matching Algorithm
 
