@@ -2,6 +2,7 @@
 
 ## Participate
 
+* [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-extensions&title=%5BScope+Extensions%5D&body=Feedback)
 * [Github issues](https://github.com/WICG/manifest-incubations/issues?q=is%3Aissue+is%3Aopen+label%3Ascope-extensions)
 
 ## Introduction
