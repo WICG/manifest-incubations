@@ -6,7 +6,8 @@
 
 ## Participate
 
-- [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-improvements&title=[Scope+Improvements]&body=Feedback) 
+- [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-improvements&title=[Scope+Improvements]&body=Feedback)
+- [Github issues](https://github.com/WICG/manifest-incubations/issues?q=is%3Aissue+is%3Aopen+label%3Ascope-improvements)
 
 ## Introduction
 
