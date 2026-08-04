@@ -6,8 +6,7 @@
 
 ## Participate
 
-- [Issue tracker TBD]
-- [Discussion forum TBD]
+- [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-improvements&title=[Scope+Improvements]&body=Feedback) 
 
 ## Introduction
 
