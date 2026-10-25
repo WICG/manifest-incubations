@@ -1,8 +1,6 @@
 # Web App Manifest: Scope Inclusions and Exclusions
 
-## Authors:
-
-- Lu Huang (Microsoft Edge)
+Author: Lu Huang (Microsoft Edge) (luhua@microsoft.com)
 
 ## Participate
 
