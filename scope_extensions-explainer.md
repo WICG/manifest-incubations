@@ -1,5 +1,7 @@
 # Scope Extensions for Web App Manifest
 
+Author: Lu Huang (luhua@microsoft.com)
+
 ## Participate
 
 * [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-extensions&title=%5BScope+Extensions%5D&body=Feedback)
