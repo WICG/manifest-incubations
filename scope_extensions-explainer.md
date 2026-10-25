@@ -1,5 +1,7 @@
 # Scope Extensions for Web App Manifest
 
+Authors: Lu Huang (luhua@microsoft.com), Alan Cutter (alancutter@google.com)
+
 ## Participate
 
 * [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-extensions&title=%5BScope+Extensions%5D&body=Feedback)
@@ -327,3 +329,9 @@ proposal with the following changes:
 
 * [launch-handler](https://github.com/WICG/sw-launch/blob/main/launch_handler.md)
 * [manifest-identity](https://w3c.github.io/manifest/#dfn-identity)
+
+## Acknowledgements
+
+Many thanks for contributions to this explainer from:
+
+- Diego Gonzalez
