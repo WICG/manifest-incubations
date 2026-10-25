@@ -1,8 +1,11 @@
 # Web App Manifest Scope: Problems and Proposed Improvements
 
-**Author:** Lu Huang (luhua@microsoft.com)
+Author: Lu Huang (luhua@microsoft.com)
 
-[Issues](https://github.com/WICG/manifest-incubations/issues?q=is%3Aissue%20is%3Aopen%20label%3Ascope-improvements)
+## Participate
+
+- [Issue template](https://github.com/WICG/manifest-incubations/issues/new?labels=scope-improvements&title=[Scope+Improvements]&body=Feedback)
+- [Github issues](https://github.com/WICG/manifest-incubations/issues?q=is%3Aissue+is%3Aopen+label%3Ascope-improvements)
 
 ## Introduction
 
