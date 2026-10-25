@@ -1,6 +1,6 @@
 # Scope Extensions for Web App Manifest
 
-Author: Lu Huang (luhua@microsoft.com)
+Authors: Lu Huang (luhua@microsoft.com), Alan Cutter (alancutter@chromium.org)
 
 ## Participate
 
