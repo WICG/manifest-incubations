@@ -329,3 +329,9 @@ proposal with the following changes:
 
 * [launch-handler](https://github.com/WICG/sw-launch/blob/main/launch_handler.md)
 * [manifest-identity](https://w3c.github.io/manifest/#dfn-identity)
+
+## Acknowledgements
+
+Many thanks for contributions to this explainer from:
+
+- Diego Gonzalez
